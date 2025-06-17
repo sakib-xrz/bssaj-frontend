@@ -9,7 +9,7 @@ import Container from "./container";
 
 export default function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-gradient-to-r from-blue-100 to-white">
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <span className="font-bold text-lg text-primary">BSSAJ</span>
