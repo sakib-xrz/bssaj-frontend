@@ -43,7 +43,7 @@ const missionCards: MissionCardProps[] = [
 
 const OurMission: React.FC = () => {
   return (
-    <div className="container mx-auto p-4 flex flex-col items-center md:p-8 mt-10">
+    <div className="container mx-auto p-4 flex flex-col items-center md:p-8 mt-[72px]">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Our Mission

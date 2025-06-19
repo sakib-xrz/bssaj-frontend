@@ -85,7 +85,7 @@ const ArticleList: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex flex-col pl-3 md:pl-4 md:border-l md:border-gray-200">
+            <div className="flex flex-col md:pl-4 md:border-l md:border-gray-200">
               {articlesRight.map((article, index) => (
                 <div key={`right-${index}`} className="py-3 md:py-4">
                   <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1">
@@ -100,7 +100,7 @@ const ArticleList: React.FC = () => {
                   </p>
 
                   {index < articlesRight.length - 1 && (
-                    <hr className="my-3 md:my-4 border-gray-200" />
+                    <hr className="my-2 md:my-4 border-gray-200" />
                   )}
                 </div>
               ))}
