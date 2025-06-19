@@ -3,6 +3,7 @@ import Hero from "@/app/(public)/_components/hero";
 import React from "react";
 import ArticleList from "./_components/articleList";
 import OurMission from "./_components/ourMission";
+import UpcomingEvents from "./_components/upcomingEvents";
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Hero />
       <OurMission />
       <ArticleList />
+      <UpcomingEvents />
     </div>
   );
 }
