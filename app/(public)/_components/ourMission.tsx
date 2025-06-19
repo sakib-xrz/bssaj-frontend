@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Card,
   CardContent,
@@ -44,7 +43,7 @@ const missionCards: MissionCardProps[] = [
 
 const OurMission: React.FC = () => {
   return (
-    <div className="container mx-auto p-4 flex flex-col items-center md:p-8">
+    <div className="container mx-auto p-4 flex flex-col items-center md:p-8 mt-10">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Our Mission
@@ -62,17 +61,18 @@ const OurMission: React.FC = () => {
         {missionCards.map((card, index) => (
           <Card
             key={index}
-            className="flex flex-col items-center justify-center p-6 text-center rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1"
+            className="flex flex-col items-center text-center rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1"
           >
-            <CardHeader className="p-0 pb-4">
-              <card.icon className="h-12 w-12 text-blue-600 mb-2" />{" "}
-              {/* Render icon */}
+            <CardHeader className="flex flex-col items-center justify-center gap-2 pt-6">
+              <div className="bg-primary/10 rounded-full p-3">
+                <card.icon className="h-10 w-10 text-primary" />
+              </div>
               <CardTitle className="text-xl font-semibold text-gray-900">
                 {card.title}
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
-              <CardDescription className="text-sm text-gray-600 leading-relaxed">
+            <CardContent className="pb-6 px-6">
+              <CardDescription className="text-sm text-gray-600 leading-relaxed text-muted-foreground">
                 {card.description}
               </CardDescription>
             </CardContent>
