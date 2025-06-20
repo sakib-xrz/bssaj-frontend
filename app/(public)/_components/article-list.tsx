@@ -1,3 +1,4 @@
+import Container from "@/components/shared/container";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDaysIcon } from "lucide-react";
 
@@ -51,7 +52,7 @@ const ArticleList: React.FC = () => {
   const articlesRight = articles.slice(articles.length / 2);
 
   return (
-    <div className="container mx-auto p-4 md:p-8 flex flex-col justify-center items-center min-h-screen">
+    <Container className="flex flex-col justify-center items-center">
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Latest News
@@ -60,7 +61,7 @@ const ArticleList: React.FC = () => {
           Stay updated with the latest news, articles, and resources.
         </p>
       </div>
-      <Card className="w-full md:max-w-3xl lg:max-w-5xl rounded-xl shadow-lg">
+      <Card className="w-full rounded-xl shadow-lg">
         <CardContent className="p-4 md:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 md:gap-x-8 gap-y-0">
             <div className="flex flex-col pr-3 md:pr-4">
@@ -108,7 +109,7 @@ const ArticleList: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </Container>
   );
 };
 

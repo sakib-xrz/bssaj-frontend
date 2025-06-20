@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { CalendarDaysIcon, MapPinIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Container from "@/components/shared/container";
 
 interface EventCardProps {
   title: string;
@@ -34,7 +35,7 @@ const eventCards: EventCardProps[] = [
 
 const UpcomingEvents: React.FC = () => {
   return (
-    <div className="container mx-auto p-4 md:p-8 flex flex-col items-center mb-10">
+    <Container className="flex flex-col items-center mb-10">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Our Upcoming Events
@@ -45,7 +46,7 @@ const UpcomingEvents: React.FC = () => {
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
         {eventCards.map((event, index) => (
           <Card
             key={index}
@@ -67,14 +68,12 @@ const UpcomingEvents: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0 mt-auto">
-              <Button className="w-full bg-primary hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
-                Learn more
-              </Button>
+              <Button className="w-full">Learn more</Button>
             </CardContent>
           </Card>
         ))}
       </div>
-    </div>
+    </Container>
   );
 };
 

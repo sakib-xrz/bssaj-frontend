@@ -1,3 +1,4 @@
+import Container from "@/components/shared/container";
 import {
   Card,
   CardContent,
@@ -43,7 +44,7 @@ const missionCards: MissionCardProps[] = [
 
 const OurMission: React.FC = () => {
   return (
-    <div className="container mx-auto p-4 flex flex-col items-center md:p-8 mt-[72px]">
+    <Container className="flex flex-col items-center">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Our Mission
@@ -57,7 +58,7 @@ const OurMission: React.FC = () => {
       </div>
 
       {/* Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
         {missionCards.map((card, index) => (
           <Card
             key={index}
@@ -79,7 +80,7 @@ const OurMission: React.FC = () => {
           </Card>
         ))}
       </div>
-    </div>
+    </Container>
   );
 };
 
