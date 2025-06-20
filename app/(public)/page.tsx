@@ -5,6 +5,7 @@ import ArticleList from "./_components/articleList";
 import OurMission from "./_components/ourMission";
 import UpcomingEvents from "./_components/upcomingEvents";
 import OurMembers from "./_components/ourMembers";
+import SupportMission from "./_components/supportMission";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
       <ArticleList />
       <UpcomingEvents />
       <OurMembers />
+      <SupportMission />
     </div>
   );
 }
