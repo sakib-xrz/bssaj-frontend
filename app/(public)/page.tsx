@@ -1,10 +1,10 @@
 import Hero from "@/app/(public)/_components/hero";
 
 import React from "react";
-import ArticleList from "./_components/articleList";
-import OurMission from "./_components/ourMission";
-import UpcomingEvents from "./_components/upcomingEvents";
-import OurMembers from "./_components/ourMembers";
+import ArticleList from "./_components/article-list";
+import OurMission from "./_components/our-mission";
+import UpcomingEvents from "./_components/upcoming-events";
+import OurMembers from "./_components/our-members";
 import SupportMission from "./_components/supportMission";
 
 export default function Home() {

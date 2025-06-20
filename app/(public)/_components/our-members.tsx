@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import Container from "@/components/shared/container";
 
 interface MemberCardProps {
   name: string;
@@ -74,7 +75,7 @@ const OurMembers: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 md:p-8 flex flex-col items-center">
+    <Container className="flex flex-col items-center">
       {/* Top Section: Heading and Paragraph */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
@@ -87,7 +88,7 @@ const OurMembers: React.FC = () => {
       </div>
 
       {/* Members Carousel Section */}
-      <div className="relative w-full max-w-6xl px-8">
+      <div className="relative w-full">
         {" "}
         {/* Added px-8 */}
         {/* Scroll Buttons */}
@@ -141,7 +142,7 @@ const OurMembers: React.FC = () => {
           ))}
         </div>
       </div>
-    </div>
+    </Container>
   );
 };
 
