@@ -5,10 +5,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import mission1 from "@/public/images/mission-01.png";
 import mission2 from "@/public/images/mission-02.png";
 import mission3 from "@/public/images/mission-03.png";
+import Container from "@/components/shared/container";
 
-const SupportMission = () => {
+const SupportMission: React.FC = () => {
   return (
-    <section className="container mx-auto px-4 md:px-8 py-12">
+    <Container>
       <div className="flex flex-col lg:flex-row">
         {/* Left: Images */}
         <div className="flex w-full lg:w-1/2 gap-4">
@@ -39,8 +40,8 @@ const SupportMission = () => {
           </div>
         </div>
         <div className="w-full lg:w-1/2 flex items-stretch">
-          <Card className="w-full bg-gray-100 shadow-sm flex items-center">
-            <CardContent className="p-8 w-full flex flex-col justify-center">
+          <Card className="w-full bg-gray-100 shadow-sm flex items-center rounded-none">
+            <CardContent className="p-16 w-full flex flex-col justify-center">
               <h2 className="text-3xl font-bold text-[#1e3a8a] mb-4 text-center lg:text-left">
                 Support Our Mission
               </h2>
@@ -63,7 +64,7 @@ const SupportMission = () => {
           </Card>
         </div>
       </div>
-    </section>
+    </Container>
   );
 };
 

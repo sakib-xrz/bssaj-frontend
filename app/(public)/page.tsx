@@ -5,7 +5,7 @@ import ArticleList from "./_components/article-list";
 import OurMission from "./_components/our-mission";
 import UpcomingEvents from "./_components/upcoming-events";
 import OurMembers from "./_components/our-members";
-import SupportMission from "./_components/supportMission";
+import SupportMission from "./_components/support-mission";
 
 export default function Home() {
   return (

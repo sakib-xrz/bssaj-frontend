@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import Image from "next/image";
 import {
   Card,
@@ -9,18 +9,15 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import Container from "@/components/shared/container";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
-interface MemberCardProps {
-  name: string;
-  role: string;
-  imageUrl: string;
-}
-
-// Dummy data for member cards
-const memberCards: MemberCardProps[] = [
+const memberCards = [
   {
     name: "Ahmed Bhuiyan Nobab",
     role: "Founder",
@@ -54,29 +51,9 @@ const memberCards: MemberCardProps[] = [
 ];
 
 const OurMembers: React.FC = () => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: -320,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({
-        left: 320,
-        behavior: "smooth",
-      });
-    }
-  };
-
   return (
-    <Container className="flex flex-col items-center">
-      {/* Top Section: Heading and Paragraph */}
+    <div className="flex flex-col items-center w-full max-w-6xl mx-auto px-4">
+      {/* Heading */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Our Members
@@ -87,62 +64,59 @@ const OurMembers: React.FC = () => {
         </p>
       </div>
 
-      {/* Members Carousel Section */}
-      <div className="relative w-full">
-        {" "}
-        {/* Added px-8 */}
-        {/* Scroll Buttons */}
-        <Button
-          onClick={scrollLeft}
-          className="absolute -left-6 top-1/2 -translate-y-1/2 bg-[#F0F0F0] text-gray-800 rounded-full shadow-md z-20 p-2 hidden md:flex items-center justify-center"
-          aria-label="Scroll left"
-        >
-          <ChevronLeftIcon className="h-6 w-6" />
-        </Button>
-        <Button
-          onClick={scrollRight}
-          className="absolute -right-6 top-1/2 -translate-y-1/2 bg-[#F0F0F0] text-gray-800 rounded-full shadow-md z-20 p-2 hidden md:flex items-center justify-center"
-          aria-label="Scroll right"
-        >
-          <ChevronRightIcon className="h-6 w-6" />
-        </Button>
-        {/* Members Cards Container */}
-        <div
-          ref={scrollContainerRef}
-          className="flex overflow-x-auto no-scrollbar py-4 space-x-6 scroll-smooth"
-        >
+      {/* Carousel */}
+      <Carousel
+        opts={{
+          align: "start",
+          loop: true,
+          // Add other options if needed
+        }}
+        className="w-full"
+      >
+        <CarouselContent className="gap-6">
           {memberCards.map((member, index) => (
-            <Card
+            <CarouselItem
               key={index}
-              className="flex-none w-72 h-80 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer"
+              className="md:basis-1/2 lg:basis-1/3 flex-none"
             >
-              <CardContent className="flex flex-col items-center p-0 h-full">
-                <div className="w-full flex-grow flex items-center justify-center overflow-hidden rounded-t-xl bg-gray-100">
-                  <Image
-                    src={member.imageUrl}
-                    alt={member.name}
-                    width={300}
-                    height={200}
-                    className="w-full h-full object-cover rounded-t-xl"
-                    onError={(e) => {
-                      console.error("Image failed to load:", e);
-                    }}
-                  />
-                </div>
-                <CardHeader className="text-center p-4">
-                  <CardTitle className="text-xl font-semibold text-gray-900">
-                    {member.name}
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    {member.role}
-                  </CardDescription>
-                </CardHeader>
-              </CardContent>
-            </Card>
+              <Card className="h-80 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
+                <CardContent className="flex flex-col items-center p-0 h-full">
+                  <div className="w-full flex-grow flex items-center justify-center overflow-hidden rounded-t-xl bg-gray-100">
+                    <Image
+                      src={member.imageUrl}
+                      alt={member.name}
+                      width={300}
+                      height={200}
+                      className="w-full h-full object-cover rounded-t-xl"
+                      onError={(e) => {
+                        console.error("Image failed to load:", e);
+                      }}
+                    />
+                  </div>
+                  <CardHeader className="text-center p-4">
+                    <CardTitle className="text-xl font-semibold text-gray-900">
+                      {member.name}
+                    </CardTitle>
+                    <CardDescription className="text-sm text-gray-600">
+                      {member.role}
+                    </CardDescription>
+                  </CardHeader>
+                </CardContent>
+              </Card>
+            </CarouselItem>
           ))}
-        </div>
-      </div>
-    </Container>
+        </CarouselContent>
+
+        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition">
+          {/* You can put an icon here, e.g., left arrow */}
+          &#8592;
+        </CarouselPrevious>
+        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition">
+          {/* You can put an icon here, e.g., right arrow */}
+          &#8594;
+        </CarouselNext>
+      </Carousel>
+    </div>
   );
 };
 
