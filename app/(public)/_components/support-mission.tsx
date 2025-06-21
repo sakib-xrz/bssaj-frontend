@@ -41,7 +41,7 @@ const SupportMission: React.FC = () => {
         </div>
         <div className="w-full lg:w-1/2 flex items-stretch">
           <Card className="w-full bg-gray-100 shadow-sm flex items-center rounded-none">
-            <CardContent className="p-16 w-full flex flex-col justify-center">
+            <CardContent className="lg:p-28 p-8 w-full flex flex-col justify-center">
               <h2 className="text-3xl font-bold text-primary mb-4 text-center lg:text-left">
                 Support Our Mission
               </h2>
