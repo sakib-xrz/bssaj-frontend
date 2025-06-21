@@ -63,14 +63,14 @@ const ArticleList: React.FC = () => {
       </div>
       <Card className="w-full rounded-xl shadow-lg">
         <CardContent className="p-4 md:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 md:gap-x-8 gap-y-0">
-            <div className="flex flex-col pr-3 md:pr-4">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr] gap-y-0">
+            {/* Left Column */}
+            <div className="flex flex-col pr-3 md:pr-6">
               {articlesLeft.map((article, index) => (
-                <div key={`left-${index}`} className="py-3 md:py-4">
+                <div key={`left-${index}`}>
                   <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1">
                     {article.title}
                   </h3>
-
                   <p className="flex items-center text-xs md:text-sm text-gray-500 mb-2">
                     <CalendarDaysIcon className="mr-2 h-3 w-3 md:h-4 md:w-4" />
                     {article.date}
@@ -78,7 +78,6 @@ const ArticleList: React.FC = () => {
                   <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                     {article.description}
                   </p>
-
                   {index < articlesLeft.length - 1 && (
                     <hr className="my-2 md:my-4 border-gray-200" />
                   )}
@@ -86,9 +85,15 @@ const ArticleList: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex flex-col md:pl-4 md:border-l md:border-gray-200">
+            {/* Vertical Divider */}
+            <div className="hidden md:flex justify-center">
+              <div className="w-px bg-gray-200 h-full" />
+            </div>
+
+            {/* Right Column */}
+            <div className="flex flex-col pl-3 md:pl-6">
               {articlesRight.map((article, index) => (
-                <div key={`right-${index}`} className="py-3 md:py-4">
+                <div key={`right-${index}`}>
                   <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1">
                     {article.title}
                   </h3>
@@ -99,7 +104,6 @@ const ArticleList: React.FC = () => {
                   <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
                     {article.description}
                   </p>
-
                   {index < articlesRight.length - 1 && (
                     <hr className="my-2 md:my-4 border-gray-200" />
                   )}

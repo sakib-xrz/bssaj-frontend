@@ -16,6 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Container from "@/components/shared/container";
 
 const memberCards = [
   {
@@ -52,7 +53,7 @@ const memberCards = [
 
 const OurMembers: React.FC = () => {
   return (
-    <div className="flex flex-col items-center w-full max-w-6xl mx-auto px-4">
+    <Container className="flex flex-col items-center w-full mx-auto px-4">
       {/* Heading */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
@@ -63,13 +64,10 @@ const OurMembers: React.FC = () => {
           in Japan.
         </p>
       </div>
-
-      {/* Carousel */}
       <Carousel
         opts={{
           align: "start",
           loop: true,
-          // Add other options if needed
         }}
         className="w-full"
       >
@@ -79,7 +77,7 @@ const OurMembers: React.FC = () => {
               key={index}
               className="md:basis-1/2 lg:basis-1/3 flex-none"
             >
-              <Card className="h-80 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
+              <Card className="rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
                 <CardContent className="flex flex-col items-center p-0 h-full">
                   <div className="w-full flex-grow flex items-center justify-center overflow-hidden rounded-t-xl bg-gray-100">
                     <Image
@@ -107,16 +105,10 @@ const OurMembers: React.FC = () => {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition">
-          {/* You can put an icon here, e.g., left arrow */}
-          &#8592;
-        </CarouselPrevious>
-        <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition">
-          {/* You can put an icon here, e.g., right arrow */}
-          &#8594;
-        </CarouselNext>
+        <CarouselPrevious className="absolute lg:-left-10 left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition"></CarouselPrevious>
+        <CarouselNext className="absolute lg:-right-10 right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition"></CarouselNext>
       </Carousel>
-    </div>
+    </Container>
   );
 };
 

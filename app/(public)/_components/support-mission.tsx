@@ -10,7 +10,7 @@ import Container from "@/components/shared/container";
 const SupportMission: React.FC = () => {
   return (
     <Container>
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-0">
         {/* Left: Images */}
         <div className="flex w-full lg:w-1/2 gap-4">
           {/* Big Image (2/3) */}
@@ -42,7 +42,7 @@ const SupportMission: React.FC = () => {
         <div className="w-full lg:w-1/2 flex items-stretch">
           <Card className="w-full bg-gray-100 shadow-sm flex items-center rounded-none">
             <CardContent className="p-16 w-full flex flex-col justify-center">
-              <h2 className="text-3xl font-bold text-[#1e3a8a] mb-4 text-center lg:text-left">
+              <h2 className="text-3xl font-bold text-primary mb-4 text-center lg:text-left">
                 Support Our Mission
               </h2>
               <p className="text-gray-700 text-base md:text-lg mb-6 leading-relaxed text-center lg:text-left">
@@ -50,12 +50,12 @@ const SupportMission: React.FC = () => {
                 scholarships, and resources for Bangladeshi students in Japan.
               </p>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start">
-                <Button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-md">
+                <Button className="bg-primary text-white px-6 py-3 rounded-md">
                   Donate Now
                 </Button>
                 <Button
                   variant="outline"
-                  className="border border-[#1e3a8a] text-[#1e3a8a] px-6 py-3 rounded-md"
+                  className="bg-primary border border-primary text-white px-6 py-3 rounded-md"
                 >
                   Become a Sponsor
                 </Button>
