@@ -1,11 +1,10 @@
-import Link from "next/link"; // For navigation links
-import { FacebookIcon, TwitterIcon, InstagramIcon } from "lucide-react"; // Social media icons
+import Link from "next/link";
+import { FacebookIcon, TwitterIcon, InstagramIcon } from "lucide-react";
 
 const Footer: React.FC = () => {
   return (
     <footer className="bg-primary text-gray-200 py-12 px-4 md:px-8">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-blue-700">
-        {/* Column 1: BSSAJ Description */}
         <div className="col-span-1">
           <h3 className="text-2xl font-bold text-white mb-4">BSSAJ</h3>
           <p className="text-sm leading-relaxed">
@@ -61,8 +60,6 @@ const Footer: React.FC = () => {
             </li>
           </ul>
         </div>
-
-        {/* Column 3: Support */}
         <div className="col-span-1">
           <h3 className="text-xl font-semibold text-white mb-4">Support</h3>
           <ul className="space-y-2 text-sm">
@@ -108,8 +105,6 @@ const Footer: React.FC = () => {
             </li>
           </ul>
         </div>
-
-        {/* Column 4: Contact */}
         <div className="col-span-1">
           <h3 className="text-xl font-semibold text-white mb-4">Contact</h3>
           <ul className="space-y-2 text-sm mb-4">
@@ -154,7 +149,6 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      {/* Copyright Section */}
       <div className="container mx-auto text-center pt-8 text-sm text-gray-400">
         &copy; {new Date().getFullYear()} Bangladesh Student Support Association
         Japan, All rights reserved
