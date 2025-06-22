@@ -6,6 +6,7 @@ import OurMission from "./_components/our-mission";
 import UpcomingEvents from "./_components/upcoming-events";
 import OurMembers from "./_components/our-members";
 import SupportMission from "./_components/support-mission";
+import ReadOurBlog from "./_components/read-our-blog";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <UpcomingEvents />
       <OurMembers />
       <SupportMission />
+      <ReadOurBlog />
     </div>
   );
 }

@@ -105,8 +105,8 @@ const OurMembers: React.FC = () => {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute lg:-left-10 left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition"></CarouselPrevious>
-        <CarouselNext className="absolute lg:-right-10 right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-100 shadow-md text-gray-800 hover:bg-gray-200 transition"></CarouselNext>
+        <CarouselPrevious className="absolute lg:-left-8 left-0 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 -translate-x-1/2 md:flex items-center justify-center" />
+        <CarouselNext className="absolute lg:-right-8 right-0 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 translate-x-1/2  md:flex items-center justify-center" />
       </Carousel>
     </Container>
   );
