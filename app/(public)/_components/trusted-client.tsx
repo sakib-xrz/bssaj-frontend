@@ -44,7 +44,7 @@ const testimonials: TestimonialCardProps[] = [
 
 const OurTrustedClients: React.FC = () => {
   return (
-    <Container className="py-12 flex flex-col items-center">
+    <Container className="flex flex-col items-center">
       {/* Top Section: Heading and Paragraph */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">

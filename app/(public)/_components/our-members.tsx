@@ -83,9 +83,6 @@ const OurMembers: React.FC = () => {
                       width={300}
                       height={200}
                       className="w-full h-full object-cover rounded-t-xl"
-                      onError={(e) => {
-                        console.error("Image failed to load:", e);
-                      }}
                     />
                   </div>
                   <CardHeader className="text-center p-4">

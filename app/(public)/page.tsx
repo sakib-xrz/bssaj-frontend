@@ -9,6 +9,7 @@ import SupportMission from "./_components/support-mission";
 import ReadOurBlog from "./_components/read-our-blog";
 import OurTrustedClients from "./_components/trusted-client";
 import OurBigMoments from "./_components/big-moments";
+import CertificateCheck from "./_components/certificate-check";
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       <ReadOurBlog />
       <OurTrustedClients />
       <OurBigMoments />
+      <CertificateCheck />
     </div>
   );
 }
