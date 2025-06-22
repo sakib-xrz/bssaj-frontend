@@ -61,7 +61,7 @@ const CertificateCheck: React.FC = () => {
         )}
 
         {certificateDetails && (
-          <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md mb-4 shadow-sm">
+          <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md shadow-sm">
             <p className="font-semibold">Certificate Found!</p>
             <p>{certificateDetails}</p>
           </div>
@@ -71,7 +71,7 @@ const CertificateCheck: React.FC = () => {
           onClick={handleCertificateCheck}
           className="w-full  bg-primary text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg shadow-md"
         >
-          View Certificate
+          Verify Certificate
         </Button>
       </div>
 

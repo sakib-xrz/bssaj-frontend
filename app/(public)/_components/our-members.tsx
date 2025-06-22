@@ -66,7 +66,6 @@ const OurMembers: React.FC = () => {
           align: "start",
           loop: true,
         }}
-        className="w-full"
       >
         <CarouselContent className="gap-6">
           {memberCards.map((member, index) => (
@@ -74,7 +73,7 @@ const OurMembers: React.FC = () => {
               key={index}
               className="md:basis-1/2 lg:basis-1/3 flex-none"
             >
-              <Card className="rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
+              <Card className="rounded-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
                 <CardContent className="flex flex-col items-center p-0 h-full">
                   <div className="w-full flex-grow flex items-center justify-center overflow-hidden rounded-t-xl bg-gray-100">
                     <Image

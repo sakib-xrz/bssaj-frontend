@@ -56,7 +56,7 @@ const OurBigMoments: React.FC = () => {
       </div>
 
       {/* Moment Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full  mb-12">
         {momentCards.map((moment) => (
           <Card
             key={moment.id}

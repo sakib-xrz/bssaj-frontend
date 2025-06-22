@@ -10,6 +10,7 @@ import ReadOurBlog from "./_components/read-our-blog";
 import OurTrustedClients from "./_components/trusted-client";
 import OurBigMoments from "./_components/big-moments";
 import CertificateCheck from "./_components/certificate-check";
+import Footer from "./_components/footer";
 
 export default function Home() {
   return (
@@ -24,6 +25,7 @@ export default function Home() {
       <OurTrustedClients />
       <OurBigMoments />
       <CertificateCheck />
+      <Footer />
     </div>
   );
 }

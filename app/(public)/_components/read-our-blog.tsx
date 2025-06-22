@@ -15,11 +15,10 @@ interface BlogCardProps {
   title: string;
   description: string;
   authorName: string;
-  authorImage: string; // Placeholder for author's image
+  authorImage: string;
   timeAgo: string;
 }
 
-// Dummy data for blog cards (using your provided image paths)
 const blogPosts: BlogCardProps[] = [
   {
     id: "1",
@@ -78,10 +77,7 @@ const ReadOurBlog: React.FC = () => {
       </div>
 
       {/* Blog Carousel */}
-      <Carousel
-        opts={{ align: "start", loop: true }}
-        className="w-full max-w-6xl"
-      >
+      <Carousel opts={{ align: "start", loop: true }} className="w-full">
         <CarouselContent className="-ml-4">
           {blogPosts.map((post) => (
             <CarouselItem
@@ -89,7 +85,7 @@ const ReadOurBlog: React.FC = () => {
               className="pl-4 md:basis-1/2 lg:basis-1/3"
             >
               <div className="p-4">
-                <Card className="h-full flex flex-col rounded-xl shadow-xl hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
+                <Card className="h-full flex flex-col rounded-xl transition duration-300 transform hover:-translate-y-1">
                   <div className="relative w-full aspect-[16/10]">
                     <Image
                       src={post.imageSrc}
@@ -100,10 +96,10 @@ const ReadOurBlog: React.FC = () => {
                     />
                   </div>
                   <CardContent className="flex flex-col flex-grow p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight line-clamp-2">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-gray-700 mb-4 flex-grow">
+                    <p className="text-sm text-gray-700 mb-4 flex-grow line-clamp-3">
                       {post.description}
                     </p>
                     <div className="flex items-center mt-auto">
