@@ -26,7 +26,7 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          <Button className="">
+          <Button className="text-muted bg-[#00AEEF]">
             En <ChevronDown />
           </Button>
           <Button>Sign in</Button>
