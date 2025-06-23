@@ -124,8 +124,8 @@ const ReadOurBlog: React.FC = () => {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute lg:-left-8 left-0 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 -translate-x-1/2 md:flex items-center justify-center" />
-        <CarouselNext className="absolute lg:-right-8 right-0 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 translate-x-1/2  md:flex items-center justify-center" />
+        <CarouselPrevious className="absolute lg:-left-2 md:left-1 left-2 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 -translate-x-1/2 md:flex items-center justify-center" />
+        <CarouselNext className="absolute lg:-right-2 md:right-1 right-2 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 translate-x-1/2  md:flex items-center justify-center" />
       </Carousel>
     </Container>
   );
