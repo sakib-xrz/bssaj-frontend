@@ -72,7 +72,7 @@ const OurMembers: React.FC = () => {
           {memberCards.map((member, index) => (
             <CarouselItem
               key={index}
-              className="md:basis-1/2 lg:basis-1/3 flex-none"
+              className="md:basis-1/2 lg:basis-1/3 pl-4"
             >
               <Card className="rounded-xl transition-shadow duration-300 transform hover:-translate-y-1 cursor-pointer">
                 <CardContent className="flex flex-col items-center p-0 h-full">
@@ -99,8 +99,8 @@ const OurMembers: React.FC = () => {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute lg:-left-8 left-0 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 -translate-x-1/2 md:flex items-center justify-center" />
-        <CarouselNext className="absolute lg:-right-8 right-0 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 translate-x-1/2  md:flex items-center justify-center" />
+        <CarouselPrevious className="absolute lg:-left-8 left-4 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 -translate-x-1/2 md:flex items-center justify-center" />
+        <CarouselNext className="absolute lg:-right-8 right-4 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 translate-x-1/2  md:flex items-center justify-center" />
       </Carousel>
     </Container>
   );
