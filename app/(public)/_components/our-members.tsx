@@ -99,8 +99,9 @@ const OurMembers: React.FC = () => {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute lg:-left-6 left-4 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 -translate-x-1/2 md:flex items-center justify-center" />
-        <CarouselNext className="absolute lg:-right-6 right-4 top-1/2 -translate-y-1/2 bg-white text-gray-800 rounded-full shadow-md z-10 p-2 translate-x-1/2  md:flex items-center justify-center" />
+        <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+
+        <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
       </Carousel>
     </Container>
   );
