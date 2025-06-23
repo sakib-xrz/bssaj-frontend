@@ -66,8 +66,9 @@ const OurMembers: React.FC = () => {
           align: "start",
           loop: true,
         }}
+        className="w-full"
       >
-        <CarouselContent className="gap-6">
+        <CarouselContent className="-ml-4">
           {memberCards.map((member, index) => (
             <CarouselItem
               key={index}
