@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, ChevronDown } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import Container from "./container";
 
@@ -26,6 +26,9 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+          <Button className="">
+            En <ChevronDown />
+          </Button>
           <Button>Sign in</Button>
         </nav>
 
