@@ -1,6 +1,5 @@
 import Hero from "@/app/(public)/_components/hero";
 
-import React from "react";
 import OurMission from "./_components/our-mission";
 import UpcomingEvents from "./_components/upcoming-events";
 import OurMembers from "./_components/our-members";
@@ -12,10 +11,12 @@ import CertificateCheck from "./_components/certificate-check";
 import Footer from "./_components/footer";
 import LatestNews from "./_components/latest-news";
 import StudentBorders from "./_components/student-borders";
+import ScrollingTextMarquee from "./_components/text-marque";
 
 export default function Home() {
   return (
     <div>
+      <ScrollingTextMarquee />
       <Hero />
       <OurMission />
       <LatestNews />
