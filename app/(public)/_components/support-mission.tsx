@@ -49,13 +49,10 @@ const SupportMission: React.FC = () => {
                 scholarships, and resources for Bangladeshi students in Japan.
               </p>
               <div className="flex flex-wrap gap-4 justify-center lg:justify-start lg:pl-20">
-                <Button className="bg-primary text-white px-6 py-3 rounded-md">
+                <Button className="bg-[#00AEEF] text-white px-6 py-3 rounded-md">
                   Donate Now
                 </Button>
-                <Button
-                  variant="outline"
-                  className="bg-primary border border-primary text-white px-6 py-3 rounded-md"
-                >
+                <Button className="bg-primary border border-primary text-white px-6 py-3 rounded-md">
                   Become a Sponsor
                 </Button>
               </div>
