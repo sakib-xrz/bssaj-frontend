@@ -61,7 +61,7 @@ export default function HeroCarousel() {
   return (
     <section className="relative w-full py-16 md:py-24 bg-gradient-to-r from-white to-blue-100 overflow-hidden">
       <Container>
-        <Carousel opts={{ loop: true }} className="w-full">
+        <Carousel opts={{ align: "start", loop: true }} className="w-full">
           <CarouselContent>
             {slides.map((slide) => (
               <CarouselItem key={slide.id}>

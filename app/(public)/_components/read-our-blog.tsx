@@ -65,7 +65,6 @@ const blogPosts: BlogCardProps[] = [
 const ReadOurBlog: React.FC = () => {
   return (
     <Container className="py-12 flex flex-col items-center">
-      {/* Heading */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Read Our Blog
@@ -75,8 +74,6 @@ const ReadOurBlog: React.FC = () => {
           - curated to inspire and inform.
         </p>
       </div>
-
-      {/* Blog Carousel */}
       <Carousel opts={{ align: "start", loop: true }} className="w-full">
         <CarouselContent className="-ml-4">
           {blogPosts.map((post) => (
