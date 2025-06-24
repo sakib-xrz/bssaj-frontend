@@ -42,7 +42,7 @@ const blogPosts: BlogCardProps[] = [
   },
   {
     id: "3",
-    imageSrc: "/images/blog-2.png",
+    imageSrc: "/images/blog-3.png",
     title: "Visa Renewal & Part-Time Work Rules Every Student Should Know",
     description:
       "Key insights into Japanese workplace norms and expectations. Key insights into Japanese workplace...",
@@ -82,7 +82,7 @@ const ReadOurBlog: React.FC = () => {
               className="pl-4 md:basis-1/2 lg:basis-1/3"
             >
               <div className="p-4">
-                <Card className="h-full flex flex-col rounded-xl transition duration-300 transform hover:-translate-y-1">
+                <Card className="group h-full flex flex-col rounded-2xl bg-white shadow-md transition duration-300 transform hover:-translate-y-1">
                   <div className="relative w-full aspect-[16/10]">
                     <Image
                       src={post.imageSrc}
@@ -92,11 +92,11 @@ const ReadOurBlog: React.FC = () => {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
-                  <CardContent className="flex flex-col flex-grow p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight line-clamp-2">
+                  <CardContent className="flex flex-col flex-grow p-5">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1 leading-snug line-clamp-2 group-hover:text-primary">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-gray-700 mb-4 flex-grow line-clamp-3">
+                    <p className="text-sm text-gray-700 mb-4 line-clamp-3">
                       {post.description}
                     </p>
                     <div className="flex items-center mt-auto">
@@ -108,7 +108,7 @@ const ReadOurBlog: React.FC = () => {
                         className="rounded-full mr-3 object-cover"
                       />
                       <div>
-                        <p className="text-sm font-semibold text-gray-800">
+                        <p className="text-sm font-semibold text-gray-900">
                           {post.authorName}
                         </p>
                         <p className="text-xs text-gray-500">{post.timeAgo}</p>

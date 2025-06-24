@@ -11,6 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { ChevronRight, ChevronLeft } from "lucide-react";
 
 export default function HeroCarousel() {
   const slides = [
@@ -93,9 +94,13 @@ export default function HeroCarousel() {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-200 transition z-20 flex items-center justify-center" />
+          <CarouselPrevious className="hidden sm:flex absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center">
+            <ChevronLeft className="w-5 h-5" />
+          </CarouselPrevious>
 
-          <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+          <CarouselNext className="hidden sm:flex absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center">
+            <ChevronRight className="w-5 h-5" />
+          </CarouselNext>
         </Carousel>
       </Container>
     </section>
