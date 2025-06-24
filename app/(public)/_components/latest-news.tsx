@@ -1,4 +1,5 @@
 import Container from "@/components/shared/container";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDaysIcon } from "lucide-react";
 
@@ -47,7 +48,7 @@ const articles: Article[] = [
   },
 ];
 
-const ArticleList: React.FC = () => {
+const LatestNews: React.FC = () => {
   const articlesLeft = articles.slice(0, articles.length / 2);
   const articlesRight = articles.slice(articles.length / 2);
 
@@ -113,8 +114,11 @@ const ArticleList: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      <Button className="bg-primary mt-10  text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg">
+        View All
+      </Button>
     </Container>
   );
 };
 
-export default ArticleList;
+export default LatestNews;
