@@ -8,7 +8,6 @@ import ReadOurBlog from "./_components/read-our-blog";
 import OurTrustedClients from "./_components/trusted-client";
 import OurBigMoments from "./_components/big-moments";
 import CertificateCheck from "./_components/certificate-check";
-import Footer from "./_components/footer";
 import LatestNews from "./_components/latest-news";
 import StudentBorders from "./_components/student-borders";
 import ScrollingTextMarquee from "./_components/text-marque";
@@ -28,7 +27,6 @@ export default function Home() {
       <OurTrustedClients />
       <OurBigMoments />
       <CertificateCheck />
-      <Footer />
     </div>
   );
 }

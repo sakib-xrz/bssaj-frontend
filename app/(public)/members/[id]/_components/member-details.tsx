@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -17,6 +16,7 @@ import {
   User,
 } from "lucide-react";
 import { Member } from "../../_components/member-card";
+import QRCode from "qrcode";
 
 const memberKindLabels = {
   ADVISER: "Adviser",
@@ -35,7 +35,6 @@ const memberKindColors = {
 };
 
 export default function MemberDetails({ member }: { member: Member }) {
-  const [showQR, setShowQR] = useState(false);
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const handleShare = async () => {
@@ -74,8 +73,33 @@ export default function MemberDetails({ member }: { member: Member }) {
     window.URL.revokeObjectURL(url);
   };
 
+  const handleQRCodeDownload = async () => {
+    try {
+      // Generate QR code as data URL
+      const qrCodeDataUrl = await QRCode.toDataURL(currentUrl, {
+        width: 512,
+        margin: 2,
+        color: {
+          dark: "#003366", // QR code color
+          light: "#FFFFFF", // Background color
+        },
+      });
+
+      // Create download link
+      const link = document.createElement("a");
+      link.href = qrCodeDataUrl;
+      link.download = `${member.name.replace(/\s+/g, "_")}_profile_qr.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      alert("Failed to generate QR code");
+    }
+  };
+
   return (
-    <div className="min-h-screen p-4">
+    <div className="p-4">
       <div className="max-w-md mx-auto">
         {/* Main Profile Card */}
         <Card className="overflow-hidden shadow-2xl border-0">
@@ -86,8 +110,8 @@ export default function MemberDetails({ member }: { member: Member }) {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => setShowQR(!showQR)}
                 className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
+                onClick={handleQRCodeDownload}
               >
                 <QrCode className="h-4 w-4" />
               </Button>
@@ -222,18 +246,6 @@ export default function MemberDetails({ member }: { member: Member }) {
                 Save Contact
               </Button>
             </div>
-
-            {/* QR Code Section */}
-            {showQR && (
-              <div className="mt-6 p-4 bg-white border-2 border-dashed border-[#00AEEF] rounded-lg text-center">
-                <div className="w-32 h-32 mx-auto mb-3 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <QrCode className="h-16 w-16 text-gray-400" />
-                </div>
-                <p className="text-sm text-gray-600">
-                  Scan to share this profile
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
       </div>
