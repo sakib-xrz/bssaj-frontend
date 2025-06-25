@@ -56,15 +56,26 @@ export default function MemberDetails({ member }: { member: Member }) {
   };
 
   const generateVCard = () => {
-    const vcard = `BEGIN:VCARD
-    VERSION:3.0
-    FN:${member.name}
-    EMAIL:${member.email}
-    TEL:${member.phone}
-    TITLE:${memberKindLabels[member.kind as keyof typeof memberKindLabels]}
-    END:VCARD`;
+    // Split the member name into first and last name
+    const nameParts = member.name.trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
 
-    const blob = new Blob([vcard], { type: "text/vcard" });
+    // Create properly formatted vCard according to RFC 2426
+    const vcard = [
+      "BEGIN:VCARD",
+      "VERSION:3.0",
+      `FN:${member.name}`,
+      `N:${lastName};${firstName};;;`,
+      `EMAIL:${member.email}`,
+      `TEL:${member.phone}`,
+      `TITLE:${memberKindLabels[member.kind as keyof typeof memberKindLabels]}`,
+      `ORG:BSSAJ`,
+      `URL:${currentUrl}`,
+      "END:VCARD",
+    ].join("\r\n");
+
+    const blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -99,7 +110,7 @@ export default function MemberDetails({ member }: { member: Member }) {
   };
 
   return (
-    <div className="p-4">
+    <div>
       <div className="max-w-md mx-auto">
         {/* Main Profile Card */}
         <Card className="overflow-hidden shadow-2xl border-0">
@@ -164,7 +175,7 @@ export default function MemberDetails({ member }: { member: Member }) {
                 </div>
                 <div className="flex-1">
                   <div className="text-sm text-gray-600">Email</div>
-                  <div className="font-medium text-[#003366]">
+                  <div className="font-medium text-[#003366] break-all">
                     {member.email}
                   </div>
                 </div>
@@ -229,20 +240,12 @@ export default function MemberDetails({ member }: { member: Member }) {
             </div>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                onClick={handleShare}
-                className="bg-[#00AEEF] hover:bg-[#00AEEF]/90 text-white"
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
+            <div className="flex gap-3">
+              <Button onClick={handleShare} variant="outline" size="icon">
+                <Share2 className="h-4 w-4" />
               </Button>
-              <Button
-                onClick={generateVCard}
-                variant="outline"
-                className="border-[#003366] text-[#003366] hover:bg-[#003366] hover:text-white"
-              >
-                <Download className="h-4 w-4 mr-2" />
+              <Button onClick={generateVCard} className="flex-1">
+                <Download className="h-4 w-4" />
                 Save Contact
               </Button>
             </div>
