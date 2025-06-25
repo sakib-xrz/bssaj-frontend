@@ -11,6 +11,7 @@ import {
   Phone,
   Star,
 } from "lucide-react";
+import Link from "next/link";
 
 const memberKindIcons = {
   ADVISER: Crown,
@@ -36,20 +37,22 @@ const memberKindLabels = {
   STUDENT_REPRESENTATIVE: "Student Representative",
 };
 
+export type Member = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  profile_picture: string;
+  kind: string;
+  approved_at: Date;
+  created_at: Date;
+};
+
 export default function MemberCard({
   member,
   isCompact = false,
 }: {
-  member: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    profile_picture: string;
-    kind: string;
-    approved_at: Date;
-    created_at: Date;
-  };
+  member: Member;
   isCompact?: boolean;
 }) {
   const IconComponent =
@@ -144,9 +147,9 @@ export default function MemberCard({
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-[#00AEEF] to-[#0099CC] hover:from-[#0099CC] hover:to-[#00AEEF] text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
-                // onClick={() => window.open(`/member/${member.id}`, "_blank")}
+                asChild
               >
-                View Profile
+                <Link href={`/members/${member.id}`}>View Profile</Link>
               </Button>
             </div>
           </div>
