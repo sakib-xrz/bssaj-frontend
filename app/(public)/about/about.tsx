@@ -25,11 +25,13 @@ const AboutBSSAJ: React.FC = () => {
     { value: "advisory-members", label: "Advisory Members" },
     { value: "associated-members", label: "Associated Members" },
     { value: "honorable-members", label: "Honorable Members" },
-    { value: "student-representatives", label: "Student Representatives" },
   ];
 
+  function cn(...classes: (string | undefined | null | false)[]): string {
+    return classes.filter(Boolean).join(" ");
+  }
   return (
-    <Container className="py-12 md:py-16 mt-10">
+    <Container className="py-12 md:py-16 mt-10 lg:mb-28">
       <SectionHeader
         title="About BSSAJ"
         description="Learn about our organization, mission, vision, and the people who make it all possible."
@@ -38,16 +40,19 @@ const AboutBSSAJ: React.FC = () => {
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="w-full mt-12"
+        className="w-full mt-20"
       >
-        {/* Tab Navigation (visible on medium screens and up) */}
-        <div className="hidden sm:block overflow-x-auto pb-4">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 md:grid-cols-8 lg:grid-cols-8 h-auto gap-2 p-1 bg-gray-100 rounded-lg">
+        <div className="hidden sm:block overflow-hidden pb-4">
+          <TabsList className="flex flex-wrap gap-2 bg-gray-100 rounded-xl shadow-inner">
             {tabItems.map((item) => (
               <TabsTrigger
                 key={item.value}
                 value={item.value}
-                className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm rounded-md px-4 py-2 text-sm md:text-base font-medium whitespace-nowrap"
+                className={cn(
+                  "px-4 text-sm font-medium rounded-full transition-colors duration-200",
+                  "data-[state=active]:bg-blue-600 data-[state=active]:text-white",
+                  "data-[state=active]:shadow-md hover:bg-blue-100 whitespace-nowrap"
+                )}
               >
                 {item.label}
               </TabsTrigger>
@@ -56,7 +61,7 @@ const AboutBSSAJ: React.FC = () => {
         </div>
         <div className="sm:hidden w-full flex justify-end mb-6">
           <Select value={activeTab} onValueChange={setActiveTab}>
-            <SelectTrigger className="w-[200px] rounded-md border border-gray-300 bg-white shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base">
+            <SelectTrigger className="w-[250px] rounded-full border-gray-300 shadow-sm text-base">
               <SelectValue placeholder="Select Category" />
             </SelectTrigger>
             <SelectContent>
@@ -68,10 +73,10 @@ const AboutBSSAJ: React.FC = () => {
             </SelectContent>
           </Select>
         </div>
+
         <TabsContent value="mission-vision" className="mt-8">
           <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
             <CardContent className="p-0 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              {/* Left Content */}
               <div className="space-y-6">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-3">
@@ -109,8 +114,6 @@ const AboutBSSAJ: React.FC = () => {
                   </ul>
                 </div>
               </div>
-
-              {/* Right Image/Graphic */}
               <div className="flex justify-center items-center">
                 <Image
                   src="/images/about-mission.png"
@@ -124,8 +127,6 @@ const AboutBSSAJ: React.FC = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
-        {/* Placeholder for other TabsContent */}
         {tabItems
           .filter((item) => item.value !== "mission-vision")
           .map((item) => (
