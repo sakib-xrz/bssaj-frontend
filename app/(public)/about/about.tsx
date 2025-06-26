@@ -42,7 +42,7 @@ const AboutBSSAJ: React.FC = () => {
         onValueChange={setActiveTab}
         className="w-full mt-20"
       >
-        <div className="hidden sm:block overflow-hidden pb-4">
+        <div className="hidden sm:block overflow-x-auto pb-4">
           <TabsList className="flex flex-wrap gap-2 bg-gray-100 rounded-xl shadow-inner">
             {tabItems.map((item) => (
               <TabsTrigger
@@ -50,7 +50,7 @@ const AboutBSSAJ: React.FC = () => {
                 value={item.value}
                 className={cn(
                   "px-4 text-sm font-medium rounded-full transition-colors duration-200",
-                  "data-[state=active]:bg-blue-600 data-[state=active]:text-white",
+                  "data-[state=active]:bg-primary data-[state=active]:text-white",
                   "data-[state=active]:shadow-md hover:bg-blue-100 whitespace-nowrap"
                 )}
               >
@@ -59,7 +59,7 @@ const AboutBSSAJ: React.FC = () => {
             ))}
           </TabsList>
         </div>
-        <div className="sm:hidden w-full flex justify-end mb-6">
+        <div className="sm:hidden md:hidden w-full flex justify-end mb-6">
           <Select value={activeTab} onValueChange={setActiveTab}>
             <SelectTrigger className="w-[250px] rounded-full border-gray-300 shadow-sm text-base">
               <SelectValue placeholder="Select Category" />
