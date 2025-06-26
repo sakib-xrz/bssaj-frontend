@@ -231,7 +231,7 @@ const MemberAgencies: React.FC = () => {
                   <Button
                     asChild
                     variant="outline"
-                    className="flex-1 border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 font-bold py-2 px-4 rounded-md transition-colors duration-200 text-sm"
+                    className="flex-1 border-primary text-primary hover:bg-blue-50 hover:text-primary font-bold py-2 px-4 rounded-md transition-colors duration-200 text-sm"
                   >
                     <Link href={agency.websiteLink}>Website</Link>
                   </Button>
