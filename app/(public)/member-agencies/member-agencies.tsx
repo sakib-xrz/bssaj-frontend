@@ -205,7 +205,7 @@ const MemberAgencies: React.FC = () => {
                   className="rounded-full object-cover flex-shrink-0 mr-4"
                 />
                 <div className="flex-grow">
-                  <CardTitle className="text-xl font-bold text-primary leading-tight mb-1">
+                  <CardTitle className="text-xl font-bold text-primary leading-tight mb-1 line-clamp-1">
                     {agency.name}
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-600">
@@ -224,7 +224,7 @@ const MemberAgencies: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-3 mt-auto w-full">
                   <Button
                     asChild
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 text-sm"
+                    className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200 text-sm"
                   >
                     <Link href={agency.profileLink}>View Profile</Link>
                   </Button>
