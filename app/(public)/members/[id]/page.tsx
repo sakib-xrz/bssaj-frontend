@@ -1,5 +1,5 @@
 import Container from "@/components/shared/container";
-import { mockMembers } from "../page";
+import { mockMembers } from "../_components/mock-data";
 import { Member } from "../_components/member-card";
 import dynamic from "next/dynamic";
 

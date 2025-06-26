@@ -167,7 +167,7 @@ export default function OurMembers() {
                 key={member.id}
                 className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4 pl-4"
               >
-                <Card className="group rounded-2xl overflow-hidden bg-white border shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+                <Card className="group rounded-2xl overflow-hidden bg-white border transition-all duration-300">
                   <div
                     className={`h-2 bg-gradient-to-r ${
                       memberKindGradients[
