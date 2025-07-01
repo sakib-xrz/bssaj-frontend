@@ -2,6 +2,7 @@ import React from "react";
 import MemberCard from "./_components/member-card";
 import Container from "@/components/shared/container";
 import { mockMembers } from "./_components/mock-data";
+import SectionHeader from "@/components/shared/section-header";
 
 export default function Members() {
   const memberKindPriority = {
@@ -19,12 +20,21 @@ export default function Members() {
   );
 
   return (
-    <Container
-      className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}
-    >
-      {sortedMembers.map((member) => (
-        <MemberCard key={member.id} member={member} />
-      ))}
-    </Container>
+    <div>
+      <div className="bg-gradient-to-b from-blue-50 via-blue-100 to-white py-20">
+        <SectionHeader
+          className="mb-20"
+          title="Our Executive Members"
+          description="Explore our network of member agencies supporting Bangladeshi students in Japan."
+        />
+      </div>
+      <Container
+        className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}
+      >
+        {sortedMembers.map((member) => (
+          <MemberCard key={member.id} member={member} />
+        ))}
+      </Container>
+    </div>
   );
 }
