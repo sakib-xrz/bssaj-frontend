@@ -17,7 +17,7 @@ export default function SectionHeader({
         {title}
       </h2>
       {description && (
-        <p className="text-muted-foreground max-w-2xl mx-auto text-wrap">
+        <p className="text-muted-foreground max-w-2xl mx-auto text-wrap pb-10">
           {description}
         </p>
       )}
