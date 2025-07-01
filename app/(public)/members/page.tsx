@@ -21,7 +21,7 @@ export default function Members() {
 
   return (
     <div>
-      <div className="bg-gradient-to-b from-blue-50 via-blue-100 to-white py-20">
+      <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
         <SectionHeader
           className="mb-20"
           title="Our Executive Members"
