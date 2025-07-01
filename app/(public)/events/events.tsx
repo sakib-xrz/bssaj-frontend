@@ -240,13 +240,13 @@ const EventsPage: React.FC = () => {
         </div>
       </Container>
 
-      <div className="bg-[#F0F0F0]">
+      <div className="bg-[#F0F0F0] py-12">
         <SectionHeader
-          className="py-12 lg:text-nowrap"
+          className="mb-8 lg:text-nowrap"
           title="Stay Updated"
           description="Subscribe to our newsletter to receive the latest news and updates from BSSAJ"
         />
-        <div className="w-full max-w-2xl mx-auto flex flex-col sm:flex-row gap-4 pb-12">
+        <div className="w-full max-w-2xl mx-auto flex flex-col sm:flex-row gap-4 px-4">
           <Input
             type="email"
             placeholder="Enter Your Email Address"
@@ -256,7 +256,7 @@ const EventsPage: React.FC = () => {
           />
           <Button
             onClick={handleSubscriptionSubmit}
-            className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-lg shadow-md flex items-center gap-2 justify-center"
+            className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 text-lg shadow-md flex-shrink-0"
           >
             Subscribe
           </Button>
