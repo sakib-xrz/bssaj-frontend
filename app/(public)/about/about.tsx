@@ -35,7 +35,7 @@ const AboutBSSAJ: React.FC = () => {
 
   return (
     <div>
-      <div className="bg-gradient-to-bl from-blue-100 to-white py-20">
+      <div className="bg-gradient-to-b from-blue-50 via-blue-100 to-white py-20">
         <SectionHeader
           title="About BSSAJ"
           description="Learn about our organization, mission, vision, and the people who make it all possible."
