@@ -65,7 +65,7 @@ const OurMission: React.FC = () => {
             className="flex flex-col items-center text-center rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1"
           >
             <CardHeader className="flex flex-col items-center justify-center gap-2 pt-6">
-              <div className="bg-primary/10 rounded-full p-3">
+              <div className="bg-[#DBEAFE] rounded-full p-3">
                 <card.icon className="h-10 w-10 text-primary" />
               </div>
               <CardTitle className="text-xl font-semibold text-gray-900">
