@@ -21,7 +21,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden lg:flex items-center space-x-6">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -45,7 +45,7 @@ export default function Navbar() {
         </nav>
 
         {/* Mobile Navigation with Sheet */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
