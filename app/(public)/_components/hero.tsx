@@ -19,9 +19,9 @@ export default function HeroCarousel() {
       id: 1,
       heading: (
         <>
-          Bangladesh Student&#39;s in
+          Bangladesh Student&#39;s
           <br className="hidden sm:block" />
-          Support Association Japan
+          Support in Association Japan
         </>
       ),
       paragraph:
