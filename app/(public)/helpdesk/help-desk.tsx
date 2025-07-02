@@ -6,23 +6,22 @@ import { Input } from "@/components/ui/input";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   SearchIcon,
-  MessageSquareIcon, // For Live Chat
-  PhoneCallIcon, // For Phone Support
-  FileTextIcon, // For Submit Ticket
-  VideoIcon, // For Video Call
-  GraduationCapIcon, // For Academic Support
-  FileStackIcon, // For Visa & Immigration
-  HomeIcon, // For Accommodation
-  BriefcaseIcon, // For Employment
-  DollarSignIcon, // For Financial Support
-  UsersIcon, // For Community
-  ChevronRightIcon, // For category card arrow
+  MessageSquareIcon,
+  PhoneCallIcon,
+  FileTextIcon,
+  VideoIcon,
+  GraduationCapIcon,
+  FileStackIcon,
+  HomeIcon,
+  BriefcaseIcon,
+  DollarSignIcon,
+  UsersIcon,
+  ChevronRightIcon,
 } from "lucide-react";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import Link from "next/link";
 
-// --- Data for Support Options ---
 interface SupportOptionProps {
   id: string;
   icon: React.ElementType;
@@ -38,7 +37,7 @@ const supportOptions: SupportOptionProps[] = [
     icon: MessageSquareIcon,
     title: "Live Chat",
     description: "Get instant help from our support team",
-    link: "#", // Link to chat interface
+    link: "#",
   },
   {
     id: "phone-support",
@@ -52,18 +51,17 @@ const supportOptions: SupportOptionProps[] = [
     icon: FileTextIcon,
     title: "Submit Ticket",
     description: "Create a support ticket for detailed help",
-    link: "#", // Link to ticket submission form
+    link: "#",
   },
   {
     id: "video-call",
     icon: VideoIcon,
     title: "Video Call",
     description: "Schedule a video consultation",
-    link: "#", // Link to video call scheduling
+    link: "#",
   },
 ];
 
-// --- Data for Categories ---
 interface CategoryCardProps {
   id: string;
   icon: React.ElementType;
@@ -135,23 +133,21 @@ const Helpdesk: React.FC = () => {
 
   const handleSearch = () => {
     console.log("Searching for:", searchTerm);
-    // Implement actual search logic or redirect to search results page
   };
 
   return (
     <div>
-      {/* Hero-like Section */}
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20 text-center">
         <SectionHeader
           title="Helpdesk"
           description="Get the support you need. Search our knowledge base, submit a ticket, or contact our support team."
         />
-        {/* Search Bar in Hero Section */}
+
         <div className="w-full max-w-xl mx-auto relative mt-8 px-4">
           <SearchIcon className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             type="text"
-            placeholder="Search Agencies" // Text from image, adjust if needed
+            placeholder="Search Agencies"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -165,7 +161,6 @@ const Helpdesk: React.FC = () => {
       </div>
 
       <Container className="py-12 md:py-16">
-        {/* Support Options Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           {supportOptions.map((option) => (
             <Card
