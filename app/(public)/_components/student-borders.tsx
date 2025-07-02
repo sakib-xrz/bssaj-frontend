@@ -19,25 +19,11 @@ const StudentBorders: React.FC = () => {
             A Student’s Journey Through the Language and Legacy of Japan
           </h2>
           <p className="text-base text-gray-600 leading-relaxed text-justify">
-            <span className="block mb-4">
-              <strong>From Bengal to Fuji</strong> represents a heartfelt
-              academic and cultural voyage—where the spirit of learning
-              transcends borders.
-            </span>
-            This initiative empowers Bangladeshi students to explore the beauty
-            of the Japanese language, the depth of its culture, and the wisdom
-            rooted in centuries-old traditions. Through immersive language
-            programs, cultural exchange workshops, and scholarship guidance, it
-            opens doors to new opportunities in education, friendship, and
-            global understanding.
-            <br />
-            <br />
-            Just as Mount Fuji symbolizes strength and serenity, this journey
-            inspires young minds from Bengal to rise with ambition and purpose,
-            embracing a world of knowledge beyond their horizon. Whether it’s
-            mastering hiragana, appreciating the nuances of Japanese etiquette,
-            or preparing for a future in Japan — this platform becomes the
-            bridge between dreams and destinations.
+            May 31, 2025 on behalf of BSSAJ – Bangladeshi Students’ Support Association in Japan, our honorable President Mr. Faruq Nagamatsu presented the current challenges related to student visas from Bangladesh to our Chief Adviser, Professor Muhammad Yunus. <br /> <br />
+
+            He elaborated on the barriers faced by Bangladeshi students in coming to Japan, visa complications, and possible future actions to ease the process. <br /> <br />
+
+            BSSAJ remains committed to representing the voice of Bangladeshi students and advocating for their support at the highest levels.
           </p>
         </div>
 

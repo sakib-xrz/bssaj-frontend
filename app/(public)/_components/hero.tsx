@@ -19,13 +19,14 @@ export default function HeroCarousel() {
       id: 1,
       heading: (
         <>
-          Bangladesh Student&#39;s
+          Bangladesh Students&#39;
           <br className="hidden sm:block" />
           Support in Association Japan
         </>
       ),
       paragraph:
-        "Supporting Bangladeshi students in Japan with community, resources, and opportunity.",
+        `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
+Founded in 2025, BSSAJ is committed to providing educational, administrative, and cultural support to ensure a safer and more enriching academic journey for students.`,
       imageSrc: hero,
       imageAlt: "Students in Japan 1",
     },
@@ -39,7 +40,8 @@ export default function HeroCarousel() {
         </>
       ),
       paragraph:
-        "Discover tailored resources, scholarship opportunities, and a vibrant community.",
+        `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
+Founded in 2025, BSSAJ is committed to providing educational, administrative, and cultural support to ensure a safer and more enriching academic journey for students.`,
       imageSrc: hero,
       imageAlt: "Students in Japan 2",
     },
@@ -53,7 +55,8 @@ export default function HeroCarousel() {
         </>
       ),
       paragraph:
-        "Join a network designed to help you thrive academically and professionally.",
+        `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
+Founded in 2025, BSSAJ is committed to providing educational, administrative, and cultural support to ensure a safer and more enriching academic journey for students.`,
       imageSrc: hero,
       imageAlt: "Students in Japan 3",
     },
