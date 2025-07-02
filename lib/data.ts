@@ -5,5 +5,4 @@ export const navLinks = [
   { name: "Membership", href: "/membership" },
   { name: "Members", href: "/members" },
   { name: "Events", href: "/events" },
-  { name: "More", href: "/more" },
 ];
