@@ -1,4 +1,4 @@
-"use client"; // This component requires client-side interactivity
+"use client";
 
 import React, { useState, useMemo } from "react";
 import Image from "next/image";
@@ -10,11 +10,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { SearchIcon } from "lucide-react"; // Reusing icons from previous components
+import { SearchIcon } from "lucide-react";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 
-// --- Data for Blog Posts (reusing and extending from your existing component) ---
 interface BlogPostProps {
   id: string;
   imageSrc: string;
@@ -23,8 +22,8 @@ interface BlogPostProps {
   authorName: string;
   authorImage: string;
   timeAgo: string;
-  category?: string; // Optional category for filtering/display
-  featured?: boolean; // To mark featured posts
+  category?: string;
+  featured?: boolean;
 }
 
 const allBlogPosts: BlogPostProps[] = [
@@ -62,7 +61,7 @@ const allBlogPosts: BlogPostProps[] = [
     authorImage: "/images/author-1.jpg",
     timeAgo: "Today",
     category: "Visa Guide",
-    featured: true, // Marked as featured to ensure 3 cards show
+    featured: true,
   },
   {
     id: "4",
@@ -101,7 +100,6 @@ const allBlogPosts: BlogPostProps[] = [
     featured: false,
   },
   {
-    // Added new non-featured post to ensure enough for 4 columns
     id: "7",
     imageSrc: "/images/blog-2.png",
     title: "Exploring Japanese Cuisine: A Student's Guide",
@@ -142,12 +140,12 @@ const BlogPage: React.FC = () => {
   const handleSubscriptionSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Subscription email:", emailSubscription);
-    alert("Thank you for subscribing!"); // Using alert for demo, replace with custom modal
+    alert("Thank you for subscribing!");
     setEmailSubscription("");
   };
 
   const filteredRecentPosts = useMemo(() => {
-    let currentPosts = allBlogPosts.filter((post) => !post.featured); // Exclude featured from recent
+    let currentPosts = allBlogPosts.filter((post) => !post.featured);
 
     if (searchTerm) {
       currentPosts = currentPosts.filter(
@@ -172,18 +170,17 @@ const BlogPage: React.FC = () => {
 
   return (
     <div>
-      {/* Hero-like Section */}
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20 text-center">
         <SectionHeader
           title="Blog"
           description="Stay updated with the latest news, events, and stories from the Bangladeshi Student Support Association Japan"
         />
-        {/* Search Bar in Hero Section */}
+
         <div className="w-full max-w-xl mx-auto relative mt-8 px-4">
           <SearchIcon className="absolute left-7 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             type="text"
-            placeholder="Search Agencies" // Text from image, adjust if needed
+            placeholder="Search Agencies"
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -192,30 +189,25 @@ const BlogPage: React.FC = () => {
       </div>
 
       <Container className="py-12 md:py-16">
-        {/* Featured Blog Section */}
         <SectionHeader
-          className="mb-8 text-left" // Align left as per image
+          className="mb-8 text-left"
           title="Featured Blog"
-          description="" // No description in image
+          description=""
         />
-        {/* Changed grid-cols-2 to grid-cols-3 for lg screens */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {featuredPosts.map((post) => (
             <Card
               key={post.id}
               className="rounded-xl shadow-lg border border-gray-200 bg-white p-4 flex flex-col"
             >
-              {" "}
-              {/* Changed to flex-col for consistent height */}
               <div className="relative w-full aspect-[16/10] flex-shrink-0">
-                {" "}
-                {/* Maintained aspect ratio */}
                 <Image
                   src={post.imageSrc}
                   alt={post.title}
                   fill
                   className="rounded-lg object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Adjusted sizes for 3-column layout
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
                 {post.category && (
                   <span className="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-full">
@@ -224,8 +216,6 @@ const BlogPage: React.FC = () => {
                 )}
               </div>
               <CardContent className="p-0 pt-4 flex flex-col flex-grow">
-                {" "}
-                {/* Added pt-4 for space below image */}
                 <CardTitle className="text-xl font-semibold text-primary mb-2 leading-tight">
                   {post.title}
                 </CardTitle>
@@ -252,13 +242,11 @@ const BlogPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Recent Blog & Updates Section */}
         <SectionHeader
-          className="mb-8 text-left" // Align left as per image
+          className="mb-8 text-left"
           title="Recent Blog & Updates"
-          description="" // No description in image
+          description=""
         />
-        {/* This grid is already set to lg:grid-cols-4 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {visibleRecentPosts.length > 0 ? (
             visibleRecentPosts.map((post) => (
