@@ -122,26 +122,33 @@ const ContactUsPage: React.FC = () => {
         message: "Please fill all required fields.",
       });
     }
-    setStatus({ state: "loading", message: "" });
 
-    // Log environment variables to console for debugging
-    console.log("EmailJS Service ID:", process.env.NEXT_PUBLIC_EMAILJS_SERVICE);
-    console.log(
-      "EmailJS Template ID:",
-      process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE
-    );
-    console.log(
-      "EmailJS Public Key:",
-      process.env.NEXT_PUBLIC_EMAILJS_PUBLICKEY
-    );
+    // Validate email format
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return setStatus({
+        state: "error",
+        message: "Please enter a valid email address.",
+      });
+    }
+
+    setStatus({ state: "loading", message: "" });
 
     try {
       const res = await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE!,
-        form,
+        {
+          from_name: `${form.firstName} ${form.lastName}`,
+          from_email: form.email,
+          phone: form.phone,
+          subject: form.subject,
+          message: form.message,
+        },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLICKEY!
       );
+
+      console.log("EmailJS response:", res); // Add this for debugging
+
       if (res.status === 200) {
         setStatus({ state: "success", message: "Message sent successfully!" });
         setForm({
@@ -153,13 +160,14 @@ const ContactUsPage: React.FC = () => {
           message: "",
         });
       } else {
-        throw new Error("Failed to send message via EmailJS.");
+        throw new Error(`EmailJS returned status ${res.status}`);
       }
     } catch (err) {
-      console.error("EmailJS error:", err);
+      console.error("Detailed EmailJS error:", err);
       setStatus({
         state: "error",
-        message: "Failed to send. Try again later.",
+        message:
+          "Failed to send message. Please check your connection and try again.",
       });
     }
   };
