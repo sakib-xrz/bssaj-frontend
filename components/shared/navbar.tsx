@@ -49,7 +49,10 @@ export default function Navbar() {
           <Button className="text-muted bg-[#00AEEF] hover:bg-[#00AEEF]/90">
             En <ChevronDown />
           </Button>
-          <Button>Sign in</Button>
+
+          <Button asChild>
+            <Link href="/login">Sign in</Link>
+          </Button>
         </nav>
 
         {/* Mobile Navigation with Sheet */}
@@ -72,7 +75,7 @@ export default function Navbar() {
                     <Link
                       key={link.name}
                       href={link.href}
-                      onClick={() => setOpen(false)} // <- CLOSE SHEET ON CLICK
+                      onClick={() => setOpen(false)}
                       className={`text-lg font-medium ${
                         isActive
                           ? "text-primary font-semibold"
@@ -83,9 +86,10 @@ export default function Navbar() {
                     </Link>
                   );
                 })}
-                <Button className="w-full" onClick={() => setOpen(false)}>
-                  Sign in
-                </Button>
+
+                <Link href="/login" onClick={() => setOpen(false)}>
+                  <Button className="w-full">Sign in</Button>
+                </Link>
               </div>
             </SheetContent>
           </Sheet>
