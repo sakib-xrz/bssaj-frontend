@@ -1,4 +1,4 @@
-const marqueeText = "Bangladesh Student's Support in Association Japan • ";
+const marqueeText = "Bangladeshi Student's Support in Association Japan • ";
 
 const ScrollingTextMarquee: React.FC = () => {
   return (
