@@ -19,20 +19,27 @@ const StudentBorders: React.FC = () => {
             A Student’s Journey Through the Language and Legacy of Japan
           </h2>
           <p className="text-base text-gray-600 leading-relaxed text-justify">
-            May 31, 2025 on behalf of BSSAJ – Bangladeshi Students’ Support Association in Japan, our honorable President Mr. Faruq Nagamatsu presented the current challenges related to student visas from Bangladesh to our Chief Adviser, Professor Muhammad Yunus. <br /> <br />
-
-            He elaborated on the barriers faced by Bangladeshi students in coming to Japan, visa complications, and possible future actions to ease the process. <br /> <br />
-
-            BSSAJ remains committed to representing the voice of Bangladeshi students and advocating for their support at the highest levels.
+            May 31, 2025 on behalf of BSSAJ – Bangladeshi Students’ Support
+            Association in Japan, our honorable President Mr. Faruq Nagamatsu
+            presented the current challenges related to student visas from
+            Bangladesh to our Chief Adviser, Professor Muhammad Yunus. <br />{" "}
+            <br />
+            He elaborated on the barriers faced by Bangladeshi students in
+            coming to Japan, visa complications, and possible future actions to
+            ease the process. <br /> <br />
+            BSSAJ remains committed to representing the voice of Bangladeshi
+            students and advocating for their support at the highest levels.
           </p>
         </div>
 
         {/* Video Section */}
         <div className="w-full lg:w-1/2 aspect-video rounded-xl overflow-hidden shadow-md">
           <iframe
-            className="w-full h-full"
-            src="https://www.youtube.com/embed/B9VRvOKKwfs?si=6O7iwAxNbhl8FCIW"
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/R8KoGPJLXfI?si=DQZiNnfrPkUc--8W"
             title="YouTube video player"
+            frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
