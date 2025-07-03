@@ -19,13 +19,12 @@ export default function HeroCarousel() {
       id: 1,
       heading: (
         <>
-          Bangladesh Students&#39;
+          Bangladeshi Students&#39;
           <br className="hidden sm:block" />
           Support in Association Japan
         </>
       ),
-      paragraph:
-        `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
+      paragraph: `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
 Founded in 2025, BSSAJ is committed to providing educational, administrative, and cultural support to ensure a safer and more enriching academic journey for students.`,
       imageSrc: hero,
       imageAlt: "Students in Japan 1",
@@ -39,8 +38,7 @@ Founded in 2025, BSSAJ is committed to providing educational, administrative, an
           Your Journey in Japan
         </>
       ),
-      paragraph:
-        `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
+      paragraph: `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
 Founded in 2025, BSSAJ is committed to providing educational, administrative, and cultural support to ensure a safer and more enriching academic journey for students.`,
       imageSrc: hero,
       imageAlt: "Students in Japan 2",
@@ -54,8 +52,7 @@ Founded in 2025, BSSAJ is committed to providing educational, administrative, an
           Succeed In Japan
         </>
       ),
-      paragraph:
-        `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
+      paragraph: `The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan.
 Founded in 2025, BSSAJ is committed to providing educational, administrative, and cultural support to ensure a safer and more enriching academic journey for students.`,
       imageSrc: hero,
       imageAlt: "Students in Japan 3",

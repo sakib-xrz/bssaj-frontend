@@ -44,7 +44,7 @@ const AboutBSSAJ: React.FC = () => {
       <Container className="py-12 md:py-16 lg:mb-28 ">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="hidden sm:block overflow-x-auto pb-4">
-            <TabsList className="flex flex-wrap gap-2 bg-gray-100 rounded-xl shadow-inner">
+            <TabsList className="flex flex-wrap gap-2 shadow-none bg-transparent">
               {tabItems.map((item) => (
                 <TabsTrigger
                   key={item.value}
@@ -52,7 +52,7 @@ const AboutBSSAJ: React.FC = () => {
                   className={cn(
                     "px-4 text-sm font-medium rounded-full transition-colors duration-200",
                     "data-[state=active]:bg-primary data-[state=active]:text-white",
-                    "data-[state=active]:shadow-md hover:bg-blue-100 whitespace-nowrap"
+                    "hover:bg-blue-100 whitespace-nowrap"
                   )}
                 >
                   {item.label}
@@ -83,25 +83,26 @@ const AboutBSSAJ: React.FC = () => {
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                      Our Mission
-                    </h2>
-                    <p className="text-gray-700 leading-relaxed text-justify">
-                      To create a supportive community for Bangladeshi students
-                      in Japan, providing resources, guidance, and opportunities
-                      for academic and professional growth while fostering
-                      cultural exchange between Bangladesh and Japan.
-                    </p>
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-3">
                       Our Vision
                     </h2>
                     <p className="text-gray-700 leading-relaxed text-justify">
-                      To be the premier organization supporting Bangladeshi
-                      students in Japan, creating a network of successful
-                      professionals who contribute to both Bangladesh and Japan,
-                      and fostering lasting relationships between the two
-                      countries.
+                      BSSAJ has set out to create a responsible and organized
+                      network to ensure a safe, transparent and supportive
+                      environment for linguistic, administrative and moral
+                      support for Bangladeshi students studying and aspiring to
+                      study in Japan. BSSAJ makes every effort to create quality
+                      students by training all teachers and students of all
+                      members of the organization about Japanese culture through
+                      special courses. BSSAJ has set out to create a responsible
+                      and organized network to ensure a safe, transparent and
+                      supportive environment for linguistic, administrative and
+                      moral support for Bangladeshi students studying and
+                      aspiring to study in Japan. BSSAJ makes every effort to
+                      create quality students by training all teachers and
+                      students of all members of the organization about Japanese
+                      culture through special courses. Turn on screen reader
+                      support To enable screen reader support, press Ctrl+Alt+Z
+                      To learn about keyboard shortcuts, press Ctrl+slash
                     </p>
                   </div>
                   <div>
