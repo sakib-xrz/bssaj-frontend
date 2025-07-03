@@ -1,6 +1,6 @@
-"use client"; // This component requires client-side interactivity for tabs and state
+"use client";
 
-import React, { useState } from "react"; // Import useState
+import React, { useState } from "react";
 import Image from "next/image";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/select";
 
 const AboutBSSAJ: React.FC = () => {
-  // State to control the active tab, synchronized with the Select dropdown
   const [activeTab, setActiveTab] = useState("mission-vision");
 
   const tabItems = [
@@ -26,7 +25,6 @@ const AboutBSSAJ: React.FC = () => {
     { value: "advisory-members", label: "Advisory Members" },
     { value: "associated-members", label: "Associated Members" },
     { value: "honorable-members", label: "Honorable Members" },
-    // { value: "student-representatives", label: "Student Representatives" }, // Removed as per previous code, add back if needed
   ];
 
   function cn(...classes: (string | undefined | null | false)[]): string {
@@ -38,7 +36,7 @@ const AboutBSSAJ: React.FC = () => {
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
         <SectionHeader
           title="About BSSAJ"
-          description="Learn about our organization, mission, vision, and the people who make it all possible."
+          description="The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan."
         />
       </div>
       <Container className="py-12 md:py-16 lg:mb-28 ">
@@ -61,8 +59,6 @@ const AboutBSSAJ: React.FC = () => {
             </TabsList>
           </div>
           <div className="sm:hidden w-full flex justify-end mb-6">
-            {" "}
-            {/* Removed md:hidden as it's redundant with sm:hidden */}
             <Select value={activeTab} onValueChange={setActiveTab}>
               <SelectTrigger className="w-[250px] rounded-full border-gray-300 shadow-sm text-base">
                 <SelectValue placeholder="Select Category" />
@@ -77,6 +73,7 @@ const AboutBSSAJ: React.FC = () => {
             </Select>
           </div>
 
+          {/* Mission & Vision */}
           <TabsContent value="mission-vision" className="mt-8">
             <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
               <CardContent className="p-0 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -93,16 +90,7 @@ const AboutBSSAJ: React.FC = () => {
                       study in Japan. BSSAJ makes every effort to create quality
                       students by training all teachers and students of all
                       members of the organization about Japanese culture through
-                      special courses. BSSAJ has set out to create a responsible
-                      and organized network to ensure a safe, transparent and
-                      supportive environment for linguistic, administrative and
-                      moral support for Bangladeshi students studying and
-                      aspiring to study in Japan. BSSAJ makes every effort to
-                      create quality students by training all teachers and
-                      students of all members of the organization about Japanese
-                      culture through special courses. Turn on screen reader
-                      support To enable screen reader support, press Ctrl+Alt+Z
-                      To learn about keyboard shortcuts, press Ctrl+slash
+                      special courses.
                     </p>
                   </div>
                   <div>
@@ -131,8 +119,36 @@ const AboutBSSAJ: React.FC = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* History */}
+          <TabsContent value="history" className="mt-8">
+            <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8 text-gray-700">
+              <CardContent className="p-0 space-y-4 text-justify">
+                <h2 className="text-2xl font-bold mb-4">History</h2>
+                <p>
+                  The Bangladeshi Students’ Support Association in Japan (BSSAJ)
+                  is a non-profit, non-political, and student-focused
+                  organization established to assist Bangladeshi students
+                  studying and aspiring to study in Japan. Founded in 2025,
+                  BSSAJ is committed to providing educational, administrative,
+                  and cultural support to ensure a safer and more enriching
+                  academic journey for students. The association actively
+                  collaborates with educational institutions, government
+                  agencies, and cultural bodies in both Bangladesh and Japan to
+                  promote fairness, guidance, and opportunity. BSSAJ also
+                  supports its member agencies and institutions by facilitating
+                  orientation programs, legal aid, and cultural training to
+                  bridge the gap between students and society in Japan.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {tabItems
-            .filter((item) => item.value !== "mission-vision")
+            .filter(
+              (item) =>
+                item.value !== "mission-vision" && item.value !== "history"
+            )
             .map((item) => (
               <TabsContent key={item.value} value={item.value} className="mt-8">
                 <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8 text-center text-gray-600">
