@@ -1,6 +1,5 @@
 import { Member } from "./member-card";
 
-
 export const mockMembers: Member[] = [
   {
     id: "1",
