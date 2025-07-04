@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css"; // Your global CSS file
+import GlobalProvider from "@/components/shared/global-provider";
 
 export const metadata: Metadata = {
   title: "BSSAJ - Bangladesh Student Support Association Japan",
@@ -14,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <GlobalProvider>{children}</GlobalProvider>
+      </body>
     </html>
   );
 }
