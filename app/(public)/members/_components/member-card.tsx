@@ -44,8 +44,8 @@ export type Member = {
   phone: string;
   profile_picture: string;
   kind: string;
-  approved_at: Date;
-  created_at: Date;
+  approved_at: string;
+  created_at: string;
 };
 
 export default function MemberCard({
@@ -72,7 +72,6 @@ export default function MemberCard({
               : "flex-col items-center text-center"
           }`}
         >
-          {/* Profile Picture */}
           <div className="relative">
             <Avatar
               className={`${
@@ -101,7 +100,6 @@ export default function MemberCard({
             </div>
           </div>
 
-          {/* Member Info */}
           <div className={`${isCompact ? "flex-1" : "mt-4 w-full"}`}>
             <h3
               className={`font-bold text-[#003366] ${
@@ -141,7 +139,7 @@ export default function MemberCard({
             >
               {!isCompact && (
                 <div className="text-xs text-gray-500">
-                  Joined {member.created_at.toLocaleDateString()}
+                  Joined {new Date(member.created_at).toLocaleDateString()}
                 </div>
               )}
               <Button

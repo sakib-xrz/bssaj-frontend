@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import MemberCard from "./_components/member-card";
 import Container from "@/components/shared/container";
-import { mockMembers } from "./_components/mock-data";
+
 import SectionHeader from "@/components/shared/section-header";
+
+import { useGetMembersQuery } from "@/redux/features/member/memberApi";
+import { Member } from "./_components/member-card";
 
 export default function Members() {
   const memberKindPriority = {
@@ -13,11 +18,41 @@ export default function Members() {
     STUDENT_REPRESENTATIVE: 5,
   };
 
-  const sortedMembers = mockMembers.sort(
+  const { data, isLoading, isError, error } = useGetMembersQuery({});
+  const fetchedMembers: Member[] = data?.data || [];
+
+  const sortedMembers = [...fetchedMembers].sort(
     (a, b) =>
       memberKindPriority[a.kind as keyof typeof memberKindPriority] -
       memberKindPriority[b.kind as keyof typeof memberKindPriority]
   );
+
+  if (isLoading) {
+    return (
+      <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
+        <p className="text-lg text-primary">Loading members...</p>
+      </Container>
+    );
+  }
+
+  if (isError) {
+    console.error("Failed to fetch members:", error);
+    return (
+      <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
+        <p className="text-lg text-red-500">
+          Error loading members. Please try again later.
+        </p>
+      </Container>
+    );
+  }
+
+  if (!sortedMembers.length) {
+    return (
+      <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
+        <p className="text-lg text-gray-600">No members found.</p>
+      </Container>
+    );
+  }
 
   return (
     <div>
@@ -29,7 +64,7 @@ export default function Members() {
         />
       </div>
       <Container
-        className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4`}
+        className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-12 md:py-16`}
       >
         {sortedMembers.map((member) => (
           <MemberCard key={member.id} member={member} />

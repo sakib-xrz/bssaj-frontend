@@ -15,8 +15,11 @@ import {
   CheckCircle,
   User,
 } from "lucide-react";
-import { Member } from "../../_components/member-card";
+import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+
+import { Member } from "../../_components/member-card";
+import { useGetMemberByIdQuery } from "@/redux/features/member/memberApi";
 
 const memberKindLabels = {
   ADVISER: "Adviser",
@@ -34,8 +37,63 @@ const memberKindColors = {
   STUDENT_REPRESENTATIVE: "bg-gray-600 text-white",
 };
 
-export default function MemberDetails({ member }: { member: Member }) {
+export default function MemberDetails({ memberId }: { memberId: string }) {
+  const { data, isLoading, isError, error } = useGetMemberByIdQuery(memberId);
+  const member: Member | undefined = data?.data;
+
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
+
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  useEffect(() => {
+    if (member && currentUrl) {
+      const generateQr = async () => {
+        try {
+          const url = `${currentUrl}`;
+          const dataUrl = await QRCode.toDataURL(url, {
+            width: 512,
+            margin: 2,
+            color: {
+              dark: "#003366",
+              light: "#FFFFFF",
+            },
+          });
+          setQrCodeDataUrl(dataUrl);
+        } catch (err) {
+          console.error("Error generating QR code:", err);
+          setQrCodeDataUrl(null);
+        }
+      };
+      generateQr();
+    }
+  }, [member, currentUrl]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh]">
+        <p className="text-lg text-primary">Loading member details...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    console.error("Failed to fetch member details:", error);
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh]">
+        <p className="text-lg text-red-500">
+          Error loading member details. Please try again later.
+        </p>
+      </div>
+    );
+  }
+
+  if (!member) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh]">
+        <p className="text-lg text-gray-600">Member not found.</p>
+      </div>
+    );
+  }
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -49,19 +107,21 @@ export default function MemberDetails({ member }: { member: Member }) {
         console.log("Error sharing:", err);
       }
     } else {
-      // Fallback to copying to clipboard
-      navigator.clipboard.writeText(currentUrl);
+      const el = document.createElement("textarea");
+      el.value = currentUrl;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
       alert("Link copied to clipboard!");
     }
   };
 
   const generateVCard = () => {
-    // Split the member name into first and last name
     const nameParts = member.name.trim().split(" ");
     const firstName = nameParts[0] || "";
     const lastName = nameParts.slice(1).join(" ") || "";
 
-    // Create properly formatted vCard according to RFC 2426
     const vcard = [
       "BEGIN:VCARD",
       "VERSION:3.0",
@@ -84,35 +144,22 @@ export default function MemberDetails({ member }: { member: Member }) {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleQRCodeDownload = async () => {
-    try {
-      // Generate QR code as data URL
-      const qrCodeDataUrl = await QRCode.toDataURL(currentUrl, {
-        width: 512,
-        margin: 2,
-        color: {
-          dark: "#003366", // QR code color
-          light: "#FFFFFF", // Background color
-        },
-      });
-
-      // Create download link
+  const handleQRCodeDownload = () => {
+    if (qrCodeDataUrl) {
       const link = document.createElement("a");
       link.href = qrCodeDataUrl;
       link.download = `${member.name.replace(/\s+/g, "_")}_profile_qr.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (error) {
-      console.error("Error generating QR code:", error);
-      alert("Failed to generate QR code");
+    } else {
+      alert("QR code not available yet. Please try again.");
     }
   };
 
   return (
-    <div>
-      <div className="max-w-md mx-auto">
-        {/* Main Profile Card */}
+    <div className="flex justify-center items-center py-12 md:py-16">
+      <div className="max-w-md mx-auto w-full">
         <Card className="overflow-hidden shadow-2xl border-0">
           {/* Header Background */}
           <div className="h-32 bg-gradient-to-r from-[#003366] to-[#00AEEF] relative">
@@ -123,6 +170,7 @@ export default function MemberDetails({ member }: { member: Member }) {
                 variant="secondary"
                 className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
                 onClick={handleQRCodeDownload}
+                disabled={!qrCodeDataUrl}
               >
                 <QrCode className="h-4 w-4" />
               </Button>
@@ -196,7 +244,6 @@ export default function MemberDetails({ member }: { member: Member }) {
 
             <Separator className="my-6" />
 
-            {/* Member Information */}
             <div className="space-y-4 mb-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -204,7 +251,7 @@ export default function MemberDetails({ member }: { member: Member }) {
                   <span>Member Since</span>
                 </div>
                 <span className="text-sm font-medium text-[#003366]">
-                  {member.created_at.toLocaleDateString("en-US", {
+                  {new Date(member.created_at).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -219,7 +266,7 @@ export default function MemberDetails({ member }: { member: Member }) {
                     <span>Approved</span>
                   </div>
                   <span className="text-sm font-medium text-green-600">
-                    {member.approved_at.toLocaleDateString("en-US", {
+                    {new Date(member.approved_at).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
