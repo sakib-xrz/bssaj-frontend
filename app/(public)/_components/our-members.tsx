@@ -96,7 +96,7 @@ export default function OurMembers() {
     );
   }
 
-  const showCarouselNavigation = sortedMembers.length >= 4;
+  const showCarouselNavigation = sortedMembers.length > 4;
 
   return (
     <Container className="flex flex-col items-center w-full mx-auto px-4 py-12 md:py-16">
