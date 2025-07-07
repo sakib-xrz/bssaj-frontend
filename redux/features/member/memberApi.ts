@@ -25,37 +25,6 @@ export const memberApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.member],
     }),
-    createMember: builder.mutation({
-      query: (data) => ({
-        url: `/members`,
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: [tagTypes.member],
-    }),
-    updateMember: builder.mutation({
-      query: ({ data, id }) => ({
-        url: `/members/${id}`,
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: [tagTypes.member],
-    }),
-    approveOrRejectMember: builder.mutation({
-      query: ({ data, id }) => ({
-        url: `/admin/approve-reject-member/${id}`,
-        method: "PUT",
-        body: data,
-      }),
-      invalidatesTags: [tagTypes.member],
-    }),
-    deleteMember: builder.mutation({
-      query: (id) => ({
-        url: `/members/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: [tagTypes.member],
-    }),
   }),
 });
 
@@ -63,8 +32,4 @@ export const {
   useGetMembersQuery,
   useGetMemberByIdQuery,
   useGetMemberStatsQuery,
-  useCreateMemberMutation,
-  useUpdateMemberMutation,
-  useApproveOrRejectMemberMutation,
-  useDeleteMemberMutation,
 } = memberApi;
