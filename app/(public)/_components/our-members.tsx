@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import {
 import Link from "next/link";
 import Container from "@/components/shared/container";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
+import { Member } from "../members/_components/member-card";
 
 const memberKindIcons = {
   ADVISER: Crown,
@@ -48,25 +50,28 @@ const memberKindLabels = {
   STUDENT_REPRESENTATIVE: "Student Representative",
 };
 
-export type Member = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  profile_picture: string;
-  kind: string;
-  approved_at: string;
-  created_at: string;
-};
-
 export default function OurMembers() {
   const { data, isLoading, isError, error } = useGetMembersQuery({});
 
-  const members: Member[] = data?.data || [];
+  const fetchedMembers: Member[] = data?.data || [];
+
+  const memberKindPriority = {
+    ADVISER: 1,
+    HONORABLE: 2,
+    EXECUTIVE: 3,
+    ASSOCIATE: 4,
+    STUDENT_REPRESENTATIVE: 5,
+  };
+
+  const sortedMembers = [...fetchedMembers].sort(
+    (a, b) =>
+      memberKindPriority[a.kind as keyof typeof memberKindPriority] -
+      memberKindPriority[b.kind as keyof typeof memberKindPriority]
+  );
 
   if (isLoading) {
     return (
-      <Container className="flex flex-col items-center justify-center min-h-[50vh]">
+      <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
         <p className="text-lg text-primary">Loading members...</p>
       </Container>
     );
@@ -75,7 +80,7 @@ export default function OurMembers() {
   if (isError) {
     console.error("Failed to fetch members:", error);
     return (
-      <Container className="flex flex-col items-center justify-center min-h-[50vh]">
+      <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
         <p className="text-lg text-red-500">
           Error loading members. Please try again later.
         </p>
@@ -83,17 +88,18 @@ export default function OurMembers() {
     );
   }
 
-  if (!members.length) {
+  if (!sortedMembers.length) {
     return (
-      <Container className="flex flex-col items-center justify-center min-h-[50vh]">
+      <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
         <p className="text-lg text-gray-600">No members found.</p>
       </Container>
     );
   }
 
+  const showCarouselNavigation = sortedMembers.length >= 4;
+
   return (
     <Container className="flex flex-col items-center w-full mx-auto px-4 py-12 md:py-16">
-      {/* Heading */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
           Our Members
@@ -104,11 +110,9 @@ export default function OurMembers() {
         </p>
       </div>
 
-      {/* Carousel */}
       <Carousel opts={{ align: "start", loop: true }} className="w-full">
         <CarouselContent className="-ml-4">
-          {members.map((member) => {
-            // Use fetched 'members' data
+          {sortedMembers.map((member) => {
             const Icon =
               memberKindIcons[member.kind as keyof typeof memberKindIcons];
 
@@ -135,7 +139,7 @@ export default function OurMembers() {
                         <AvatarFallback className="bg-gradient-to-br from-[#00AEEF] to-[#003366] text-white text-xl font-bold">
                           {member.name
                             .split(" ")
-                            .map((n) => n[0])
+                            .map((n: string) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
@@ -199,8 +203,12 @@ export default function OurMembers() {
           })}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
-        <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+        {showCarouselNavigation && (
+          <>
+            <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+            <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+          </>
+        )}
       </Carousel>
     </Container>
   );
