@@ -1,53 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { JwtDecode } from "@/lib/JwtDecode/JwtDecode";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { setUser } from "@/redux/features/auth/authSlice";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
-const Login: React.FC = () => {
-  // State for Login Form
-  const [loginEmail, setLoginEmail] = useState("");
-  const [loginPassword, setLoginPassword] = useState("");
-  const [loginStatus, setLoginStatus] = useState({
-    state: "idle",
-    message: "",
-  });
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [login, { isLoading }] = useLoginMutation();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoginStatus({ state: "loading", message: "" });
 
-    if (!loginEmail || !loginPassword) {
-      return setLoginStatus({
-        state: "error",
-        message: "Please fill all fields.",
-      });
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
     }
-    setTimeout(() => {
-      if (
-        loginEmail === "test@example.com" &&
-        loginPassword === "password123"
-      ) {
-        setLoginStatus({ state: "success", message: "Login successful!" });
-        setLoginEmail("");
-        setLoginPassword("");
-      } else {
-        setLoginStatus({
-          state: "error",
-          message: "Invalid email or password.",
-        });
+
+    try {
+      const res = await login({ email, password }).unwrap();
+
+      if (res?.success) {
+        toast.success(res?.message);
+        const user = JwtDecode(res?.data?.access_token);
+        dispatch(setUser({ user, token: res.data.access_token }));
+        setTimeout(() => router.push('/'), 2000);
       }
-    }, 1500);
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'data' in err) {
+        const error = err as { data?: { success?: boolean; message?: string } };
+        toast.error(error.data?.message || 'Login failed');
+      } else {
+        toast.error('An unexpected error occurred');
+      }
+    }
   };
 
   return (
@@ -75,29 +73,24 @@ const Login: React.FC = () => {
               <Input
                 type="email"
                 placeholder="Email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
               <Input
                 type="password"
                 placeholder="Password"
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              {loginStatus.state === "error" && (
-                <p className="text-red-500 text-sm">{loginStatus.message}</p>
-              )}
-              {loginStatus.state === "success" && (
-                <p className="text-green-600 text-sm">{loginStatus.message}</p>
-              )}
+
               <Button
                 type="submit"
-                disabled={loginStatus.state === "loading"}
+                disabled={isLoading}
                 className="w-full bg-primary hover:bg-primary/95 text-white font-bold py-3 rounded-lg transition"
               >
-                {loginStatus.state === "loading" ? "Logging in..." : "Login"}
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
               <p className="text-center text-sm text-gray-600 mt-4">
                 <Link href="#" className="text-primary hover:underline">

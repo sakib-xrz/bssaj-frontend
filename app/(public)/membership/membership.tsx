@@ -37,14 +37,14 @@ const Membership: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // console.log("Form submitted!");
-    // console.log({
-    //   email,
-    //   directorName,
-    //   logoFile,
-    //   successStoriesFiles,
-    //   downloadsFiles,
-    // });
+    console.log("Form submitted!");
+    console.log({
+      email,
+      directorName,
+      logoFile,
+      successStoriesFiles,
+      downloadsFiles,
+    });
   };
 
   const faqs = [
@@ -96,8 +96,8 @@ const Membership: React.FC = () => {
             ? multiple
               ? (fileState as FileList).length > 0
                 ? Array.from(fileState as FileList)
-                    .map((f) => f.name)
-                    .join(", ")
+                  .map((f) => f.name)
+                  .join(", ")
                 : "No file chosen"
               : (fileState as File).name
             : "No file chosen"}

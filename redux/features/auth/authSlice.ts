@@ -1,57 +1,38 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
-import { useSelector } from "react-redux";
+import { DecodedUser } from "@/lib/JwtDecode/JwtDecode";
 import { RootState } from "@/redux/store";
+import { createSlice } from "@reduxjs/toolkit";
+import { useSelector } from "react-redux";
 
 interface AuthState {
-  token: string | null;
+    token: string | null;
+    user: null | DecodedUser
 }
 
 const initialState: AuthState = {
-  token: null,
+    token: null,
+    user: null
 };
 
-interface SetTokenPayload {
-  token: string;
-}
-
 const authSlice = createSlice({
-  name: "auth",
-  initialState,
-  reducers: {
-    setToken: (state, action: PayloadAction<SetTokenPayload>) => {
-      state.token = action.payload.token;
+    name: "auth",
+    initialState,
+    reducers: {
+        setUser: (state, action) => {
+            const { user, token } = action.payload;
+            state.user = user;
+            state.token = token;
+        },
+        logout: (state) => {
+            state.user = null;
+            state.token = null;
+        },
     },
-    logout: (state) => {
-      state.token = null;
-    },
-  },
 });
 
-export const { setToken, logout } = authSlice.actions;
+export const { setUser, logout } = authSlice.actions;
 export default authSlice.reducer;
 
 export const useAuthToken = (): string | null => {
-  return useSelector((state: RootState) => state.auth.token);
+    return useSelector((state: RootState) => state.auth.token);
 };
 
-interface DecodedUser {
-  id: string;
-  email: string;
-  role: string;
-  exp: number;
-  iat: number;
-  [key: string]: unknown;
-}
-
-export const useCurrentUser = (): DecodedUser | null => {
-  const token = useAuthToken();
-
-  if (!token) return null;
-
-  try {
-    return jwtDecode<DecodedUser>(token);
-  } catch {
-    return null;
-  }
-};

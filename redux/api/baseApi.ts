@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { tagTypesList } from "../tagTypes";
 import { RootState } from "../store";
-import { BASE_URL } from "@/lib/constant";
+// import { BASE_URL } from "@/lib/constant";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: BASE_URL,
+  baseUrl: `https://api.bssaj.org/api/v1`,
   prepareHeaders: (headers, { getState }) => {
     const state = getState() as RootState;
     const token = state.auth?.token;
