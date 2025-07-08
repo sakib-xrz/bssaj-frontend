@@ -1,407 +1,502 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { MailIcon, PhoneIcon, UploadIcon } from "lucide-react";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useCreateAgencyMutation } from "@/redux/features/agency/agencyApi";
+import { useFormik } from "formik";
+import { Upload, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import * as Yup from "yup";
 
-const Membership: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [directorName, setDirectorName] = useState("");
 
+const agencySchema = Yup.object({
+  name: Yup.string()
+    .required("Agency name is required")
+    .min(2, "Name must be at least 2 characters"),
+  contact_email: Yup.string()
+    .email("Invalid email format")
+    .required("Contact email is required"),
+  contact_phone: Yup.string(),
+  website: Yup.string().url("Invalid URL format"),
+  director_name: Yup.string(),
+  established_year: Yup.number()
+    .typeError("Established year must be a number")
+    .min(1900, "Invalid year")
+    .max(new Date().getFullYear(), "Year cannot be in the future")
+    .nullable(),
+  description: Yup.string(),
+  address: Yup.string(),
+  facebook_url: Yup.string().url("Invalid URL format"),
+});
+
+
+const Membership = () => {
+  const router = useRouter();
+  const [createAgency, { isLoading }] =
+    useCreateAgencyMutation();
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [successStoriesFiles, setSuccessStoriesFiles] =
-    useState<FileList | null>(null);
-  const [downloadsFiles, setDownloadsFiles] = useState<FileList | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [successStoryImages, setSuccessStoryImages] = useState<File[]>([]);
+  const [successStoryPreviews, setSuccessStoryPreviews] = useState<string[]>(
+    []
+  );
 
-  const logoInputRef = useRef<HTMLInputElement>(null);
-  const successStoriesInputRef = useRef<HTMLInputElement>(null);
-  const downloadsInputRef = useRef<HTMLInputElement>(null);
+  console.log(logoFile);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    return () => {
+      if (logoPreview) {
+        URL.revokeObjectURL(logoPreview);
+      }
+      successStoryPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [logoPreview, successStoryPreviews]);
 
-    console.log("Form submitted!");
-    console.log({
-      email,
-      directorName,
-      logoFile,
-      successStoriesFiles,
-      downloadsFiles,
-    });
+  const formik = useFormik({
+    initialValues: {
+      name: "Dev Agency",
+      contact_email: "dev@agency.com",
+      contact_phone: "1234567890",
+      website: "https://devagency.com",
+      director_name: "Dev Director",
+      established_year: "2025",
+      description: "Dev Agency Description",
+      address: "Dev Address",
+      facebook_url: "https://facebook.com/devagency",
+    },
+    validationSchema: agencySchema,
+    onSubmit: async (values) => {
+      try {
+        const formData = new FormData();
+
+        // Append user and agency fields
+        for (const key in values) {
+          if (Object.prototype.hasOwnProperty.call(values, key)) {
+            const value = values[key as keyof typeof values];
+            if (key === "established_year") {
+              if (value) {
+                formData.append(key, String(Number(value)));
+              }
+            } else if (value !== null && value !== undefined) {
+              formData.append(key, value);
+            }
+          }
+        }
+
+        // Append logo file
+        if (logoFile) {
+          formData.append("logo", logoFile);
+        }
+
+        // Append success story images
+        successStoryImages.forEach((file, index) => {
+          formData.append(`successStoryImages[${index}]`, file);
+        });
+
+        // Add static status fields
+        formData.append("status", "PENDING");
+        formData.append("is_approved", "false");
+        formData.append("is_deleted", "false");
+
+        // Use RTK Query mutation
+        const result = await createAgency(formData).unwrap();
+        console.log("Agency created successfully:", result);
+
+        // Success actions
+        formik.resetForm();
+        if (logoPreview) URL.revokeObjectURL(logoPreview);
+        setLogoFile(null);
+        setLogoPreview(null);
+        successStoryPreviews.forEach((url) => URL.revokeObjectURL(url));
+        setSuccessStoryImages([]);
+        setSuccessStoryPreviews([]);
+
+        // Navigate to agencies list
+        router.push("/agencies");
+        toast.success("Agency created successfully");
+      } catch (error) {
+        console.error("Error creating agency:", error);
+        toast.error("Failed to create agency");
+      }
+    },
+  });
+
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (logoPreview) {
+      URL.revokeObjectURL(logoPreview);
+    }
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setLogoPreview(previewUrl);
+      setLogoFile(file);
+    } else {
+      setLogoPreview(null);
+      setLogoFile(null);
+    }
   };
 
-  const faqs = [
-    {
-      question: "How long does the application process take?",
-      answer: "The application review typically takes 3-5 business days.",
-    },
-    {
-      question: "Can I apply if I'm not currently in Japan?",
-      answer:
-        "Yes, you can apply if you're planning to come to Japan or have a connection to the Bangladeshi student community in Japan.",
-    },
-    {
-      question: "Is there a discount for long-term membership?",
-      answer:
-        "We offer discounts for 3-year and 5-year membership commitments. Contact us for details.",
-    },
-  ];
+  const handleSuccessStoryImagesChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFiles = Array.from(event.target.files || []);
 
-  const renderFileInput = (
-    id: string,
-    label: string,
-    maxFilesInfo: string,
-    fileState: File | FileList | null,
-    setFileState:
-      | React.Dispatch<React.SetStateAction<File | null>>
-      | React.Dispatch<React.SetStateAction<FileList | null>>,
-    inputRef: React.RefObject<HTMLInputElement>,
-    multiple: boolean = false
-  ) => (
-    <div className="md:col-span-2">
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-1"
-      >
-        {label} *
-      </label>
-      <div className="flex items-center space-x-2 w-full max-w-md border border-gray-300 rounded-md shadow-sm overflow-hidden">
-        <Button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded-l-md transition-colors duration-200 flex-shrink-0"
-        >
-          <UploadIcon className="h-4 w-4 mr-2" /> Choose File
-          {multiple ? "s" : ""}
-        </Button>
-        <span className="text-sm text-gray-500 truncate px-2">
-          {fileState
-            ? multiple
-              ? (fileState as FileList).length > 0
-                ? Array.from(fileState as FileList)
-                  .map((f) => f.name)
-                  .join(", ")
-                : "No file chosen"
-              : (fileState as File).name
-            : "No file chosen"}
-        </span>
-        <input
-          type="file"
-          id={id}
-          ref={inputRef}
-          multiple={multiple}
-          onChange={(e) => {
-            if (multiple) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              setFileState(e.target.files as any);
-            } else {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              setFileState(e.target.files ? e.target.files[0] : (null as any));
-            }
-          }}
-          className="hidden" // Hide the actual input
-        />
-      </div>
-      <p className="text-xs text-gray-500 mt-1">{maxFilesInfo}</p>
-    </div>
-  );
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+
+    setSuccessStoryPreviews((prev) => [...prev, ...newPreviews]);
+    setSuccessStoryImages((prev) => [...prev, ...selectedFiles]);
+
+    // Clear the input value to allow selecting the same file(s) again
+    event.target.value = "";
+  };
+
+  const handleRemoveSuccessStory = (index: number) => {
+    URL.revokeObjectURL(successStoryPreviews[index]);
+
+    setSuccessStoryPreviews((prev) => prev.filter((_, i) => i !== index));
+    setSuccessStoryImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
 
   return (
     <div>
-      <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
+      {/* Hero-like Section */}
+      <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20 text-center">
         <SectionHeader
-          className="mb-20"
-          title="Membership"
-          description="Join our community and access exclusive benefits and support services."
+          title="Join Our Community"
+          description="Create your account to access personalized student support."
         />
       </div>
-      <Container className="py-12 md:py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-          <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
-            <CardHeader className="p-0 mb-6">
-              <CardTitle className="text-2xl font-bold text-primary mb-2">
-                Membership Application
-              </CardTitle>
-              <CardDescription className="text-muted-foreground text-sm leading-relaxed">
-                Complete the form below to apply for BSSAJ membership. Please
-                ensure all information is accurate and up-to-date.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <p className="text-sm text-gray-600">
-                  Please provide your agencies details for the membership
-                  application:
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Email *
-                    </label>
+
+      <Container className="py-12 md:py-16 flex justify-center items-center">
+        <Card className="w-full max-w-md rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
+          <CardHeader className="p-0 mb-6 text-center">
+            <CardTitle className="text-2xl font-bold text-primary mb-2">
+              Create Your Account
+            </CardTitle>
+            <CardDescription className="text-muted-foreground text-sm leading-relaxed">
+              Join our community by filling out the registration form.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <form onSubmit={formik.handleSubmit} className="space-y-6">
+              {/* Basic Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Basic Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Agency Name *</Label>
                     <Input
-                      type="email"
-                      id="email"
-                      placeholder="Your Email Address"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="name"
+                      name="name"
+                      placeholder="Enter agency name"
+                      value={formik.values.name}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={
+                        formik.touched.name && formik.errors.name
+                          ? "border-red-500"
+                          : ""
+                      }
                     />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="directorName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Director Name *
-                    </label>
-                    <Input
-                      type="text"
-                      id="directorName"
-                      placeholder="Your Answer"
-                      required
-                      value={directorName}
-                      onChange={(e) => setDirectorName(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="instituteName"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Institute Name *
-                    </label>
-                    <Input
-                      type="text"
-                      id="instituteName"
-                      placeholder="Your Answer"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="establishmentYear"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Establishment year *
-                    </label>
-                    <Input
-                      type="text"
-                      id="establishmentYear"
-                      placeholder="Your Answer"
-                      required
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label
-                      htmlFor="aboutInstitute"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      About Your Institute *
-                    </label>
-                    <Textarea
-                      id="aboutInstitute"
-                      placeholder="Your Answer"
-                      rows={3}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="fullAddress"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Full Address *
-                    </label>
-                    <Input
-                      type="text"
-                      id="fullAddress"
-                      placeholder="Your Answer"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="contactNumber"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Contact Number (only one) *
-                    </label>
-                    <Input
-                      type="tel"
-                      id="contactNumber"
-                      placeholder="Your Answer"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="messageFromDirector"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Message From Director
-                    </label>
-                    <Input
-                      type="text"
-                      id="messageFromDirector"
-                      placeholder="Your Answer"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="servicesOffered"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Services Offered
-                    </label>
-                    <Input
-                      type="text"
-                      id="servicesOffered"
-                      placeholder="Your Answer"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="facebookPageUrl"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Facebook Page (URL) *
-                    </label>
-                    <Input
-                      type="url"
-                      id="facebookPageUrl"
-                      placeholder="Your Answer"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="websiteUrl"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      Website URL(If have)
-                    </label>
-                    <Input
-                      type="url"
-                      id="websiteUrl"
-                      placeholder="Your Answer"
-                    />
+                    {formik.touched.name && formik.errors.name && (
+                      <p className="text-sm text-red-500">
+                        {formik.errors.name}
+                      </p>
+                    )}
                   </div>
 
-                  {renderFileInput(
-                    "logo",
-                    "Logo",
-                    "Upload 1 supported file. Max 10 MB",
-                    logoFile,
-                    setLogoFile,
-                    logoInputRef
-                  )}
-                  {renderFileInput(
-                    "successStories",
-                    "Success Stories (5 photos only)",
-                    "Upload up to 5 supported files. Max 100 MB per file.",
-                    successStoriesFiles,
-                    setSuccessStoriesFiles,
-                    successStoriesInputRef,
-                    true // multiple files allowed
-                  )}
-                  {renderFileInput(
-                    "downloads",
-                    "Downloads (Admission Form, etc.)",
-                    "Upload up to 5 supported files. PDF, document, or image. Max 100 MB per file.",
-                    downloadsFiles,
-                    setDownloadsFiles,
-                    downloadsInputRef,
-                    true
-                  )}
+                  <div className="space-y-2">
+                    <Label htmlFor="director_name">Director Name</Label>
+                    <Input
+                      id="director_name"
+                      name="director_name"
+                      placeholder="Enter director name"
+                      value={formik.values.director_name}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                  </div>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="logo">Agency Logo</Label>
+                  <div className="flex flex-col gap-4">
+                    <Input
+                      id="logo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoChange}
+                      className="hidden"
+                    />
+                    {logoPreview ? (
+                      <div className="relative w-40 h-40">
+                        <Image
+                          src={logoPreview}
+                          alt="Logo preview"
+                          width={160}
+                          height={160}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                          onClick={() => {
+                            URL.revokeObjectURL(logoPreview);
+                            setLogoPreview(null);
+                            setLogoFile(null);
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById("logo")?.click()}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Logo
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="Enter agency description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    rows={4}
+                  />
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Contact Information
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="contact_email">Contact Email *</Label>
+                    <Input
+                      id="contact_email"
+                      name="contact_email"
+                      type="email"
+                      placeholder="Enter contact email"
+                      value={formik.values.contact_email}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={
+                        formik.touched.contact_email &&
+                          formik.errors.contact_email
+                          ? "border-red-500"
+                          : ""
+                      }
+                    />
+                    {formik.touched.contact_email &&
+                      formik.errors.contact_email && (
+                        <p className="text-sm text-red-500">
+                          {formik.errors.contact_email}
+                        </p>
+                      )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="contact_phone">Contact Phone</Label>
+                    <Input
+                      id="contact_phone"
+                      name="contact_phone"
+                      placeholder="Enter contact phone"
+                      value={formik.values.contact_phone}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Textarea
+                    id="address"
+                    name="address"
+                    placeholder="Enter agency address"
+                    value={formik.values.address}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      name="website"
+                      placeholder="https://example.com"
+                      value={formik.values.website}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={
+                        formik.touched.website && formik.errors.website
+                          ? "border-red-500"
+                          : ""
+                      }
+                    />
+                    {formik.touched.website && formik.errors.website && (
+                      <p className="text-sm text-red-500">
+                        {formik.errors.website}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="facebook_url">Facebook URL</Label>
+                    <Input
+                      id="facebook_url"
+                      name="facebook_url"
+                      placeholder="https://facebook.com/agency"
+                      value={formik.values.facebook_url}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                      className={
+                        formik.touched.facebook_url &&
+                          formik.errors.facebook_url
+                          ? "border-red-500"
+                          : ""
+                      }
+                    />
+                    {formik.touched.facebook_url &&
+                      formik.errors.facebook_url && (
+                        <p className="text-sm text-red-500">
+                          {formik.errors.facebook_url}
+                        </p>
+                      )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="established_year">Established Year</Label>
+                  <Input
+                    id="established_year"
+                    name="established_year"
+                    type="number"
+                    placeholder="2020"
+                    value={formik.values.established_year}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    className={
+                      formik.touched.established_year &&
+                        formik.errors.established_year
+                        ? "border-red-500"
+                        : ""
+                    }
+                  />
+                  {formik.touched.established_year &&
+                    formik.errors.established_year && (
+                      <p className="text-sm text-red-500">
+                        {formik.errors.established_year}
+                      </p>
+                    )}
+                </div>
+              </div>
+
+              {/* Success Stories */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Success Stories
+                </h3>
+
+                <div className="space-y-2">
+                  <Label htmlFor="success_stories">Success Story Images</Label>
+                  <div className="flex flex-col gap-4">
+                    <Input
+                      id="success_stories"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleSuccessStoryImagesChange}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() =>
+                        document.getElementById("success_stories")?.click()
+                      }
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Success Story Images
+                    </Button>
+                    {successStoryImages.length > 0 && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {successStoryImages.map((file, index) => (
+                          <div
+                            key={file.name + index}
+                            className="relative w-full aspect-square"
+                          >
+                            <Image
+                              src={successStoryPreviews[index]}
+                              alt={`Success story ${index + 1}`}
+                              fill
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                              onClick={() => handleRemoveSuccessStory(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4">
+                <Link href="/agencies">
+                  <Button type="button" variant="outline" disabled={isLoading}>
+                    Cancel
+                  </Button>
+                </Link>
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg shadow-md"
+                  disabled={isLoading || !formik.isValid}
+                  className="bg-primary hover:bg-primary/90"
                 >
-                  Save changed
+                  {isLoading ? "Creating Agency..." : "Create Agency"}
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
-          <div className="flex flex-col space-y-8">
-            <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
-              <CardHeader className="p-0 mb-6">
-                <CardTitle className="text-2xl font-bold text-primary">
-                  Membership FAQs
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <Accordion type="single" collapsible className="w-full">
-                  {faqs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left text-base font-medium text-gray-800 hover:no-underline">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-600 text-sm leading-relaxed">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </CardContent>
-            </Card>
-
-            <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
-              <CardHeader className="p-0 mb-6">
-                <CardTitle className="text-2xl font-bold text-primary">
-                  Need Help?
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 space-y-4">
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  If you have any questions or need assistance with your
-                  application, we are here to help.
-                </p>
-                <div className="flex items-center space-x-3 text-gray-700">
-                  <PhoneIcon className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-base font-medium">Call Us</p>
-                    <p className="text-sm">000 XXXXXXXX</p>
-                    <p className="text-xs text-gray-500">
-                      Monday to Friday, 9:00 AM - 5:00 PM JST
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 text-gray-700">
-                  <MailIcon className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="text-base font-medium">Email Us</p>
-                    <p className="text-sm">membership@bssaj.com</p>
-                    <p className="text-xs text-gray-500">
-                      We will respond within 24 hours
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       </Container>
     </div>
   );
