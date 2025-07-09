@@ -4,7 +4,13 @@ import { Agency as AgencyType } from "@/app/(public)/_components/types";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useGetAllAgencyQuery } from "@/redux/features/agency/agencyApi";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
@@ -13,12 +19,12 @@ import Agency from "../_components/Agency";
 const MemberAgencies = () => {
   // const [page, setPage] = useState(1);
   // const [limit, setLimit] = useState(12);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const { isLoading, isError, data } = useGetAllAgencyQuery([
     // { name: 'limit', value: limit },
     // { name: 'page', value: page },
-    { name: 'search', value: search },
+    { name: "search", value: search },
   ]);
 
   if (isLoading) return <div>Loading...</div>;
@@ -26,7 +32,7 @@ const MemberAgencies = () => {
 
   return (
     <div>
-      <div className="bg-gradient-to-r my-10 from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
+      <div className="bg-gradient-to-r mb-10 from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
         <SectionHeader
           className="mb-12"
           title="Member Agencies"
