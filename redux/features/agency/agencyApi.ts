@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "@/redux/api/baseApi";
 
 export const agencyApi = baseApi.injectEndpoints({
@@ -29,8 +30,14 @@ export const agencyApi = baseApi.injectEndpoints({
             },
             {} as Record<string, string>
           )
+    getAllAgency: builder.query({
+      query: (args:any) => {
+        const queryString = new URLSearchParams(
+          args.reduce((acc, { name, value }) => {
+            if (value) acc[name] = value;
+            return acc;
+          }, {}),
         ).toString();
-
         return {
           url: `/agencies?${queryString}`,
           method: "GET",
