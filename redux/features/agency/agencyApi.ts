@@ -31,7 +31,7 @@ export const agencyApi = baseApi.injectEndpoints({
               if (value) acc[name] = value;
               return acc;
             },
-            {}
+            {} as Record<string, string>
           )
         ).toString();
         return {
