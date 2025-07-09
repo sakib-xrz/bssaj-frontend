@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "@/redux/api/baseApi";
 
 export const agencyApi = baseApi.injectEndpoints({
@@ -12,7 +13,7 @@ export const agencyApi = baseApi.injectEndpoints({
       invalidatesTags: ["Agency"],
     }),
 
-  
+
     getMemberById: builder.query({
       query: (id) => ({
         url: `/agencies/${id}`,
@@ -21,12 +22,21 @@ export const agencyApi = baseApi.injectEndpoints({
       providesTags: ["Agency"],
     }),
 
-    
+
     getAllAgency: builder.query({
-      query: () => ({
-        url: `/agencies`,
-        method: "GET",
-      }),
+      query: (args:any) => {
+        const queryString = new URLSearchParams(
+          args.reduce((acc, { name, value }) => {
+            if (value) acc[name] = value;
+            return acc;
+          }, {}),
+        ).toString();
+
+        return {
+          url: `/agencies?${queryString}`,
+          method: "GET",
+        };
+      },
       providesTags: ["Agency"],
     }),
   }),
