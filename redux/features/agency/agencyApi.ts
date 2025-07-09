@@ -21,22 +21,18 @@ export const agencyApi = baseApi.injectEndpoints({
     }),
 
     getAllAgency: builder.query({
-      query: (args: { name: string; value: string }[]) => {
+      query: (args: any) => {
         const queryString = new URLSearchParams(
           args.reduce(
-            (acc: Record<string, string>, { name, value }) => {
+            (
+              acc: Record<string, string>,
+              { name, value }: { name: string; value: string }
+            ) => {
               if (value) acc[name] = value;
               return acc;
             },
-            {} as Record<string, string>
+            {}
           )
-    getAllAgency: builder.query({
-      query: (args:any) => {
-        const queryString = new URLSearchParams(
-          args.reduce((acc, { name, value }) => {
-            if (value) acc[name] = value;
-            return acc;
-          }, {}),
         ).toString();
         return {
           url: `/agencies?${queryString}`,
