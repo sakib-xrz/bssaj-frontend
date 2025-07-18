@@ -36,3 +36,6 @@ export const useAuthToken = (): string | null => {
     return useSelector((state: RootState) => state.auth.token);
 };
 
+export const useAuthUser = (): DecodedUser | null => {
+  return useSelector((state: RootState) => state.auth.user);
+};

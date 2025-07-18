@@ -1,18 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { MenuIcon, ChevronDown } from "lucide-react";
 import { navLinks } from "@/lib/data";
-import Container from "./container";
+import { logout, useAuthUser } from "@/redux/features/auth/authSlice";
+import { AppDispatch, persistor } from "@/redux/store";
+import { ChevronDown, MenuIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import Container from "./container";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const user = useAuthUser()
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter()
+
+  const handleLogout = () => {
+    // step 1 state clear 
+    dispatch(logout());
+    // step 2 persistor theke remove kora holo 
+    persistor.purge();
+    // logout er pore login e redirect kora holo 
+    router.push('/login')
+  };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF]">
@@ -36,11 +52,10 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  isActive
-                    ? "text-primary font-semibold"
-                    : "text-[#868686] hover:text-primary"
-                }`}
+                className={`text-sm font-medium transition-colors ${isActive
+                  ? "text-primary font-semibold"
+                  : "text-[#868686] hover:text-primary"
+                  }`}
               >
                 {link.name}
               </Link>
@@ -49,10 +64,14 @@ export default function Navbar() {
           <Button className="text-muted bg-[#00AEEF] hover:bg-[#00AEEF]/90">
             En <ChevronDown />
           </Button>
-
-          <Button asChild>
-            <Link href="/login">Sign in</Link>
-          </Button>
+          {user ?
+            <Button onClick={handleLogout}>
+              Logout
+            </Button>
+            :
+            <Button asChild>
+              <Link href="/login">Sign in</Link>
+            </Button>}
         </nav>
 
         {/* Mobile Navigation with Sheet */}
@@ -76,20 +95,22 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-lg font-medium ${
-                        isActive
-                          ? "text-primary font-semibold"
-                          : "text-gray-700 hover:text-primary"
-                      }`}
+                      className={`text-lg font-medium ${isActive
+                        ? "text-primary font-semibold"
+                        : "text-gray-700 hover:text-primary"
+                        }`}
                     >
                       {link.name}
                     </Link>
                   );
                 })}
 
-                <Link href="/login" onClick={() => setOpen(false)}>
-                  <Button className="w-full">Sign in</Button>
-                </Link>
+                {user ?
+                  <Button className="w-full">Logout</Button>
+                  :
+                  <Link href="/login" onClick={() => setOpen(false)}>
+                    <Button className="w-full">Sign In</Button>
+                  </Link>}
               </div>
             </SheetContent>
           </Sheet>

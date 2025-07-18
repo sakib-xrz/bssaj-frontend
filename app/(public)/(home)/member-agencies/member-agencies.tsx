@@ -4,17 +4,11 @@ import { Agency as AgencyType } from "@/app/(public)/_components/types";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGetAllAgencyQuery } from "@/redux/features/agency/agencyApi";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
-import Agency from "../_components/Agency";
+import Agency from "../../_components/Agency";
 
 const MemberAgencies = () => {
   // const [page, setPage] = useState(1);

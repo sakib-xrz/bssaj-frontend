@@ -8,11 +8,7 @@ export const metadata: Metadata = {
     "Supporting Bangladeshi students in Japan through community, resources and opportunities.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>

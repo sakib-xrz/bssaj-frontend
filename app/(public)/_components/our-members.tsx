@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import Container from "@/components/shared/container";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
-import { Member } from "../members/_components/member-card";
+import { Member } from "../(home)/members/_components/member-card";
 
 const memberKindIcons = {
   ADVISER: Crown,
