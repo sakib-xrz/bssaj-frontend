@@ -53,7 +53,7 @@ export function DashboardHeader() {
           </Button>
 
           {/* Logo/Brand - visible on desktop */}
-          <Link href="/dashboard" className="hidden lg:flex items-center gap-2">
+          <Link href="/" className="hidden lg:flex items-center gap-2">
             <span className="text-xl font-semibold">Bssaj</span>
           </Link>
         </div>
