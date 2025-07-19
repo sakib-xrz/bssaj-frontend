@@ -184,7 +184,6 @@ const Membership: React.FC = () => {
           description="Join our community by registering your agency to support Bangladeshi students in Japan."
         />
       </div>
-
       <Container className="py-12 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <Card className="w-full rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">

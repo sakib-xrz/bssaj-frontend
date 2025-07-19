@@ -1,8 +1,5 @@
-
 function page() {
-    return (
-        <div>profile information ekhane</div>
-    )
+  return <div>profile information ekhane</div>;
 }
 
-export default page
+export default page;
