@@ -3,9 +3,14 @@
 
 import { DashboardHeader } from "../_components/DashboardHeader";
 import ProtectedRoute from "../_components/ProtectedRoute";
+
 import { Sidebar } from "../_components/Sidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ProtectedRoute>
       <DashboardHeader />
@@ -15,6 +20,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <main className="bg-gray-50">{children}</main>
         </div>
       </div>
-    </ProtectedRoute >
+    </ProtectedRoute>
   );
 }
