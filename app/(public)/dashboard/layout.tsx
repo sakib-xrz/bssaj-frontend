@@ -1,4 +1,3 @@
-// app/dashboard/layout.tsx
 "use client";
 
 import { DashboardHeader } from "../_components/dashboard-header";
