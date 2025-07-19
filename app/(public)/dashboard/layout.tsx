@@ -1,10 +1,9 @@
 // app/dashboard/layout.tsx
 "use client";
 
-import { DashboardHeader } from "../_components/DashboardHeader";
-import ProtectedRoute from "../_components/ProtectedRoute";
-
-import { Sidebar } from "../_components/Sidebar";
+import { DashboardHeader } from "../_components/dashboard-header";
+import ProtectedRoute from "../_components/protectedRoute";
+import { Sidebar } from "../_components/sidebar";
 
 export default function DashboardLayout({
   children,

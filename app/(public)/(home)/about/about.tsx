@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Image from "next/image";
-import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Container from "@/components/shared/container";
+import { useGetMembersQuery } from "@/redux/features/member/memberApi";
+import MemberCard, { Member } from "../members/_components/member-card";
 
 const AboutBSSAJ: React.FC = () => {
   const [activeTab, setActiveTab] = useState("mission-vision");
@@ -20,16 +22,19 @@ const AboutBSSAJ: React.FC = () => {
   const tabItems = [
     { value: "mission-vision", label: "Mission & Vision" },
     { value: "history", label: "History" },
-    { value: "executive-committee", label: "Executive Committee" },
-    { value: "executive-members", label: "Executive Members" },
-    { value: "advisory-members", label: "Advisory Members" },
-    { value: "associated-members", label: "Associated Members" },
-    { value: "honorable-members", label: "Honorable Members" },
+    { value: "EXECUTIVE", label: "Executive" },
+    { value: "ADVISER", label: "Advisor" },
+    { value: "ASSOCIATE", label: "Associative" },
+    { value: "HONORABLE", label: "Honorable" },
+    { value: "STUDENT_REPRESENTATIVE", label: "Student Representative" },
   ];
 
   function cn(...classes: (string | undefined | null | false)[]): string {
     return classes.filter(Boolean).join(" ");
   }
+
+  const { data, isLoading, isError } = useGetMembersQuery({});
+  const allMembers: Member[] = useMemo(() => data?.data || [], [data]);
 
   return (
     <div>
@@ -39,8 +44,10 @@ const AboutBSSAJ: React.FC = () => {
           description="The Bangladeshi Students’ Support Association in Japan (BSSAJ) is a non-profit, non-political, and student-focused organization established to assist Bangladeshi students studying and aspiring to study in Japan."
         />
       </div>
-      <Container className="py-12 md:py-16 lg:mb-28 ">
+
+      <Container className="py-12 md:py-16 lg:mb-28">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Desktop Tabs */}
           <div className="hidden sm:block overflow-x-auto pb-4">
             <TabsList className="flex flex-wrap gap-2 shadow-none bg-transparent">
               {tabItems.map((item) => (
@@ -58,6 +65,8 @@ const AboutBSSAJ: React.FC = () => {
               ))}
             </TabsList>
           </div>
+
+          {/* Mobile Select */}
           <div className="sm:hidden w-full flex justify-end mb-6">
             <Select value={activeTab} onValueChange={setActiveTab}>
               <SelectTrigger className="w-[250px] rounded-full border-gray-300 shadow-sm text-base">
@@ -144,21 +153,51 @@ const AboutBSSAJ: React.FC = () => {
             </Card>
           </TabsContent>
 
+          {/* Dynamic Member Tabs */}
           {tabItems
             .filter(
               (item) =>
                 item.value !== "mission-vision" && item.value !== "history"
             )
-            .map((item) => (
-              <TabsContent key={item.value} value={item.value} className="mt-8">
-                <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8 text-center text-gray-600">
-                  <CardContent className="p-0">
-                    <h2 className="text-2xl font-bold mb-4">{item.label}</h2>
-                    <p>Content for {item.label} goes here...</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            ))}
+            .map((item) => {
+              const filteredMembers = allMembers.filter(
+                (member) => member.kind === item.value
+              );
+
+              return (
+                <TabsContent
+                  key={item.value}
+                  value={item.value}
+                  className="mt-8"
+                >
+                  {isLoading ? (
+                    <div className="text-center py-8">
+                      <p className="text-lg text-primary">
+                        Loading {item.label} members...
+                      </p>
+                    </div>
+                  ) : isError ? (
+                    <div className="text-center py-8">
+                      <p className="text-lg text-red-500">
+                        Error loading {item.label} members.
+                      </p>
+                    </div>
+                  ) : filteredMembers.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {filteredMembers.map((member) => (
+                        <MemberCard key={member.id} member={member} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-lg text-gray-600">
+                        No {item.label} members found.
+                      </p>
+                    </div>
+                  )}
+                </TabsContent>
+              );
+            })}
         </Tabs>
       </Container>
     </div>

@@ -14,7 +14,7 @@ import {
 import { useGetAllAgencyQuery } from "@/redux/features/agency/agencyApi";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
-import Agency from "../../_components/Agency";
+import Agency from "../../_components/agency";
 
 const MemberAgencies = () => {
   const [search, setSearch] = useState("");

@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { SidebarContent } from "./Sidebar";
+import { SidebarContent } from "./sidebar";
 
 export function DashboardHeader() {
   const router = useRouter();
@@ -54,7 +54,7 @@ export function DashboardHeader() {
 
           {/* Logo/Brand - visible on desktop */}
           <Link href="/dashboard" className="hidden lg:flex items-center gap-2">
-            <span className="text-xl font-semibold">Bassaj</span>
+            <span className="text-xl font-semibold">Bssaj</span>
           </Link>
         </div>
 
@@ -69,7 +69,7 @@ export function DashboardHeader() {
               >
                 <Avatar className="h-8 w-8">
                   <AvatarImage
-                    src={user?.profile_picture || ''}
+                    src={user?.profile_picture || ""}
                     alt={`${user?.name}'s profile picture`}
                   />
                   <AvatarFallback>
