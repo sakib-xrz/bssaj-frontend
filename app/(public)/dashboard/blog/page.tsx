@@ -141,7 +141,7 @@ const Blogs: React.FC = () => {
                         asChild
                         className="flex-1 bg-primary hover:bg-primary/90 text-white"
                       >
-                        <Link href={`/dashboard/blogs/edit/${blog.id}`}>
+                        <Link href={`/dashboard/blog/edit/${blog.id}`}>
                           Edit
                         </Link>
                       </Button>
