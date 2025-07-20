@@ -1,13 +1,13 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users } from "lucide-react";
+import { LayoutDashboard, Users, FileText } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigation = [
   { name: "My Profile", href: "/dashboard", icon: LayoutDashboard },
-  { name: "My Blogs", href: "/dashboard/blog", icon: Users },
+  { name: "My Blogs", href: "/dashboard/blog", icon: FileText },
   { name: "My Membership", href: "/dashboard/my-membership", icon: Users },
 ];
 
@@ -16,7 +16,9 @@ export function SidebarContent() {
 
   return (
     <div className="flex flex-col h-full bg-white border-r border-gray-200">
-      <div className="p-4 text-xl font-bold text-primary">Dashboard</div>
+      <div className="p-4 text-xl font-bold text-primary">
+        <Link href="/">Bssaj</Link>
+      </div>
       <nav className="flex-1 px-4 space-y-1">
         {navigation.map((item) => {
           const Icon = item.icon;
