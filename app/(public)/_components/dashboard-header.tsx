@@ -39,9 +39,8 @@ export function DashboardHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex items-center justify-between p-6 bg-white border-b border-gray-200 h-16">
+      <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-3 bg-white shadow-sm h-16">
         <div className="flex items-center gap-4">
-          {/* Mobile menu button */}
           <Button
             variant="ghost"
             size="icon"
@@ -52,22 +51,20 @@ export function DashboardHeader() {
             <Menu className="w-5 h-5" />
           </Button>
 
-          {/* Logo/Brand - visible on desktop */}
           <Link href="/" className="hidden lg:flex items-center gap-2">
-            <span className="text-xl font-semibold">Bssaj</span>
+            <span className="text-2xl font-bold text-primary">Bssaj</span>
           </Link>
         </div>
 
-        {/* User dropdown */}
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="relative h-8 w-8 rounded-full"
+                className="relative h-9 w-9 rounded-full"
                 aria-label="User menu"
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-9 w-9">
                   <AvatarImage
                     src={user?.profile_picture || ""}
                     alt={`${user?.name}'s profile picture`}
@@ -78,20 +75,22 @@ export function DashboardHeader() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent
+              className="w-60 rounded-xl shadow-lg"
+              align="end"
+              forceMount
+            >
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none truncate">
-                    {user?.name}
-                  </p>
-                  <p className="text-xs leading-none text-muted-foreground truncate">
+                  <p className="text-sm font-semibold truncate">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">
                     {user?.email}
                   </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/dashboard">
+                <Link href="/dashboard" className="flex items-center">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
@@ -99,7 +98,7 @@ export function DashboardHeader() {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={handleLogout}
-                className="focus:bg-destructive focus:text-destructive-foreground cursor-pointer"
+                className="text-destructive focus:bg-destructive/10"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
@@ -109,7 +108,6 @@ export function DashboardHeader() {
         </div>
       </header>
 
-      {/* Mobile Sidebar */}
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="left" className="p-0 w-64">
           <SidebarContent />
