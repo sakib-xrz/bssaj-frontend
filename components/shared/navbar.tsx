@@ -5,30 +5,40 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/data";
 import { logout, useAuthUser } from "@/redux/features/auth/authSlice";
 import { AppDispatch, persistor } from "@/redux/store";
-import { ChevronDown, MenuIcon } from "lucide-react";
+import { ChevronDown, MenuIcon, LogOut, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import Container from "./container";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const user = useAuthUser()
+  const user = useAuthUser();
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter()
+  const router = useRouter();
 
   const handleLogout = () => {
-    // step 1 state clear 
     dispatch(logout());
-    // step 2 persistor theke remove kora holo 
     persistor.purge();
-    // logout er pore login e redirect kora holo 
-    router.push('/login')
+    router.push("/login");
   };
 
+  const userInitials = user?.name
+    ?.split(" ")
+    ?.map((name) => name[0])
+    .join("");
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF]">
@@ -52,26 +62,90 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${isActive
-                  ? "text-primary font-semibold"
-                  : "text-[#868686] hover:text-primary"
-                  }`}
+                className={`text-sm font-medium transition-colors ${
+                  isActive
+                    ? "text-primary font-semibold"
+                    : "text-[#868686] hover:text-primary"
+                }`}
               >
                 {link.name}
               </Link>
             );
           })}
+          {/* New: Profile link, visible only when user is logged in */}
+          {user && (
+            <Link
+              href="/dashboard"
+              className={`text-sm font-medium transition-colors ${
+                pathname === "/dashboard"
+                  ? "text-primary font-semibold"
+                  : "text-[#868686] hover:text-primary"
+              }`}
+            >
+              Profile
+            </Link>
+          )}
           <Button className="text-muted bg-[#00AEEF] hover:bg-[#00AEEF]/90">
-            En <ChevronDown />
+            En <ChevronDown className="ml-1 h-4 w-4" />
           </Button>
-          {user ?
-            <Button onClick={handleLogout}>
-              Logout
-            </Button>
-            :
+
+          {/* Conditional rendering for user dropdown or Sign in button */}
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative h-9 w-9 rounded-full"
+                  aria-label="User menu"
+                >
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage
+                      src={user?.profile_picture || ""}
+                      alt={`${user?.name}'s profile picture`}
+                    />
+                    <AvatarFallback>
+                      {userInitials || <User className="h-4 w-4" />}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="w-60 rounded-xl shadow-lg"
+                align="end"
+                forceMount
+              >
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-semibold truncate">
+                      {user?.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user?.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard" className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive focus:bg-destructive/10"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
             <Button asChild>
               <Link href="/login">Sign in</Link>
-            </Button>}
+            </Button>
+          )}
         </nav>
 
         {/* Mobile Navigation with Sheet */}
@@ -95,22 +169,32 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-lg font-medium ${isActive
-                        ? "text-primary font-semibold"
-                        : "text-gray-700 hover:text-primary"
-                        }`}
+                      className={`text-lg font-medium ${
+                        isActive
+                          ? "text-primary font-semibold"
+                          : "text-gray-700 hover:text-primary"
+                      }`}
                     >
                       {link.name}
                     </Link>
                   );
                 })}
 
-                {user ?
-                  <Button className="w-full">Logout</Button>
-                  :
+                {/* Mobile conditional rendering for login/logout */}
+                {user ? (
+                  <>
+                    <Link href="/dashboard" onClick={() => setOpen(false)}>
+                      <Button className="w-full">Dashboard</Button>
+                    </Link>
+                    <Button onClick={handleLogout} className="w-full">
+                      Logout
+                    </Button>
+                  </>
+                ) : (
                   <Link href="/login" onClick={() => setOpen(false)}>
                     <Button className="w-full">Sign In</Button>
-                  </Link>}
+                  </Link>
+                )}
               </div>
             </SheetContent>
           </Sheet>
