@@ -3,7 +3,6 @@
 
 import React from "react";
 import Container from "@/components/shared/container";
-import SectionHeader from "@/components/shared/section-header";
 import { Loader2 } from "lucide-react";
 
 import MembershipApplicationForm from "./_components/membership-application-form";
