@@ -113,20 +113,8 @@ const MemberProfileDisplay: React.FC<MemberProfileDisplayProps> = ({
 
         <div className="flex justify-between items-center w-full mt-2 text-xs text-gray-500">
           <div>Joined {new Date(member.created_at).toLocaleDateString()}</div>
-          {/* Removed "View" button as this is the user's own profile display, not a list item */}
-          {/* You can add an "Edit Profile" button here if desired */}
-          {/* Example:
-          <Button
-            size="sm"
-            className="text-white px-3 py-1 text-sm bg-gradient-to-r from-[#00AEEF] to-[#0099CC] hover:from-[#0099CC] hover:to-[#00AEEF] transition"
-            asChild
-          >
-            <Link href={`/dashboard/profile/edit`}>Edit Profile</Link>
-          </Button>
-          */}
         </div>
 
-        {/* Optional: Display approval status if available in the member object */}
         {member.is_approved !== undefined && (
           <div className="flex items-center justify-center gap-2 mt-4 text-sm font-medium">
             <CheckCircle
