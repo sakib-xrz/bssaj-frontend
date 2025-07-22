@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { SidebarContent } from "./sidebar"; // Ensure this import path is correct
+import { SidebarContent } from "./sidebar";
 
 export function DashboardHeader() {
   const router = useRouter();
@@ -41,7 +41,6 @@ export function DashboardHeader() {
     <>
       <header className="sticky top-0 z-40 flex items-center justify-between px-6 py-3 bg-white shadow-sm h-16">
         <div className="flex items-center gap-4">
-          {/* Menu button: Only visible on small screens (hidden on 'lg' and up) */}
           <Button
             variant="ghost"
             size="icon"
@@ -51,11 +50,6 @@ export function DashboardHeader() {
           >
             <Menu className="w-5 h-5" />
           </Button>
-
-          {/* You can add a logo or a simplified title here if needed for small screens */}
-          {/* <Link href="/" className="lg:hidden flex items-center gap-2">
-            <span className="text-xl font-bold text-primary">Bssaj</span>
-          </Link> */}
         </div>
 
         <div className="flex items-center gap-4 ml-auto">
