@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Container from "@/components/shared/container";
@@ -13,27 +14,23 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 
 const Blogs: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"Approved" | "Pending">(
-    "Approved"
-  );
+  const [activeTab, setActiveTab] = useState<"Approved" | "Pending">("Approved");
 
-  const isApprovedParam = activeTab === "Approved" ? true : false;
+  const isApprovedParam = activeTab === "Approved";
 
   const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery({
     is_approved: isApprovedParam,
   });
 
   const blogs = data?.data || [];
-  console.log(blogs)
   const [deleteBlog] = useDeleteBlogMutation();
 
   const handleDelete = async (blogId: string) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
-      // Use a custom modal in production
       try {
         await deleteBlog({ id: blogId }).unwrap();
         toast.success("Blog deleted successfully!");
-        refetch(); // Refetch blogs after deletion
+        refetch();
       } catch (err) {
         console.error("Failed to delete blog:", err);
         toast.error("Failed to delete blog.");
@@ -94,8 +91,6 @@ const Blogs: React.FC = () => {
         </TabsList>
 
         <TabsContent value={activeTab}>
-          {" "}
-          {/* Use activeTab directly here */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogs.length > 0 ? (
               blogs.map((blog: Blog) => (
@@ -112,8 +107,9 @@ const Blogs: React.FC = () => {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div
-                      className={`absolute top-3 right-3 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${blog.is_approved ? "bg-green-500" : "bg-yellow-500"
-                        }`}
+                      className={`absolute top-3 right-3 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${
+                        blog.is_approved ? "bg-green-500" : "bg-yellow-500"
+                      }`}
                     >
                       {blog.is_approved ? (
                         <CheckCircleIcon className="h-3 w-3" />
@@ -129,7 +125,7 @@ const Blogs: React.FC = () => {
                     </CardTitle>
                     <CardDescription className="text-sm text-gray-600 line-clamp-3 mb-4">
                       {blog.content.replace(/<[^>]*>/g, "").substring(0, 100)}
-                      ... {/* Use content and truncate */}
+                      ...
                     </CardDescription>
                     <div className="flex gap-3">
                       <Button
