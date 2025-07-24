@@ -18,11 +18,11 @@ export default function EditBlogPage() {
   const blog = blogData?.data;
 
   const handleSuccess = () => {
-    router.push("/blogs");
+    router.push("/dashboard/blog");
   };
 
   const handleCancel = () => {
-    router.push("/blogs");
+    router.push("/dashboard/blog");
   };
 
   if (isLoading) {
