@@ -12,7 +12,7 @@ import MembershipPendingStatus from "./_components/membership-pending-status";
 const useGetMyMembershipStatusQuery = () => {
   // 4. Approved member (mock data)
   const [data, setData] = React.useState({
-    status: "PENDING",
+    status: "NOT APPROVED",
     memberData: {
       id: "user-member-123",
       name: "Redwan Hasan",
