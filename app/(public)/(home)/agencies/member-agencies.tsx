@@ -1,20 +1,15 @@
 "use client";
 
-import { Agency as AgencyType } from "@/lib/types";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Agency as AgencyType } from "@/lib/types";
 import { useGetAllAgencyQuery } from "@/redux/features/agency/agencyApi";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
-import Agency from "../../_components/agency";
+import Agency from "../../_components/Agency";
+
 
 const MemberAgencies = () => {
   const [search, setSearch] = useState("");

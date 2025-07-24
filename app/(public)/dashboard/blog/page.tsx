@@ -1,22 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import Container from "@/components/shared/container";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Blog } from "@/lib/types";
+import { useDeleteBlogMutation, useGetAllBlogsQuery } from "@/redux/features/blog/blogApi";
+import { CheckCircleIcon, Loader2, PlusIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircleIcon, PlusIcon, XCircleIcon, Loader2 } from "lucide-react";
-import Container from "@/components/shared/container";
-import {
-  useGetAllBlogsQuery,
-  useDeleteBlogMutation,
-} from "@/redux/features/blog/blogApi";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
 const Blogs: React.FC = () => {
@@ -31,7 +24,7 @@ const Blogs: React.FC = () => {
   });
 
   const blogs = data?.data || [];
-
+  console.log(blogs)
   const [deleteBlog] = useDeleteBlogMutation();
 
   const handleDelete = async (blogId: string) => {
@@ -105,7 +98,7 @@ const Blogs: React.FC = () => {
           {/* Use activeTab directly here */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogs.length > 0 ? (
-              blogs.map((blog) => (
+              blogs.map((blog: Blog) => (
                 <Card
                   key={blog.id}
                   className="rounded-xl shadow-lg border border-gray-200 bg-white overflow-hidden"
@@ -119,9 +112,8 @@ const Blogs: React.FC = () => {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div
-                      className={`absolute top-3 right-3 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${
-                        blog.is_approved ? "bg-green-500" : "bg-yellow-500"
-                      }`}
+                      className={`absolute top-3 right-3 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1 ${blog.is_approved ? "bg-green-500" : "bg-yellow-500"
+                        }`}
                     >
                       {blog.is_approved ? (
                         <CheckCircleIcon className="h-3 w-3" />

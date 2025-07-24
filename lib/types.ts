@@ -37,3 +37,29 @@ export type Agency = {
   profileLink?: string;
   websiteLink?: string;
 };
+
+export type Blog = {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  cover_image: string;
+  is_approved: boolean;
+  is_published: boolean;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+  approved_at: string;
+  approved_by_id: string;
+  approved_by: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  author_id: string;
+  author: {
+    id: string;
+    name: string;
+    email: string;
+  };
+};

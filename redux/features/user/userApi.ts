@@ -34,8 +34,8 @@ export const userApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.user],
     }),
     updateUser: builder.mutation({
-      query: ({ data, id }) => ({
-        url: `/users/${id}`,
+      query: (data) => ({
+        url: `/users`,
         method: "PATCH",
         body: data,
       }),
@@ -48,6 +48,14 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [tagTypes.user],
     }),
+    updateProfilePitcher: builder.mutation({
+      query: (data) => ({
+        url: `/users/profile-picture`,
+        method: "PATCH",
+        body:data
+      }),
+      invalidatesTags: [tagTypes.getMe],
+    }),
   }),
 });
 
@@ -58,4 +66,5 @@ export const {
   useCreateUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  useUpdateProfilePitcherMutation
 } = userApi;

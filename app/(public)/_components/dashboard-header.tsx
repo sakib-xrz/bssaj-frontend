@@ -18,7 +18,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { SidebarContent } from "./sidebar";
+import { SidebarContent } from "./Sidebar";
+
 
 export function DashboardHeader() {
   const router = useRouter();

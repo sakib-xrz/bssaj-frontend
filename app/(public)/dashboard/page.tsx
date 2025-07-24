@@ -1,36 +1,22 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import Container from "@/components/shared/container";
+import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
+import { useUpdateProfilePitcherMutation, useUpdateUserMutation } from "@/redux/features/user/userApi";
+import { useFormik } from "formik";
 import { CameraIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import Image from "next/image";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import * as Yup from "yup";
-import { useFormik } from "formik";
 
 const myProfileSchema = Yup.object({
-  name: Yup.string()
-    .required("Name is required")
-    .min(2, "Name must be at least 2 characters"),
-  email: Yup.string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  phone: Yup.string()
-    .matches(/^\+?[0-9]{10,15}$/, "Invalid phone number")
-    .nullable(),
-  country: Yup.string().nullable(),
-  timezone: Yup.string().nullable(),
+  name: Yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
+  email: Yup.string().email("Invalid email format").required("Email is required"),
 });
 
 const changePasswordSchema = Yup.object({
@@ -40,61 +26,59 @@ const changePasswordSchema = Yup.object({
     .matches(/[a-z]/, "Password must contain at least one lowercase letter")
     .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
     .matches(/[0-9]/, "Password must contain at least one number")
-    .matches(
-      /[^a-zA-Z0-9]/,
-      "Password must contain at least one special character"
-    ),
+    .matches(/[^a-zA-Z0-9]/, "Password must contain at least one special character"),
   confirmPassword: Yup.string()
     .required("Confirm password is required")
     .oneOf([Yup.ref("newPassword")], "Passwords must match"),
 });
 
-const ManageProfile: React.FC = () => {
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
-    "/images/bssaj-logo.jpeg" // Default image
-  );
+const ManageProfile = () => {
   const profileImageInputRef = useRef<HTMLInputElement>(null);
-
+  const user = useGetMyInfoQuery();
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const myProfileFormik = useFormik({
+  const [addNewProfilePitcher] = useUpdateProfilePitcherMutation()
+  const [updateUserInfo] = useUpdateUserMutation()
+const [profileImagePreview, setProfileImagePreview] = useState<string | null>("/images/bssaj-logo.jpeg");
+  
+const myProfileFormik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      name: "Nusrat Jahan",
-      role: "User",
-      email: "nusrat123@gmail.com",
-      phone: "01342562899",
-      country: "Nusrat Jahan",
-      timezone: "Nusrat Jahan",
+      name: user?.data?.name || "",
+      role: user?.data?.role || "",
+      email: user?.data?.email || "",
     },
     validationSchema: myProfileSchema,
     onSubmit: async (values) => {
-      console.log("Updating profile:", values);
-      // Simulate API call
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        toast.success("Profile updated successfully!");
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        toast.error("Failed to update profile.");
-      }
-    },
+  try {
+    const userinformation = { name: values.name };
+    const res = await updateUserInfo(userinformation);
+
+    if (res?.data?.success) {
+      console.log("Profile updated:", res);
+      toast.success(res?.data?.message || "Profile updated successfully.");
+    } else {
+      // If res is not successful but no error thrown
+      console.warn("Profile update failed:", res);
+    }
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    toast.error("Failed to update profile.");
+  }
+}
   });
 
-  // Change Password Formik
   const changePasswordFormik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       newPassword: "",
       confirmPassword: "",
     },
     validationSchema: changePasswordSchema,
-    onSubmit: async (values) => {
-      console.log("Changing password:", values);
-      // Simulate API call
+    onSubmit: async () => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        toast.success("Password changed successfully!");
-        changePasswordFormik.resetForm(); // Clear fields after successful change
+        
+        changePasswordFormik.resetForm();
       } catch (error) {
         console.error("Error changing password:", error);
         toast.error("Failed to change password.");
@@ -110,30 +94,42 @@ const ManageProfile: React.FC = () => {
     };
   }, [profileImagePreview]);
 
-  const handleProfileImageChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (profileImagePreview && profileImagePreview.startsWith("blob:")) {
-      URL.revokeObjectURL(profileImagePreview);
-    }
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setProfileImagePreview(previewUrl);
-    } else {
-      setProfileImagePreview("/images/placeholder-avatar.png");
-    }
-  };
+ const handleProfileImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0];
 
+  if (profileImagePreview && profileImagePreview.startsWith("blob:")) {
+    URL.revokeObjectURL(profileImagePreview);
+  }
+
+  if (file) {
+    const previewUrl = URL.createObjectURL(file);
+    setProfileImagePreview(previewUrl);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file); 
+      const res = await addNewProfilePitcher(formData); 
+      if(res?.data?.statusCode === 200){
+            toast.success(res?.data?.message)
+        }
+    if(res?.error){
+       console.log(res)
+    }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      toast.error("Failed to update profile picture.");
+    }
+  } else {
+    setProfileImagePreview( "/images/placeholder-avatar.png");
+  }
+};
   return (
     <Container className="py-12 md:py-16 flex justify-center items-center">
       <div className="w-full max-w-4xl space-y-8">
         {/* My Profile Card */}
         <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
           <CardHeader className="p-0 mb-6">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              My Profile
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-900">My Profile</CardTitle>
             <CardDescription className="text-muted-foreground text-sm">
               Update your personal information here.
             </CardDescription>
@@ -143,7 +139,7 @@ const ManageProfile: React.FC = () => {
               <div className="flex justify-center mb-6">
                 <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
                   <Image
-                    src={profileImagePreview || "/images/bssaj-logo.jpeg"}
+                    src={user?.data?.profile_picture || profileImagePreview || "/images/bssaj-logo.jpeg"}
                     alt="Profile Picture"
                     fill
                     className="object-cover"
@@ -179,19 +175,11 @@ const ManageProfile: React.FC = () => {
                     value={myProfileFormik.values.name}
                     onChange={myProfileFormik.handleChange}
                     onBlur={myProfileFormik.handleBlur}
-                    className={
-                      myProfileFormik.touched.name &&
-                      myProfileFormik.errors.name
-                        ? "border-red-500"
-                        : ""
-                    }
+                    className={myProfileFormik.touched.name && myProfileFormik.errors.name ? "border-red-500" : ""}
                   />
-                  {myProfileFormik.touched.name &&
-                    myProfileFormik.errors.name && (
-                      <p className="text-sm text-red-500">
-                        {myProfileFormik.errors.name}
-                      </p>
-                    )}
+                  {/* {myProfileFormik.touched.name && myProfileFormik.errors.name && (
+                    <p className="text-sm text-red-500">{myProfileFormik.errors.name}</p>
+                  )} */}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
@@ -200,7 +188,7 @@ const ManageProfile: React.FC = () => {
                     name="role"
                     type="text"
                     value={myProfileFormik.values.role}
-                    disabled // Role is display-only
+                    disabled
                     className="bg-gray-100 cursor-not-allowed"
                   />
                 </div>
@@ -210,80 +198,20 @@ const ManageProfile: React.FC = () => {
                     id="email"
                     name="email"
                     type="email"
+                    disabled
                     placeholder="Enter your email"
                     value={myProfileFormik.values.email}
                     onChange={myProfileFormik.handleChange}
                     onBlur={myProfileFormik.handleBlur}
-                    className={
-                      myProfileFormik.touched.email &&
-                      myProfileFormik.errors.email
-                        ? "border-red-500"
-                        : ""
-                    }
+                    className={myProfileFormik.touched.email && myProfileFormik.errors.email ? "border-red-500" : ""}
                   />
-                  {myProfileFormik.touched.email &&
-                    myProfileFormik.errors.email && (
-                      <p className="text-sm text-red-500">
-                        {myProfileFormik.errors.email}
-                      </p>
-                    )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="Enter your phone number"
-                    value={myProfileFormik.values.phone}
-                    onChange={myProfileFormik.handleChange}
-                    onBlur={myProfileFormik.handleBlur}
-                    className={
-                      myProfileFormik.touched.phone &&
-                      myProfileFormik.errors.phone
-                        ? "border-red-500"
-                        : ""
-                    }
-                  />
-                  {myProfileFormik.touched.phone &&
-                    myProfileFormik.errors.phone && (
-                      <p className="text-sm text-red-500">
-                        {myProfileFormik.errors.phone}
-                      </p>
-                    )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="country">Country</Label>
-                  <Input
-                    id="country"
-                    name="country"
-                    type="text"
-                    placeholder="Enter your country"
-                    value={myProfileFormik.values.country}
-                    onChange={myProfileFormik.handleChange}
-                    onBlur={myProfileFormik.handleBlur}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="timezone">Timezone</Label>
-                  <Input
-                    id="timezone"
-                    name="timezone"
-                    type="text"
-                    placeholder="Enter your timezone"
-                    value={myProfileFormik.values.timezone}
-                    onChange={myProfileFormik.handleChange}
-                    onBlur={myProfileFormik.handleBlur}
-                  />
+                  {/* {myProfileFormik.touched.email && myProfileFormik.errors.email && (
+                    <p className="text-sm text-red-500">{myProfileFormik.errors.email}</p>
+                  )} */}
                 </div>
               </div>
               <div className="flex justify-start">
-                <Button
-                  type="submit"
-                  disabled={
-                    myProfileFormik.isSubmitting || !myProfileFormik.isValid
-                  }
-                >
+                <Button type="submit" disabled={myProfileFormik.isSubmitting || !myProfileFormik.isValid}>
                   {myProfileFormik.isSubmitting ? "Updating..." : "Update"}
                 </Button>
               </div>
@@ -294,18 +222,13 @@ const ManageProfile: React.FC = () => {
         {/* Change Password Card */}
         <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
           <CardHeader className="p-0 mb-6">
-            <CardTitle className="text-2xl font-bold text-gray-900">
-              Change Password
-            </CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-900">Change Password</CardTitle>
             <CardDescription className="text-muted-foreground text-sm">
               Update your password to keep your account secure.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <form
-              onSubmit={changePasswordFormik.handleSubmit}
-              className="space-y-6"
-            >
+            <form onSubmit={changePasswordFormik.handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">New Password</Label>
@@ -319,10 +242,9 @@ const ManageProfile: React.FC = () => {
                       onChange={changePasswordFormik.handleChange}
                       onBlur={changePasswordFormik.handleBlur}
                       className={
-                        changePasswordFormik.touched.newPassword &&
-                        changePasswordFormik.errors.newPassword
-                          ? "border-red-500 pr-10" // Add padding for icon
-                          : "pr-10" // Add padding for icon
+                        changePasswordFormik.touched.newPassword && changePasswordFormik.errors.newPassword
+                          ? "border-red-500 pr-10"
+                          : "pr-10"
                       }
                       required
                     />
@@ -333,19 +255,12 @@ const ManageProfile: React.FC = () => {
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:bg-gray-100"
                       onClick={() => setShowNewPassword(!showNewPassword)}
                     >
-                      {showNewPassword ? (
-                        <EyeOffIcon className="h-4 w-4" />
-                      ) : (
-                        <EyeIcon className="h-4 w-4" />
-                      )}
+                      {showNewPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                     </Button>
                   </div>
-                  {changePasswordFormik.touched.newPassword &&
-                    changePasswordFormik.errors.newPassword && (
-                      <p className="text-sm text-red-500">
-                        {changePasswordFormik.errors.newPassword}
-                      </p>
-                    )}
+                  {changePasswordFormik.touched.newPassword && changePasswordFormik.errors.newPassword && (
+                    <p className="text-sm text-red-500">{changePasswordFormik.errors.newPassword}</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -359,10 +274,9 @@ const ManageProfile: React.FC = () => {
                       onChange={changePasswordFormik.handleChange}
                       onBlur={changePasswordFormik.handleBlur}
                       className={
-                        changePasswordFormik.touched.confirmPassword &&
-                        changePasswordFormik.errors.confirmPassword
-                          ? "border-red-500 pr-10" // Add padding for icon
-                          : "pr-10" // Add padding for icon
+                        changePasswordFormik.touched.confirmPassword && changePasswordFormik.errors.confirmPassword
+                          ? "border-red-500 pr-10"
+                          : "pr-10"
                       }
                       required
                     />
@@ -371,32 +285,21 @@ const ManageProfile: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:bg-gray-100"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
-                      {showConfirmPassword ? (
-                        <EyeOffIcon className="h-4 w-4" />
-                      ) : (
-                        <EyeIcon className="h-4 w-4" />
-                      )}
+                      {showConfirmPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                     </Button>
                   </div>
                   {changePasswordFormik.touched.confirmPassword &&
                     changePasswordFormik.errors.confirmPassword && (
-                      <p className="text-sm text-red-500">
-                        {changePasswordFormik.errors.confirmPassword}
-                      </p>
+                      <p className="text-sm text-red-500">{changePasswordFormik.errors.confirmPassword}</p>
                     )}
                 </div>
               </div>
               <div className="flex justify-start">
                 <Button
                   type="submit"
-                  disabled={
-                    changePasswordFormik.isSubmitting ||
-                    !changePasswordFormik.isValid
-                  }
+                  disabled={changePasswordFormik.isSubmitting || !changePasswordFormik.isValid}
                 >
                   {changePasswordFormik.isSubmitting ? "Updating..." : "Update"}
                 </Button>
