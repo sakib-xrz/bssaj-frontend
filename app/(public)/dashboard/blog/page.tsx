@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -105,7 +106,7 @@ const Blogs: React.FC = () => {
           {/* Use activeTab directly here */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {blogs.length > 0 ? (
-              blogs.map((blog) => (
+              blogs.map((blog: any) => (
                 <Card
                   key={blog.id}
                   className="rounded-xl shadow-lg border border-gray-200 bg-white overflow-hidden"
