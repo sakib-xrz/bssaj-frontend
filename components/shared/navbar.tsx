@@ -1,26 +1,19 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/data";
 import { logout, useAuthUser } from "@/redux/features/auth/authSlice";
 import { AppDispatch, persistor } from "@/redux/store";
-import { ChevronDown, MenuIcon, LogOut, User } from "lucide-react";
+import { ChevronDown, LogOut, MenuIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import Container from "./container";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -28,7 +21,6 @@ export default function Navbar() {
   const user = useAuthUser();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-
   const handleLogout = () => {
     dispatch(logout());
     persistor.purge();
@@ -62,11 +54,10 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  isActive
+                className={`text-sm font-medium transition-colors ${isActive
                     ? "text-primary font-semibold"
                     : "text-[#868686] hover:text-primary"
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -76,11 +67,10 @@ export default function Navbar() {
           {user && (
             <Link
               href="/dashboard"
-              className={`text-sm font-medium transition-colors ${
-                pathname === "/dashboard"
+              className={`text-sm font-medium transition-colors ${pathname === "/dashboard"
                   ? "text-primary font-semibold"
                   : "text-[#868686] hover:text-primary"
-              }`}
+                }`}
             >
               Profile
             </Link>
@@ -169,11 +159,10 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-lg font-medium ${
-                        isActive
+                      className={`text-lg font-medium ${isActive
                           ? "text-primary font-semibold"
                           : "text-gray-700 hover:text-primary"
-                      }`}
+                        }`}
                     >
                       {link.name}
                     </Link>

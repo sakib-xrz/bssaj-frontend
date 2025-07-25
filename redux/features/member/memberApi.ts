@@ -3,6 +3,14 @@ import { tagTypes } from "@/redux/tagTypes";
 
 export const memberApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    createMember: builder.mutation({
+      query: (data) => ({
+        url: `/members`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: [tagTypes.member],
+    }),
     getMembers: builder.query({
       query: (query) => ({
         url: `/members`,
@@ -25,6 +33,12 @@ export const memberApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.member],
     }),
+    getOwnMember:builder.query({
+      query:()=>({
+        url:'/members/me'
+      }),
+      providesTags:[tagTypes.member]
+    })
   }),
 });
 
@@ -32,4 +46,6 @@ export const {
   useGetMembersQuery,
   useGetMemberByIdQuery,
   useGetMemberStatsQuery,
+  useCreateMemberMutation,
+  useGetOwnMemberQuery
 } = memberApi;
