@@ -6,17 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Blog } from "@/lib/types";
+import { useAuthUser } from "@/redux/features/auth/authSlice";
 import { useDeleteBlogMutation, useGetAllBlogsQuery } from "@/redux/features/blog/blogApi";
 import { CheckCircleIcon, Loader2, PlusIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-const Blogs: React.FC = () => {
+const Blogs = () => {
   const [activeTab, setActiveTab] = useState<"Approved" | "Pending">("Approved");
-
   const isApprovedParam = activeTab === "Approved";
+  const user = useAuthUser();
 
   const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery({
     is_approved: isApprovedParam,
@@ -25,12 +26,18 @@ const Blogs: React.FC = () => {
   const blogs = data?.data || [];
   const [deleteBlog] = useDeleteBlogMutation();
 
+  // delete 
   const handleDelete = async (blogId: string) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
-        await deleteBlog({ id: blogId }).unwrap();
-        toast.success("Blog deleted successfully!");
-        refetch();
+        const res = await deleteBlog({ id: blogId });
+        if (res?.data?.success) {
+          toast.success(res?.data?.message);
+          refetch();
+        } else {
+          const errorMessage = (res as any)?.error?.data?.message || "Something went wrong";
+          toast.error(errorMessage);
+        }
       } catch (err) {
         console.error("Failed to delete blog:", err);
         toast.error("Failed to delete blog.");
@@ -56,12 +63,17 @@ const Blogs: React.FC = () => {
     );
   }
 
+  // filter 
+  const filteredBlogs = blogs.filter(
+    (blog: Blog) =>
+      blog.author?.id === user?.id &&
+      (activeTab === "Approved" ? blog.is_approved : !blog.is_approved)
+  );
+
   return (
     <Container className="py-12 md:py-16">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-          Manage Blogs
-        </h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Manage Blogs</h1>
         <Link href="/dashboard/blog/create-blog">
           <Button className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2">
             <PlusIcon className="h-4 w-4" />
@@ -92,8 +104,8 @@ const Blogs: React.FC = () => {
 
         <TabsContent value={activeTab}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {blogs.length > 0 ? (
-              blogs.map((blog: Blog) => (
+            {filteredBlogs.length > 0 ? (
+              filteredBlogs.map((blog: Blog) => (
                 <Card
                   key={blog.id}
                   className="rounded-xl shadow-lg border border-gray-200 bg-white overflow-hidden"
@@ -124,17 +136,14 @@ const Blogs: React.FC = () => {
                       {blog.title}
                     </CardTitle>
                     <CardDescription className="text-sm text-gray-600 line-clamp-3 mb-4">
-                      {blog.content.replace(/<[^>]*>/g, "").substring(0, 100)}
-                      ...
+                      {blog.content.replace(/<[^>]*>/g, "").substring(0, 100)}...
                     </CardDescription>
                     <div className="flex gap-3">
                       <Button
                         asChild
                         className="flex-1 bg-primary hover:bg-primary/90 text-white"
                       >
-                        <Link href={`/dashboard/blog/edit/${blog.id}`}>
-                          Edit
-                        </Link>
+                        <Link href={`/dashboard/blog/edit/${blog.id}`}>Edit</Link>
                       </Button>
                       <Button
                         variant="destructive"
