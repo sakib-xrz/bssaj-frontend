@@ -1,11 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import MemberCard from "./_components/member-card";
 import Container from "@/components/shared/container";
-
 import SectionHeader from "@/components/shared/section-header";
-
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
 import { Member } from "./_components/member-card";
 
@@ -21,11 +19,16 @@ export default function Members() {
   const { data, isLoading, isError, error } = useGetMembersQuery({});
   const fetchedMembers: Member[] = data?.data || [];
 
-  const sortedMembers = [...fetchedMembers].sort(
-    (a, b) =>
-      memberKindPriority[a.kind as keyof typeof memberKindPriority] -
-      memberKindPriority[b.kind as keyof typeof memberKindPriority]
-  );
+  // Sort & filter approved members
+  const approvedMembers = useMemo(() => {
+    return [...fetchedMembers]
+      .filter((member) => member.status === "APPROVED")
+      .sort(
+        (a, b) =>
+          memberKindPriority[a.kind as keyof typeof memberKindPriority] -
+          memberKindPriority[b.kind as keyof typeof memberKindPriority]
+      );
+  }, [fetchedMembers]);
 
   if (isLoading) {
     return (
@@ -46,10 +49,10 @@ export default function Members() {
     );
   }
 
-  if (!sortedMembers.length) {
+  if (!approvedMembers.length) {
     return (
       <Container className="flex flex-col items-center justify-center min-h-[50vh] py-12 md:py-16">
-        <p className="text-lg text-gray-600">No members found.</p>
+        <p className="text-lg text-gray-600">No approved members found.</p>
       </Container>
     );
   }
@@ -63,10 +66,9 @@ export default function Members() {
           description="Explore our network of member agencies supporting Bangladeshi students in Japan."
         />
       </div>
-      <Container
-        className={`grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-12 md:py-16`}
-      >
-        {sortedMembers.map((member) => (
+
+      <Container className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-12 md:py-16">
+        {approvedMembers.map((member) => (
           <MemberCard key={member.id} member={member} />
         ))}
       </Container>

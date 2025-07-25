@@ -2,15 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Award,
-  Briefcase,
-  Crown,
-  GraduationCap,
-  Mail,
-  Phone,
-  Star,
-} from "lucide-react";
+import { Award, Briefcase, Crown, GraduationCap, Mail, Phone, Star } from "lucide-react";
 import Link from "next/link";
 
 const memberKindIcons = {
@@ -38,16 +30,22 @@ const memberKindLabels = {
 };
 
 export type Member = {
+  profile_picture: string | undefined;
   id: string;
   name: string;
   email: string;
   phone: string;
-  profile_picture: string;
-  kind: string;
-  approved_at: string;
+  kind: "ADVISER" | "HONORABLE" | "EXECUTIVE" | "ASSOCIATE" | "STUDENT_REPRESENTATIVE";
+  status: "APPROVED" | "PENDING" | "NOT_APPROVED";
+  approved_at: string | null;
   created_at: string;
+  user: {
+    profile_picture: string | null;
+  };
+  approved_by: {
+    name: string;
+  } | null;
 };
-
 export default function MemberCard({
   member,
   isCompact = false,
@@ -60,26 +58,23 @@ export default function MemberCard({
   return (
     <Card className="group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-0 shadow-lg overflow-hidden bg-white">
       <div
-        className={`h-2 bg-gradient-to-r ${
-          memberKindGradients[member.kind as keyof typeof memberKindGradients]
-        }`}
+        className={`h-2 bg-gradient-to-r ${memberKindGradients[member.kind as keyof typeof memberKindGradients]
+          }`}
       />
       <CardContent className="p-6">
         <div
-          className={`flex ${
-            isCompact
+          className={`flex ${isCompact
               ? "items-center gap-4"
               : "flex-col items-center text-center"
-          }`}
+            }`}
         >
           <div className="relative">
             <Avatar
-              className={`${
-                isCompact ? "h-16 w-16" : "h-24 w-24"
-              } ring-4 ring-white shadow-lg group-hover:ring-[#00AEEF]/30 transition-all duration-300`}
+              className={`${isCompact ? "h-16 w-16" : "h-24 w-24"
+                } ring-4 ring-white shadow-lg group-hover:ring-[#00AEEF]/30 transition-all duration-300`}
             >
               <AvatarImage
-                src={member.profile_picture || "/placeholder.svg"}
+                src={member?.user?.profile_picture || "" }
                 alt={member.name}
               />
               <AvatarFallback className="bg-gradient-to-br from-[#00AEEF] to-[#003366] text-white text-xl font-bold">
@@ -90,11 +85,10 @@ export default function MemberCard({
               </AvatarFallback>
             </Avatar>
             <div
-              className={`absolute -bottom-1 -right-1 p-1.5 bg-gradient-to-r ${
-                memberKindGradients[
-                  member.kind as keyof typeof memberKindGradients
+              className={`absolute -bottom-1 -right-1 p-1.5 bg-gradient-to-r ${memberKindGradients[
+                member.kind as keyof typeof memberKindGradients
                 ]
-              } rounded-full shadow-lg`}
+                } rounded-full shadow-lg`}
             >
               <IconComponent className="h-4 w-4 text-white" />
             </div>
@@ -102,19 +96,17 @@ export default function MemberCard({
 
           <div className={`${isCompact ? "flex-1" : "mt-4 w-full"}`}>
             <h3
-              className={`font-bold text-[#003366] ${
-                isCompact ? "text-lg" : "text-xl"
-              } mb-2 group-hover:text-[#00AEEF] transition-colors`}
+              className={`font-bold text-[#003366] ${isCompact ? "text-lg" : "text-xl"
+                } mb-2 group-hover:text-[#00AEEF] transition-colors`}
             >
               {member.name}
             </h3>
 
             <Badge
-              className={`bg-gradient-to-r ${
-                memberKindGradients[
-                  member.kind as keyof typeof memberKindGradients
+              className={`bg-gradient-to-r ${memberKindGradients[
+                member.kind as keyof typeof memberKindGradients
                 ]
-              } text-white border-0 shadow-sm mb-3`}
+                } text-white border-0 shadow-sm mb-3`}
             >
               {memberKindLabels[member.kind as keyof typeof memberKindLabels]}
             </Badge>
@@ -133,9 +125,8 @@ export default function MemberCard({
             )}
 
             <div
-              className={`flex ${
-                isCompact ? "justify-end" : "justify-between"
-              } items-center ${isCompact ? "" : "mt-4"}`}
+              className={`flex ${isCompact ? "justify-end" : "justify-between"
+                } items-center ${isCompact ? "" : "mt-4"}`}
             >
               {!isCompact && (
                 <div className="text-xs text-gray-500">
