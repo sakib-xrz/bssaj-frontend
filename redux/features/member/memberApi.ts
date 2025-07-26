@@ -33,12 +33,12 @@ export const memberApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.member],
     }),
-    getOwnMember:builder.query({
-      query:()=>({
-        url:'/members/me'
+    getOwnMember: builder.query({
+      query: () => ({
+        url: "/members/me",
       }),
-      providesTags:[tagTypes.member]
-    })
+      providesTags: [tagTypes.member],
+    }),
   }),
 });
 
@@ -47,5 +47,5 @@ export const {
   useGetMemberByIdQuery,
   useGetMemberStatsQuery,
   useCreateMemberMutation,
-  useGetOwnMemberQuery
+  useGetOwnMemberQuery,
 } = memberApi;

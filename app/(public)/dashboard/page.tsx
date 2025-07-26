@@ -174,17 +174,30 @@ const ManageProfile = () => {
           <CardContent className="p-0">
             <form onSubmit={myProfileFormik.handleSubmit} className="space-y-6">
               <div className="flex justify-center mb-6">
-                <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
-                  <Image
-                    src={
-                      user?.data?.profile_picture ||
-                      profileImagePreview ||
-                      "/images/bssaj-logo.jpeg"
-                    }
-                    alt="Profile Picture"
-                    fill
-                    className="object-cover"
-                  />
+                <div className="relative w-32 h-32 mx-auto">
+                  {/* Circle wrapper with overflow-hidden and rounded-full */}
+                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md relative">
+                    <Image
+                      src={
+                        user?.data?.profile_picture ||
+                        profileImagePreview ||
+                        "/images/bssaj-logo.jpeg"
+                      }
+                      alt="Profile Picture"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  {/* Camera icon positioned absolutely relative to the outer div */}
+                  <button
+                    type="button"
+                    onClick={() => profileImageInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 p-3 rounded-full shadow-lg bg-gray-100 border border-gray-300 hover:bg-gray-200 flex items-center justify-center transition"
+                  >
+                    <CameraIcon className="w-5 h-5 text-blue-800" />
+                  </button>
+
                   <input
                     type="file"
                     id="profileImage"
@@ -193,13 +206,6 @@ const ManageProfile = () => {
                     onChange={handleProfileImageChange}
                     className="hidden"
                   />
-                  <button
-                    type="button"
-                    onClick={() => profileImageInputRef.current?.click()}
-                    className="absolute bottom-2 right-2 bg-gray-100 border border-gray-300 shadow-md hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition"
-                  >
-                    <CameraIcon className="w-5 h-5 text-blue-800" />
-                  </button>
                 </div>
               </div>
 
