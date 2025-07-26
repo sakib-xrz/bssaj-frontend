@@ -9,9 +9,10 @@ import { useSelector } from "react-redux";
 
 interface Props {
   children: React.ReactNode;
+  allowedRoles?: string[]; // <- add this for role-based access
 }
 
-export default function ProtectedRoute({ children }: Props) {
+export default function ProtectedRoute({ children, allowedRoles = [] }: Props) {
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.token);
   const [loading, setLoading] = useState(true);
@@ -28,8 +29,8 @@ export default function ProtectedRoute({ children }: Props) {
 
       if (decoded.exp < currentTime) {
         router.push("/login");
-      } else if (decoded.role !== "USER") {
-        router.push("/"); 
+      } else if (allowedRoles.length > 0 && !allowedRoles.includes(decoded.role)) {
+        router.push("/"); // not authorized
       } else {
         setLoading(false);
       }
@@ -37,7 +38,7 @@ export default function ProtectedRoute({ children }: Props) {
       console.error("Token decode failed:", err);
       router.push("/login");
     }
-  }, [token, router]);
+  }, [token, router, allowedRoles]);
 
   if (loading) {
     return <div className="p-6 text-center">Loading...</div>;

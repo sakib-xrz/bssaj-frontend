@@ -9,6 +9,7 @@ const navigation = [
   { name: "My Profile", href: "/dashboard", icon: LayoutDashboard },
   { name: "My Blogs", href: "/dashboard/blog", icon: FileText },
   { name: "My Membership", href: "/dashboard/my-membership", icon: Users },
+  { name: "My Agencies", href: "/dashboard/my-agencies", icon: Users },
 ];
 
 export function SidebarContent() {
@@ -45,7 +46,7 @@ export function SidebarContent() {
   );
 }
 
-export function Sidebar() {
+export function AgencySidebar() {
   return (
     <div className="hidden lg:flex lg:flex-col lg:w-64">
       <SidebarContent />

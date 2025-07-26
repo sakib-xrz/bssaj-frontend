@@ -11,16 +11,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { baseApi } from "@/redux/api/baseApi";
 import { logout } from "@/redux/features/auth/authSlice";
+import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
 import { AppDispatch, persistor } from "@/redux/store";
 import { LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { SidebarContent } from "./Sidebar";
-import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
-import { baseApi } from "@/redux/api/baseApi";
+import { SidebarContent } from "./UserSidebar";
 
 export function DashboardHeader() {
   const router = useRouter();
