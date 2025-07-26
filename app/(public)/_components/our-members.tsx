@@ -52,7 +52,6 @@ const memberKindLabels = {
 
 export default function OurMembers() {
   const { data, isLoading, isError, error } = useGetMembersQuery({});
-
   const fetchedMembers: Member[] = data?.data || [];
 
   const memberKindPriority = {
@@ -131,10 +130,16 @@ export default function OurMembers() {
                   />
                   <CardContent className="p-6 flex flex-col items-center text-center">
                     <div className="relative mb-4">
-                      <Avatar className="h-24 w-24 ring-4 ring-white shadow-md group-hover:ring-[#00AEEF]/40 transition-all duration-300">
+                      <Avatar className="h-24 w-24 rounded-full ring-4 ring-white shadow-md overflow-hidden">
                         <AvatarImage
-                          src={member.profile_picture || "/placeholder.svg"}
+                          src={member?.user?.profile_picture || ""}
                           alt={member.name}
+                          className="object-cover w-full h-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/placeholder.svg";
+                            target.onerror = null;
+                          }}
                         />
                         <AvatarFallback className="bg-gradient-to-br from-[#00AEEF] to-[#003366] text-white text-xl font-bold">
                           {member.name

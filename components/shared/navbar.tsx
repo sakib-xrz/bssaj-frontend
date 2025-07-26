@@ -62,14 +62,15 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF]">
       <Container className="flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
-          <Image
-            src="/images/bssaj-logo.jpeg"
-            alt="BSSAJ Logo"
-            width={40}
-            height={40}
-            className="h-10 w-auto object-contain"
-            priority
-          />
+          <div className="h-12 w-12 relative">
+            <Image
+              src="/images/LOGO.png"
+              alt="BSSAJ Logo"
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Desktop Navigation */}

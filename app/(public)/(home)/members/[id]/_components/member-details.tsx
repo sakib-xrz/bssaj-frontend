@@ -183,7 +183,7 @@ export default function MemberDetails({ memberId }: { memberId: string }) {
               <div className="relative">
                 <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
                   <AvatarImage
-                    src={member.profile_picture || "/placeholder.svg"}
+                    src={member?.user?.profile_picture || "/placeholder.svg"}
                     alt={member.name}
                   />
                   <AvatarFallback className="bg-[#00AEEF] text-white text-3xl">
