@@ -1,27 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import Container from "@/components/shared/container";
+import SectionHeader from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Upload, X, Phone, Mail } from "lucide-react";
-import Image from "next/image";
+import { useCreateAgencyMutation } from "@/redux/features/agency/agencyApi";
+import { useFormik } from "formik";
+import { Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as Yup from "yup";
-import { useFormik } from "formik";
-import Container from "@/components/shared/container";
-import SectionHeader from "@/components/shared/section-header";
-import { useCreateAgencyMutation } from "@/redux/features/agency/agencyApi";
 
 const agencySchema = Yup.object({
   name: Yup.string()
@@ -60,24 +58,10 @@ const faqs = [
   },
 ];
 
-const Membership: React.FC = () => {
+const Membership = () => {
+
   const router = useRouter();
   const [createAgency, { isLoading }] = useCreateAgencyMutation();
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [successStoryImages, setSuccessStoryImages] = useState<File[]>([]);
-  const [successStoryPreviews, setSuccessStoryPreviews] = useState<string[]>(
-    []
-  );
-
-  useEffect(() => {
-    return () => {
-      if (logoPreview) {
-        URL.revokeObjectURL(logoPreview);
-      }
-      successStoryPreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [logoPreview, successStoryPreviews]);
 
   const formik = useFormik({
     initialValues: {
@@ -90,6 +74,8 @@ const Membership: React.FC = () => {
       description: "",
       address: "",
       facebook_url: "",
+      user_selection_type: "new",
+      user_id: "",
     },
     validationSchema: agencySchema,
     onSubmit: async (values) => {
@@ -109,29 +95,13 @@ const Membership: React.FC = () => {
           }
         }
 
-        if (logoFile) {
-          formData.append("logo", logoFile);
-        }
-
-        successStoryImages.forEach((file) => {
-          formData.append(`successStoryImages`, file);
-        });
 
         formData.append("status", "PENDING");
         formData.append("is_approved", "false");
         formData.append("is_deleted", "false");
 
-        const result = await createAgency(formData).unwrap();
-        console.log("Agency created successfully:", result);
-
+        await createAgency(formData).unwrap();
         formik.resetForm();
-        if (logoPreview) URL.revokeObjectURL(logoPreview);
-        setLogoFile(null);
-        setLogoPreview(null);
-        successStoryPreviews.forEach((url) => URL.revokeObjectURL(url));
-        setSuccessStoryImages([]);
-        setSuccessStoryPreviews([]);
-
         router.push("/agencies");
         toast.success("Agency created successfully");
       } catch (error) {
@@ -141,40 +111,7 @@ const Membership: React.FC = () => {
     },
   });
 
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (logoPreview) {
-      URL.revokeObjectURL(logoPreview);
-    }
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setLogoPreview(previewUrl);
-      setLogoFile(file);
-    } else {
-      setLogoPreview(null);
-      setLogoFile(null);
-    }
-  };
 
-  const handleSuccessStoryImagesChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const selectedFiles = Array.from(event.target.files || []);
-
-    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
-
-    setSuccessStoryPreviews((prev) => [...prev, ...newPreviews]);
-    setSuccessStoryImages((prev) => [...prev, ...selectedFiles]);
-
-    event.target.value = "";
-  };
-
-  const handleRemoveSuccessStory = (index: number) => {
-    URL.revokeObjectURL(successStoryPreviews[index]);
-
-    setSuccessStoryPreviews((prev) => prev.filter((_, i) => i !== index));
-    setSuccessStoryImages((prev) => prev.filter((_, i) => i !== index));
-  };
 
   return (
     <div>
@@ -238,53 +175,6 @@ const Membership: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="logo">Agency Logo</Label>
-                    <div className="flex flex-col gap-4">
-                      <Input
-                        id="logo"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleLogoChange}
-                        className="hidden"
-                      />
-                      {logoPreview ? (
-                        <div className="relative w-40 h-40">
-                          <Image
-                            src={logoPreview}
-                            alt="Logo preview"
-                            width={160}
-                            height={160}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                            onClick={() => {
-                              URL.revokeObjectURL(logoPreview);
-                              setLogoPreview(null);
-                              setLogoFile(null);
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() =>
-                            document.getElementById("logo")?.click()
-                          }
-                        >
-                          <Upload className="w-4 h-4 mr-2" />
-                          Upload Logo
-                        </Button>
-                      )}
-                    </div>
-                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="description">Description</Label>
@@ -318,7 +208,7 @@ const Membership: React.FC = () => {
                         onBlur={formik.handleBlur}
                         className={
                           formik.touched.contact_email &&
-                          formik.errors.contact_email
+                            formik.errors.contact_email
                             ? "border-red-500"
                             : ""
                         }
@@ -391,7 +281,7 @@ const Membership: React.FC = () => {
                         onBlur={formik.handleBlur}
                         className={
                           formik.touched.facebook_url &&
-                          formik.errors.facebook_url
+                            formik.errors.facebook_url
                             ? "border-red-500"
                             : ""
                         }
@@ -417,7 +307,7 @@ const Membership: React.FC = () => {
                       onBlur={formik.handleBlur}
                       className={
                         formik.touched.established_year &&
-                        formik.errors.established_year
+                          formik.errors.established_year
                           ? "border-red-500"
                           : ""
                       }
@@ -430,66 +320,6 @@ const Membership: React.FC = () => {
                       )}
                   </div>
                 </div>
-
-                {/* Success Stories */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Success Stories
-                  </h3>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="success_stories">
-                      Success Story Images
-                    </Label>
-                    <div className="flex flex-col gap-4">
-                      <Input
-                        id="success_stories"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={handleSuccessStoryImagesChange}
-                        className="hidden"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() =>
-                          document.getElementById("success_stories")?.click()
-                        }
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Success Story Images
-                      </Button>
-                      {successStoryImages.length > 0 && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                          {successStoryImages.map((file, index) => (
-                            <div
-                              key={file.name + index}
-                              className="relative w-full aspect-square"
-                            >
-                              <Image
-                                src={successStoryPreviews[index]}
-                                alt={`Success story ${index + 1}`}
-                                fill
-                                className="w-full h-full object-cover rounded-lg"
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="icon"
-                                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                                onClick={() => handleRemoveSuccessStory(index)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
                 <div className="flex justify-end space-x-4">
                   <Link href="/agencies">
                     <Button
