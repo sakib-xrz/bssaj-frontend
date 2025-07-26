@@ -3,13 +3,7 @@
 
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useChangePasswordMutation } from "@/redux/features/auth/authApi";
@@ -222,7 +216,7 @@ const ManageProfile = () => {
                     onBlur={myProfileFormik.handleBlur}
                     className={
                       myProfileFormik.touched.name &&
-                      myProfileFormik.errors.name
+                        myProfileFormik.errors.name
                         ? "border-red-500"
                         : ""
                     }
@@ -252,7 +246,7 @@ const ManageProfile = () => {
                     onBlur={myProfileFormik.handleBlur}
                     className={
                       myProfileFormik.touched.email &&
-                      myProfileFormik.errors.email
+                        myProfileFormik.errors.email
                         ? "border-red-500"
                         : ""
                     }
@@ -303,7 +297,7 @@ const ManageProfile = () => {
                       onBlur={changePasswordFormik.handleBlur}
                       className={
                         changePasswordFormik.touched.old_password &&
-                        changePasswordFormik.errors.old_password
+                          changePasswordFormik.errors.old_password
                           ? "border-red-500 pr-10"
                           : "pr-10"
                       }
@@ -345,7 +339,7 @@ const ManageProfile = () => {
                       onBlur={changePasswordFormik.handleBlur}
                       className={
                         changePasswordFormik.touched.new_password &&
-                        changePasswordFormik.errors.new_password
+                          changePasswordFormik.errors.new_password
                           ? "border-red-500 pr-10"
                           : "pr-10"
                       }
@@ -389,7 +383,7 @@ const ManageProfile = () => {
                   onBlur={changePasswordFormik.handleBlur}
                   className={
                     changePasswordFormik.touched.confirmPassword &&
-                    changePasswordFormik.errors.confirmPassword
+                      changePasswordFormik.errors.confirmPassword
                       ? "border-red-500"
                       : ""
                   }

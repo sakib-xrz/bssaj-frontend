@@ -38,7 +38,7 @@ const ReadOurBlog = () => {
               className="pl-4 md:basis-1/2 lg:basis-1/3"
             >
               <div className="p-4">
-                <Link href={`/blogs/${post.slug}`} className="block h-full">
+                <Link href={`/blog/${post.id}`} className="block h-full">
                   <Card className="group h-full flex flex-col rounded-2xl bg-white shadow-md transition duration-300 transform hover:-translate-y-1">
                     <div className="relative w-full aspect-[16/10]">
                       <Image
