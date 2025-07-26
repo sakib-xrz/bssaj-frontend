@@ -227,9 +227,6 @@ const ManageProfile = () => {
                         : ""
                     }
                   />
-                  {/* {myProfileFormik.touched.name && myProfileFormik.errors.name && (
-                    <p className="text-sm text-red-500">{myProfileFormik.errors.name}</p>
-                  )} */}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
@@ -260,9 +257,6 @@ const ManageProfile = () => {
                         : ""
                     }
                   />
-                  {/* {myProfileFormik.touched.email && myProfileFormik.errors.email && (
-                    <p className="text-sm text-red-500">{myProfileFormik.errors.email}</p>
-                  )} */}
                 </div>
               </div>
               <div className="flex justify-start">
