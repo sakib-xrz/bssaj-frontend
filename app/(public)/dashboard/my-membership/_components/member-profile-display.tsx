@@ -5,7 +5,16 @@ import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {Phone,Mail,Calendar,Share2,Download,QrCode,CheckCircle,User} from "lucide-react";
+import {
+  Phone,
+  Mail,
+  Calendar,
+  Share2,
+  Download,
+  QrCode,
+  CheckCircle,
+  User,
+} from "lucide-react";
 import Container from "@/components/shared/container";
 import { useGetOwnMemberQuery } from "@/redux/features/member/memberApi";
 import MemberCard from "@/app/(public)/(home)/members/_components/member-card";
@@ -22,9 +31,9 @@ const memberKindLabels = {
 export default function SingleMemberProfilePage() {
   const { data, isLoading, isError, error } = useGetOwnMemberQuery("own");
   const member: Member | undefined = data?.data;
-  const user = useAuthUser()
-  console.log(user)
-    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
+  const user = useAuthUser();
+  console.log(user);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   useEffect(() => {
