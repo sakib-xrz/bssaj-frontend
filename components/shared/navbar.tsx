@@ -12,32 +12,51 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/data";
-import { logout, useAuthUser } from "@/redux/features/auth/authSlice";
+import { logout } from "@/redux/features/auth/authSlice";
 import { AppDispatch, persistor } from "@/redux/store";
 import { ChevronDown, LogOut, MenuIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import Container from "./container";
+import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
+import { useUpdateProfilePitcherMutation } from "@/redux/features/user/userApi";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const user = useAuthUser();
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const [updateProfilePicture] = useUpdateProfilePitcherMutation();
+  const { data: user } = useGetMyInfoQuery();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleLogout = () => {
     dispatch(logout());
     persistor.purge();
     router.push("/login");
   };
 
-  const userInitials = user?.name
-    ?.split(" ")
-    ?.map((name) => name[0])
-    .join("");
+  const userInitials =
+    user?.name
+      ?.split(" ")
+      ?.map((name: string) => name[0])
+      .join("") || "";
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("profile_picture", file);
+      await updateProfilePicture(formData).unwrap();
+    } catch (error) {
+      console.error("Failed to upload profile picture", error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF]">
@@ -77,60 +96,77 @@ export default function Navbar() {
           </Button>
 
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-10 w-10 rounded-full ring-1 ring-ring/20 shadow-sm"
-                  aria-label="User menu"
-                >
-                  <Avatar className="h-10 w-10 rounded-full overflow-hidden">
-                    {user?.profile_picture ? (
+            <>
+              {/* Hidden file input */}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-10 w-10 rounded-full ring-1 ring-ring/20 shadow-sm p-0"
+                    aria-label="User menu"
+                  >
+                    <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={user.profile_picture}
-                        alt={`${user?.name}'s profile picture`}
-                        className="object-cover"
+                        key={user?.profile_picture || "default-avatar"}
+                        src={user?.profile_picture || "/placeholder.svg"}
+                        alt={`${user?.name || "User"}'s profile picture`}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "/placeholder.svg";
+                        }}
                       />
-                    ) : (
                       <AvatarFallback className="bg-[#E0F7FF] text-[#007B9E] font-semibold">
                         {userInitials || <User className="h-4 w-4" />}
                       </AvatarFallback>
-                    )}
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-60 rounded-xl shadow-lg"
-                align="end"
-                forceMount
-              >
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-semibold truncate">
-                      {user?.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard" className="flex items-center">
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  className="text-destructive focus:bg-destructive/10"
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent
+                  className="w-60 rounded-xl shadow-lg"
+                  align="end"
+                  forceMount
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-semibold truncate">
+                        {user?.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard" className="flex items-center">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-destructive focus:bg-destructive/10"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           ) : (
             <Button asChild>
               <Link href="/login">Sign in</Link>
