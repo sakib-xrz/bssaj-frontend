@@ -1,12 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-
 import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
   Phone,
@@ -17,40 +14,10 @@ import {
   QrCode,
   CheckCircle,
   User,
-  Award,
-  Briefcase,
-  Crown,
-  GraduationCap,
-  Star,
 } from "lucide-react";
 import Container from "@/components/shared/container";
 import { useGetOwnMemberQuery } from "@/redux/features/member/memberApi";
-export type Member = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  profile_picture: string;
-  kind: string;
-  approved_at: string;
-  created_at: string;
-};
-
-const memberKindIcons = {
-  ADVISER: Crown,
-  HONORABLE: Award,
-  EXECUTIVE: Briefcase,
-  ASSOCIATE: Star,
-  STUDENT_REPRESENTATIVE: GraduationCap,
-};
-
-const memberKindColors = {
-  ADVISER: "bg-[#003366] text-white",
-  HONORABLE: "bg-[#00AEEF] text-white",
-  EXECUTIVE: "bg-[#003366]/80 text-white",
-  ASSOCIATE: "bg-[#00AEEF]/80 text-white",
-  STUDENT_REPRESENTATIVE: "bg-gray-600 text-white",
-};
+import MemberCard from "@/app/(public)/(home)/members/_components/member-card";
 
 const memberKindLabels = {
   ADVISER: "Adviser",
@@ -65,7 +32,6 @@ export default function SingleMemberProfilePage() {
   const member: Member | undefined = data?.data;
 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
-
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   useEffect(() => {
@@ -106,7 +72,6 @@ export default function SingleMemberProfilePage() {
     );
   }
 
-  // Handle error state
   if (isError) {
     console.error("Failed to fetch member details:", error);
     return (
@@ -118,7 +83,6 @@ export default function SingleMemberProfilePage() {
     );
   }
 
-  // Handle case where member is not found after loading
   if (!member) {
     return (
       <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
@@ -131,10 +95,6 @@ export default function SingleMemberProfilePage() {
       </Container>
     );
   }
-
-  // Get the appropriate icon for the member's kind
-  const MemberKindIcon =
-    memberKindIcons[member.kind as keyof typeof memberKindIcons];
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -200,59 +160,32 @@ export default function SingleMemberProfilePage() {
 
   return (
     <div>
-      <Container className="py-12 md:py-16 flex justify-center items-center">
-        <Card className="w-full max-w-2xl rounded-xl shadow-lg border border-gray-200 bg-white overflow-hidden">
-          {/* Header Section of the Card */}
-          <div className="relative h-48 bg-gradient-to-r from-[#003366] to-[#00AEEF] flex items-end justify-center pb-6">
-            <div className="absolute top-4 right-4">
-              <Button
-                size="sm"
-                variant="secondary"
-                className="bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
-                onClick={handleQRCodeDownload}
-                disabled={!qrCodeDataUrl}
-              >
-                <QrCode className="h-4 w-4" />
-              </Button>
-            </div>
-            {/* Profile Picture and Kind Icon */}
-            <div className="relative -mb-16">
-              <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-                <AvatarImage
-                  src={member.profile_picture || "/placeholder.svg"}
-                  alt={member.name}
-                />
-                <AvatarFallback className="bg-[#00AEEF] text-white text-3xl font-bold">
-                  {member.name
-                    .split(" ")
-                    .map((n: string) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div
-                className={`absolute -bottom-1 -right-1 p-3 rounded-full shadow-lg ${
-                  memberKindColors[member.kind as keyof typeof memberKindColors]
-                }`}
-              >
-                <MemberKindIcon className="h-5 w-5 text-white" />
-              </div>
-            </div>
-          </div>
+      <Container className="py-12 md:py-16 flex flex-col items-center gap-8">
+        {/* Member Card Section */}
+        <div className="w-full max-w-2xl">
+          <MemberCard
+            member={{
+              id: member.id,
+              name: member.name,
+              email: member.email,
+              phone: member.phone,
+              kind: member.kind,
+              status: member.approved_at ? "APPROVED" : "PENDING",
+              approved_at: member.approved_at,
+              created_at: member.created_at,
+              user: {
+                profile_picture: member?.user?.profile_picture || null, // Map the correct field here
+              },
+              approved_by: null,
+              profile_picture: member.profile_picture, // Add this if your MemberCard uses it directly
+            }}
+            isCompact={false}
+          />
+        </div>
 
-          <CardContent className="p-6 pt-20 text-center">
-            {" "}
-            {/* Adjusted padding-top to account for avatar overlap */}
-            {/* Name and Badge */}
-            <h1 className="text-2xl font-bold text-[#003366] mb-2">
-              {member.name}
-            </h1>
-            <Badge
-              className={`${
-                memberKindColors[member.kind as keyof typeof memberKindColors]
-              } text-sm px-3 py-1 mb-6`}
-            >
-              {memberKindLabels[member.kind as keyof typeof memberKindLabels]}
-            </Badge>
+        {/* Detailed Information Section */}
+        <Card className="w-full max-w-2xl rounded-xl shadow-lg border border-gray-200 bg-white">
+          <CardContent className="p-6">
             {/* Contact Information Section */}
             <div className="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left">
@@ -284,7 +217,9 @@ export default function SingleMemberProfilePage() {
                 </div>
               </div>
             </div>
+
             <Separator className="my-6" />
+
             {/* Additional Details Section */}
             <div className="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left">
@@ -335,6 +270,7 @@ export default function SingleMemberProfilePage() {
                 </div>
               </div>
             </div>
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 w-full">
               <Button
@@ -350,6 +286,15 @@ export default function SingleMemberProfilePage() {
               >
                 <Download className="h-4 w-4 mr-2" /> Save Contact
               </Button>
+              {qrCodeDataUrl && (
+                <Button
+                  onClick={handleQRCodeDownload}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <QrCode className="h-4 w-4 mr-2" /> Download QR
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -357,3 +302,25 @@ export default function SingleMemberProfilePage() {
     </div>
   );
 }
+
+export type Member = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  profile_picture: string;
+  kind:
+    | "ADVISER"
+    | "HONORABLE"
+    | "EXECUTIVE"
+    | "ASSOCIATE"
+    | "STUDENT_REPRESENTATIVE";
+  approved_at: string;
+  created_at: string;
+  user: {
+    profile_picture: string | null;
+  };
+  approved_by: {
+    name: string;
+  } | null;
+};
