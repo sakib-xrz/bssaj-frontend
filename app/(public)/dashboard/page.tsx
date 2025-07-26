@@ -39,7 +39,7 @@ const ManageProfile = () => {
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     "/images/bssaj-logo.jpeg"
   );
-
+console.log(user)
   const myProfileFormik = useFormik({
     enableReinitialize: true,
     initialValues: {

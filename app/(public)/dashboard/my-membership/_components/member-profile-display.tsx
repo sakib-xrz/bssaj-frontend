@@ -5,19 +5,11 @@ import QRCode from "qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Phone,
-  Mail,
-  Calendar,
-  Share2,
-  Download,
-  QrCode,
-  CheckCircle,
-  User,
-} from "lucide-react";
+import {Phone,Mail,Calendar,Share2,Download,QrCode,CheckCircle,User} from "lucide-react";
 import Container from "@/components/shared/container";
 import { useGetOwnMemberQuery } from "@/redux/features/member/memberApi";
 import MemberCard from "@/app/(public)/(home)/members/_components/member-card";
+import { useAuthUser } from "@/redux/features/auth/authSlice";
 
 const memberKindLabels = {
   ADVISER: "Adviser",
@@ -30,8 +22,9 @@ const memberKindLabels = {
 export default function SingleMemberProfilePage() {
   const { data, isLoading, isError, error } = useGetOwnMemberQuery("own");
   const member: Member | undefined = data?.data;
-
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
+  const user = useAuthUser()
+  console.log(user)
+    const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   useEffect(() => {
@@ -174,7 +167,7 @@ export default function SingleMemberProfilePage() {
               approved_at: member.approved_at,
               created_at: member.created_at,
               user: {
-                profile_picture: member.profile_picture || null,
+                profile_picture: user?.profile_picture || null,
               },
               approved_by: null,
               profile_picture: member.profile_picture,
