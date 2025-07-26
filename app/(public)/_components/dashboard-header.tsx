@@ -20,11 +20,10 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { SidebarContent } from "./Sidebar";
 
-
 export function DashboardHeader() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const user = useAuthUser();
+  const user = useAuthUser(); // This hook should provide the latest user data, including profile_picture
   const dispatch = useDispatch<AppDispatch>();
 
   const handleLogout = () => {
@@ -63,7 +62,8 @@ export function DashboardHeader() {
               >
                 <Avatar className="h-9 w-9">
                   <AvatarImage
-                    src={user?.profile_picture || ""}
+                    key={user?.profile_picture || "default-dashboard-avatar"} // Added key to force re-render
+                    src={user?.profile_picture || "/placeholder.svg"} // Ensure a fallback placeholder
                     alt={`${user?.name}'s profile picture`}
                   />
                   <AvatarFallback>

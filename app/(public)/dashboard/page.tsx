@@ -3,12 +3,21 @@
 
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useChangePasswordMutation } from "@/redux/features/auth/authApi";
 import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
-import { useUpdateProfilePitcherMutation, useUpdateUserMutation } from "@/redux/features/user/userApi";
+import {
+  useUpdateProfilePitcherMutation,
+  useUpdateUserMutation,
+} from "@/redux/features/user/userApi";
 import { useFormik } from "formik";
 import { CameraIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import Image from "next/image";
@@ -17,20 +26,25 @@ import { toast } from "sonner";
 import * as Yup from "yup";
 
 const myProfileSchema = Yup.object({
-  name: Yup.string().required("Name is required").min(2, "Name must be at least 2 characters"),
-  email: Yup.string().email("Invalid email format").required("Email is required"),
+  name: Yup.string()
+    .required("Name is required")
+    .min(2, "Name must be at least 2 characters"),
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
 });
-
 
 const ManageProfile = () => {
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const user = useGetMyInfoQuery();
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [addNewProfilePitcher] = useUpdateProfilePitcherMutation()
-  const [updateUserInfo] = useUpdateUserMutation()
-  const [changePassword] = useChangePasswordMutation()
-  const [profileImagePreview, setProfileImagePreview] = useState<string | null>("/images/bssaj-logo.jpeg");
+  const [addNewProfilePitcher] = useUpdateProfilePitcherMutation();
+  const [updateUserInfo] = useUpdateUserMutation();
+  const [changePassword] = useChangePasswordMutation();
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    "/images/bssaj-logo.jpeg"
+  );
 
   const myProfileFormik = useFormik({
     enableReinitialize: true,
@@ -56,7 +70,7 @@ const ManageProfile = () => {
         console.error("Error updating profile:", error);
         toast.error("Failed to update profile.");
       }
-    }
+    },
   });
   const changePasswordSchema = Yup.object({
     old_password: Yup.string().required("Current password is required"),
@@ -87,7 +101,8 @@ const ManageProfile = () => {
         if (res?.data?.success) {
           toast.success(res?.data?.message);
         } else {
-          const errorMessage = (res as any)?.error?.data?.message || "Something went wrong";
+          const errorMessage =
+            (res as any)?.error?.data?.message || "Something went wrong";
           toast.error(errorMessage);
         }
       } catch (error) {
@@ -104,7 +119,9 @@ const ManageProfile = () => {
     };
   }, [profileImagePreview]);
 
-  const handleProfileImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
 
     if (profileImagePreview && profileImagePreview.startsWith("blob:")) {
@@ -125,8 +142,10 @@ const ManageProfile = () => {
         }
 
         if (res?.error) {
-          if ('data' in res.error) {
-            toast.error((res.error.data as any)?.message || "Something went wrong");
+          if ("data" in res.error) {
+            toast.error(
+              (res.error.data as any)?.message || "Something went wrong"
+            );
           } else {
             toast.error("An unexpected error occurred");
           }
@@ -145,7 +164,9 @@ const ManageProfile = () => {
         {/* My Profile Card */}
         <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
           <CardHeader className="p-0 mb-6">
-            <CardTitle className="text-2xl font-bold text-gray-900">My Profile</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              My Profile
+            </CardTitle>
             <CardDescription className="text-muted-foreground text-sm">
               Update your personal information here.
             </CardDescription>
@@ -153,9 +174,13 @@ const ManageProfile = () => {
           <CardContent className="p-0">
             <form onSubmit={myProfileFormik.handleSubmit} className="space-y-6">
               <div className="flex justify-center mb-6">
-                <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
+                <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
                   <Image
-                    src={user?.data?.profile_picture || profileImagePreview || "/images/bssaj-logo.jpeg"}
+                    src={
+                      user?.data?.profile_picture ||
+                      profileImagePreview ||
+                      "/images/bssaj-logo.jpeg"
+                    }
                     alt="Profile Picture"
                     fill
                     className="object-cover"
@@ -168,15 +193,13 @@ const ManageProfile = () => {
                     onChange={handleProfileImageChange}
                     className="hidden"
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="absolute bottom-0 right-0 bg-white/70 hover:bg-white rounded-full p-2"
                     onClick={() => profileImageInputRef.current?.click()}
+                    className="absolute bottom-2 right-2 bg-gray-100 border border-gray-300 shadow-md hover:bg-gray-200 rounded-full w-10 h-10 flex items-center justify-center transition"
                   >
-                    <CameraIcon className="h-5 w-5 text-gray-700" />
-                  </Button>
+                    <CameraIcon className="w-5 h-5 text-blue-800" />
+                  </button>
                 </div>
               </div>
 
@@ -191,7 +214,12 @@ const ManageProfile = () => {
                     value={myProfileFormik.values.name}
                     onChange={myProfileFormik.handleChange}
                     onBlur={myProfileFormik.handleBlur}
-                    className={myProfileFormik.touched.name && myProfileFormik.errors.name ? "border-red-500" : ""}
+                    className={
+                      myProfileFormik.touched.name &&
+                      myProfileFormik.errors.name
+                        ? "border-red-500"
+                        : ""
+                    }
                   />
                   {/* {myProfileFormik.touched.name && myProfileFormik.errors.name && (
                     <p className="text-sm text-red-500">{myProfileFormik.errors.name}</p>
@@ -219,7 +247,12 @@ const ManageProfile = () => {
                     value={myProfileFormik.values.email}
                     onChange={myProfileFormik.handleChange}
                     onBlur={myProfileFormik.handleBlur}
-                    className={myProfileFormik.touched.email && myProfileFormik.errors.email ? "border-red-500" : ""}
+                    className={
+                      myProfileFormik.touched.email &&
+                      myProfileFormik.errors.email
+                        ? "border-red-500"
+                        : ""
+                    }
                   />
                   {/* {myProfileFormik.touched.email && myProfileFormik.errors.email && (
                     <p className="text-sm text-red-500">{myProfileFormik.errors.email}</p>
@@ -227,7 +260,12 @@ const ManageProfile = () => {
                 </div>
               </div>
               <div className="flex justify-start">
-                <Button type="submit" disabled={myProfileFormik.isSubmitting || !myProfileFormik.isValid}>
+                <Button
+                  type="submit"
+                  disabled={
+                    myProfileFormik.isSubmitting || !myProfileFormik.isValid
+                  }
+                >
                   {myProfileFormik.isSubmitting ? "Updating..." : "Update"}
                 </Button>
               </div>
@@ -238,13 +276,18 @@ const ManageProfile = () => {
         {/* change password  */}
         <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8">
           <CardHeader className="p-0 mb-6">
-            <CardTitle className="text-2xl font-bold text-gray-900">Change Password</CardTitle>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              Change Password
+            </CardTitle>
             <CardDescription className="text-muted-foreground text-sm">
               Update your password to keep your account secure.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <form onSubmit={changePasswordFormik.handleSubmit} className="space-y-6">
+            <form
+              onSubmit={changePasswordFormik.handleSubmit}
+              className="space-y-6"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* old password  */}
                 <div className="space-y-2">
@@ -260,7 +303,7 @@ const ManageProfile = () => {
                       onBlur={changePasswordFormik.handleBlur}
                       className={
                         changePasswordFormik.touched.old_password &&
-                          changePasswordFormik.errors.old_password
+                        changePasswordFormik.errors.old_password
                           ? "border-red-500 pr-10"
                           : "pr-10"
                       }
@@ -273,7 +316,11 @@ const ManageProfile = () => {
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:bg-gray-100"
                       onClick={() => setShowNewPassword(!showNewPassword)}
                     >
-                      {showNewPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+                      {showNewPassword ? (
+                        <EyeOffIcon className="h-4 w-4" />
+                      ) : (
+                        <EyeIcon className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                   {changePasswordFormik.touched.old_password &&
@@ -298,7 +345,7 @@ const ManageProfile = () => {
                       onBlur={changePasswordFormik.handleBlur}
                       className={
                         changePasswordFormik.touched.new_password &&
-                          changePasswordFormik.errors.new_password
+                        changePasswordFormik.errors.new_password
                           ? "border-red-500 pr-10"
                           : "pr-10"
                       }
@@ -309,7 +356,9 @@ const ManageProfile = () => {
                       variant="ghost"
                       size="icon"
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-gray-500 hover:bg-gray-100"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                     >
                       {showConfirmPassword ? (
                         <EyeOffIcon className="h-4 w-4" />
@@ -340,7 +389,7 @@ const ManageProfile = () => {
                   onBlur={changePasswordFormik.handleBlur}
                   className={
                     changePasswordFormik.touched.confirmPassword &&
-                      changePasswordFormik.errors.confirmPassword
+                    changePasswordFormik.errors.confirmPassword
                       ? "border-red-500"
                       : ""
                   }
@@ -358,14 +407,14 @@ const ManageProfile = () => {
                 <Button
                   type="submit"
                   disabled={
-                    changePasswordFormik.isSubmitting || !changePasswordFormik.isValid
+                    changePasswordFormik.isSubmitting ||
+                    !changePasswordFormik.isValid
                   }
                 >
                   {changePasswordFormik.isSubmitting ? "Updating..." : "Update"}
                 </Button>
               </div>
             </form>
-
           </CardContent>
         </Card>
       </div>

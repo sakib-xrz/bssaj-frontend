@@ -2,7 +2,14 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/data";
 import { logout, useAuthUser } from "@/redux/features/auth/authSlice";
@@ -54,48 +61,41 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${isActive
+                className={`text-sm font-medium transition-colors ${
+                  isActive
                     ? "text-primary font-semibold"
                     : "text-[#868686] hover:text-primary"
-                  }`}
+                }`}
               >
                 {link.name}
               </Link>
             );
           })}
-          {/* New: Profile link, visible only when user is logged in */}
-          {user && (
-            <Link
-              href="/dashboard"
-              className={`text-sm font-medium transition-colors ${pathname === "/dashboard"
-                  ? "text-primary font-semibold"
-                  : "text-[#868686] hover:text-primary"
-                }`}
-            >
-              Profile
-            </Link>
-          )}
+
           <Button className="text-muted bg-[#00AEEF] hover:bg-[#00AEEF]/90">
             En <ChevronDown className="ml-1 h-4 w-4" />
           </Button>
 
-          {/* Conditional rendering for user dropdown or Sign in button */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-9 w-9 rounded-full"
+                  className="relative h-10 w-10 rounded-full ring-1 ring-ring/20 shadow-sm"
                   aria-label="User menu"
                 >
-                  <Avatar className="h-9 w-9">
-                    <AvatarImage
-                      src={user?.profile_picture || ""}
-                      alt={`${user?.name}'s profile picture`}
-                    />
-                    <AvatarFallback>
-                      {userInitials || <User className="h-4 w-4" />}
-                    </AvatarFallback>
+                  <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                    {user?.profile_picture ? (
+                      <AvatarImage
+                        src={user.profile_picture}
+                        alt={`${user?.name}'s profile picture`}
+                        className="object-cover"
+                      />
+                    ) : (
+                      <AvatarFallback className="bg-[#E0F7FF] text-[#007B9E] font-semibold">
+                        {userInitials || <User className="h-4 w-4" />}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -159,21 +159,31 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-lg font-medium ${isActive
+                      className={`text-lg font-medium ${
+                        isActive
                           ? "text-primary font-semibold"
                           : "text-gray-700 hover:text-primary"
-                        }`}
+                      }`}
                     >
                       {link.name}
                     </Link>
                   );
                 })}
 
-                {/* Mobile conditional rendering for login/logout */}
                 {user ? (
                   <>
                     <Link href="/dashboard" onClick={() => setOpen(false)}>
                       <Button className="w-full">Dashboard</Button>
+                    </Link>
+                    <Link
+                      href="/dashboard"
+                      className={`text-sm font-medium transition-colors ${
+                        pathname === "/dashboard"
+                          ? "text-primary font-semibold"
+                          : "text-[#868686] hover:text-primary"
+                      }`}
+                    >
+                      Profile
                     </Link>
                     <Button onClick={handleLogout} className="w-full">
                       Logout
