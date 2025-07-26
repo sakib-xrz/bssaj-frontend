@@ -5,7 +5,13 @@ import type React from "react";
 import Container from "@/components/shared/container";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,12 +55,15 @@ const agencySchema = Yup.object({
 
 export default function CreateAgencyPage() {
   const router = useRouter();
-  const [createAgency, { isLoading, isError, error }] = useCreateAgencyMutation();
+  const [createAgency, { isLoading, isError, error }] =
+    useCreateAgencyMutation();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null);
-  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
-  const user = useAuthUser()
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(
+    null
+  );
+  const user = useAuthUser();
   interface SuccessStoryImage {
     id: string;
     file: File;
@@ -63,7 +72,6 @@ export default function CreateAgencyPage() {
   const [successStoryImages, setSuccessStoryImages] = useState<
     SuccessStoryImage[]
   >([]);
-
 
   console.log(logoFile);
 
@@ -102,22 +110,21 @@ export default function CreateAgencyPage() {
         for (const key in values) {
           if (Object.prototype.hasOwnProperty.call(values, key)) {
             const value = values[key as keyof typeof values];
+
+            // Skip if value is null or undefined
+            if (value === null || value === undefined) continue;
+
+            // Handle special cases
             if (key === "established_year") {
-              if (value) {
-                formData.append(key, String(Number(value)));
-              }
-            }  else if (
+              formData.append(key, String(value));
+            } else if (
               key === "user_id" &&
               values.user_selection_type === "existing"
             ) {
-              formData.append(key, value);
-            } else if (
-              key !== "user_selection_type" &&
-              key !== "user_id" &&
-              value !== null &&
-              value !== undefined
-            ) {
-              formData.append(key, value);
+              formData.append(key, String(value));
+            } else if (key !== "user_selection_type") {
+              // Convert all other values to string before appending
+              formData.append(key, String(value));
             }
           }
         }
@@ -450,7 +457,6 @@ export default function CreateAgencyPage() {
                       id="contact_email"
                       name="contact_email"
                       type="email"
-                      
                       placeholder="Enter contact email"
                       value={formik.values.contact_email}
                       onChange={formik.handleChange}
@@ -458,7 +464,7 @@ export default function CreateAgencyPage() {
                       disabled
                       className={
                         formik.touched.contact_email &&
-                          formik.errors.contact_email
+                        formik.errors.contact_email
                           ? "border-red-500"
                           : ""
                       }
@@ -531,7 +537,7 @@ export default function CreateAgencyPage() {
                       onBlur={formik.handleBlur}
                       className={
                         formik.touched.facebook_url &&
-                          formik.errors.facebook_url
+                        formik.errors.facebook_url
                           ? "border-red-500"
                           : ""
                       }
@@ -557,7 +563,7 @@ export default function CreateAgencyPage() {
                     onBlur={formik.handleBlur}
                     className={
                       formik.touched.established_year &&
-                        formik.errors.established_year
+                      formik.errors.established_year
                         ? "border-red-500"
                         : ""
                     }
