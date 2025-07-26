@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { logout, useAuthUser } from "@/redux/features/auth/authSlice";
+import { logout } from "@/redux/features/auth/authSlice";
 import { AppDispatch, persistor } from "@/redux/store";
 import { LogOut, Menu, User } from "lucide-react";
 import Link from "next/link";
@@ -19,12 +19,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { SidebarContent } from "./Sidebar";
+import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
 
 export function DashboardHeader() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const user = useAuthUser(); // This hook should provide the latest user data, including profile_picture
   const dispatch = useDispatch<AppDispatch>();
+  const [open, setOpen] = useState(false);
+
+  // Use your RTK Query to get fresh user info
+  const { data: user } = useGetMyInfoQuery();
 
   const handleLogout = () => {
     dispatch(logout());
@@ -34,7 +37,7 @@ export function DashboardHeader() {
 
   const userInitials = user?.name
     ?.split(" ")
-    ?.map((name) => name[0])
+    ?.map((n: string) => n[0])
     .join("");
 
   return (
@@ -62,9 +65,13 @@ export function DashboardHeader() {
               >
                 <Avatar className="h-9 w-9">
                   <AvatarImage
-                    key={user?.profile_picture || "default-dashboard-avatar"} // Added key to force re-render
-                    src={user?.profile_picture || "/placeholder.svg"} // Ensure a fallback placeholder
-                    alt={`${user?.name}'s profile picture`}
+                    key={user?.profile_picture || "default-avatar"}
+                    src={user?.profile_picture || "/placeholder.svg"}
+                    alt={`${user?.name || "User"}'s profile picture`}
+                    onError={(e) => {
+                      // fallback if image fails
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
+                    }}
                   />
                   <AvatarFallback>
                     {userInitials || <User className="h-4 w-4" />}
@@ -72,6 +79,7 @@ export function DashboardHeader() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent
               className="w-60 rounded-xl shadow-lg"
               align="end"
@@ -85,14 +93,18 @@ export function DashboardHeader() {
                   </p>
                 </div>
               </DropdownMenuLabel>
+
               <DropdownMenuSeparator />
+
               <DropdownMenuItem asChild>
                 <Link href="/dashboard" className="flex items-center">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
+
               <DropdownMenuSeparator />
+
               <DropdownMenuItem
                 onClick={handleLogout}
                 className="text-destructive focus:bg-destructive/10"
