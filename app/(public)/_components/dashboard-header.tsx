@@ -20,6 +20,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { SidebarContent } from "./Sidebar";
 import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
+import { baseApi } from "@/redux/api/baseApi";
 
 export function DashboardHeader() {
   const router = useRouter();
@@ -29,10 +30,27 @@ export function DashboardHeader() {
   // Use your RTK Query to get fresh user info
   const { data: user } = useGetMyInfoQuery();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    persistor.purge();
-    router.push("/login");
+  const handleLogout = async () => {
+    // Made async to await persistor.purge
+    try {
+      // 1. Dispatch the 'logout' action from your authSlice to clear Redux state
+      dispatch(logout());
+
+      // 2. Clear Redux Persist store
+      await persistor.purge();
+      // 3. Clear local and session storage
+      localStorage.clear();
+      sessionStorage.clear();
+      // 4. Clear RTK Query cache immediately
+      dispatch(baseApi.util.resetApiState()); // <--- Crucial line for immediate effect
+
+      // 5. Redirect to login page
+      router.push("/login");
+      // 6. Force a refresh to ensure all client-side states are reset
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const userInitials = user?.name
@@ -65,11 +83,12 @@ export function DashboardHeader() {
               >
                 <Avatar className="h-9 w-9">
                   <AvatarImage
-                    key={user?.profile_picture || "default-avatar"}
+                    // Use a key that changes when profile_picture changes to force re-render
+                    key={user?.profile_picture || "default-avatar-dashboard"}
                     src={user?.profile_picture || "/placeholder.svg"}
                     alt={`${user?.name || "User"}'s profile picture`}
                     onError={(e) => {
-                      // fallback if image fails
+                      // Fallback if image fails to load
                       (e.target as HTMLImageElement).src = "/placeholder.svg";
                     }}
                   />

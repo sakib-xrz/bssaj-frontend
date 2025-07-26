@@ -12,31 +12,42 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/data";
-import { logout } from "@/redux/features/auth/authSlice";
-import { AppDispatch, persistor } from "@/redux/store";
+import { persistor } from "@/redux/store";
 import { ChevronDown, LogOut, MenuIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
+
 import Container from "./container";
 import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
 import { useUpdateProfilePitcherMutation } from "@/redux/features/user/userApi";
+import { baseApi } from "@/redux/api/baseApi";
+import { logout } from "@/redux/features/auth/authSlice";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
+
   const router = useRouter();
+  const dispatch = useDispatch();
   const [updateProfilePicture] = useUpdateProfilePitcherMutation();
-  const { data: user } = useGetMyInfoQuery();
+  const { data: user, isLoading, isError } = useGetMyInfoQuery();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    persistor.purge();
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      dispatch(logout());
+      await persistor.purge();
+      localStorage.clear();
+      sessionStorage.clear();
+      dispatch(baseApi.util.resetApiState());
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const userInitials =
@@ -115,18 +126,26 @@ export default function Navbar() {
                     aria-label="User menu"
                   >
                     <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        key={user?.profile_picture || "default-avatar"}
-                        src={user?.profile_picture || "/placeholder.svg"}
-                        alt={`${user?.name || "User"}'s profile picture`}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "/placeholder.svg";
-                        }}
-                      />
-                      <AvatarFallback className="bg-[#E0F7FF] text-[#007B9E] font-semibold">
-                        {userInitials || <User className="h-4 w-4" />}
-                      </AvatarFallback>
+                      {!isLoading && !isError && user ? (
+                        <>
+                          <AvatarImage
+                            key={user?.profile_picture || "default-avatar"}
+                            src={user?.profile_picture || "/placeholder.svg"}
+                            alt={`${user?.name || "User"}'s profile picture`}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "/placeholder.svg";
+                            }}
+                          />
+                          <AvatarFallback className="bg-[#E0F7FF] text-[#007B9E] font-semibold">
+                            {userInitials || <User className="h-4 w-4" />}
+                          </AvatarFallback>
+                        </>
+                      ) : (
+                        <AvatarFallback className="bg-[#E0F7FF] text-[#007B9E] font-semibold">
+                          <User className="h-4 w-4" />
+                        </AvatarFallback>
+                      )}
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -209,11 +228,18 @@ export default function Navbar() {
 
                 {user ? (
                   <>
-                    <Link href="/dashboard" onClick={() => setOpen(false)}>
-                      <Button className="w-full">Dashboard</Button>
+                    <Link href="/dashboard" passHref>
+                      {" "}
+                      {/* Added passHref */}
+                      <Button asChild className="w-full">
+                        {" "}
+                        {/* Added asChild */}
+                        <span>Dashboard</span>
+                      </Button>
                     </Link>
                     <Link
                       href="/dashboard"
+                      onClick={() => setOpen(false)}
                       className={`text-sm font-medium transition-colors ${
                         pathname === "/dashboard"
                           ? "text-primary font-semibold"
@@ -227,8 +253,14 @@ export default function Navbar() {
                     </Button>
                   </>
                 ) : (
-                  <Link href="/login" onClick={() => setOpen(false)}>
-                    <Button className="w-full">Sign In</Button>
+                  <Link href="/login" passHref>
+                    {" "}
+                    {/* Added passHref */}
+                    <Button asChild className="w-full">
+                      {" "}
+                      {/* Added asChild */}
+                      <span>Sign In</span>
+                    </Button>
                   </Link>
                 )}
               </div>

@@ -174,10 +174,10 @@ export default function SingleMemberProfilePage() {
               approved_at: member.approved_at,
               created_at: member.created_at,
               user: {
-                profile_picture: member?.user?.profile_picture || null, // Map the correct field here
+                profile_picture: member.profile_picture || null,
               },
               approved_by: null,
-              profile_picture: member.profile_picture, // Add this if your MemberCard uses it directly
+              profile_picture: member.profile_picture,
             }}
             isCompact={false}
           />
@@ -186,7 +186,6 @@ export default function SingleMemberProfilePage() {
         {/* Detailed Information Section */}
         <Card className="w-full max-w-2xl rounded-xl shadow-lg border border-gray-200 bg-white">
           <CardContent className="p-6">
-            {/* Contact Information Section */}
             <div className="bg-gray-50 p-6 rounded-lg mb-6 shadow-sm">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left">
                 Contact Information
