@@ -12,9 +12,26 @@ export const agencyApi = baseApi.injectEndpoints({
       invalidatesTags: ["Agency"],
     }),
 
-    getMemberById: builder.query({
+    getAgencyById: builder.query({
       query: (id) => ({
         url: `/agencies/${id}`,
+        method: "GET",
+      }),
+      providesTags: ["Agency"],
+    }),
+
+    updateAgency: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/agencies/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Agency"],
+    }),
+
+    getAgenciesByUserId: builder.query<any, string>({
+      query: (userId) => ({
+        url: `/agencies?creatorId=${userId}`,
         method: "GET",
       }),
       providesTags: ["Agency"],
@@ -47,6 +64,8 @@ export const agencyApi = baseApi.injectEndpoints({
 
 export const {
   useCreateAgencyMutation,
-  useGetMemberByIdQuery,
+  useGetAgencyByIdQuery,
+  useUpdateAgencyMutation,
+  useGetAgenciesByUserIdQuery,
   useGetAllAgencyQuery,
 } = agencyApi;
