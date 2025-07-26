@@ -2,31 +2,24 @@
 
 import type React from "react";
 
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import Container from "@/components/shared/container";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, Upload, X } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { useState, useEffect, useMemo, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Container from "@/components/shared/container";
 import { useCreateAgencyMutation } from "@/redux/features/agency/agencyApi";
-import { useSearchUsersQuery } from "@/redux/features/user/userApi";
+import { useFormik } from "formik";
+import { ArrowLeft, Upload, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import * as Yup from "yup";
 
 import { toast } from "sonner";
-import { SearchSelect } from "@/components/shared/search-and-select";
+import { useAuthUser } from "@/redux/features/auth/authSlice";
 
 const agencySchema = Yup.object({
   name: Yup.string()
@@ -56,14 +49,12 @@ const agencySchema = Yup.object({
 
 export default function CreateAgencyPage() {
   const router = useRouter();
-  const [createAgency, { isLoading, isError, error }] =
-    useCreateAgencyMutation();
+  const [createAgency, { isLoading, isError, error }] = useCreateAgencyMutation();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [coverPhotoFile, setCoverPhotoFile] = useState<File | null>(null);
-  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(
-    null
-  );
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState<string | null>(null);
+  const user = useAuthUser()
   interface SuccessStoryImage {
     id: string;
     file: File;
@@ -73,8 +64,6 @@ export default function CreateAgencyPage() {
     SuccessStoryImage[]
   >([]);
 
-  // User cache for search select
-  const usersCache = useRef(new Map());
 
   console.log(logoFile);
 
@@ -93,7 +82,7 @@ export default function CreateAgencyPage() {
   const formik = useFormik({
     initialValues: {
       name: "",
-      contact_email: "",
+      contact_email: user?.email || "",
       contact_phone: "",
       website: "",
       director_name: "",
@@ -102,7 +91,7 @@ export default function CreateAgencyPage() {
       address: "",
       facebook_url: "",
       user_selection_type: "existing",
-      user_id: "",
+      user_id: user?.id,
     },
     validationSchema: agencySchema,
     onSubmit: async (values) => {
@@ -117,9 +106,7 @@ export default function CreateAgencyPage() {
               if (value) {
                 formData.append(key, String(Number(value)));
               }
-            } else if (key === "user_selection_type") {
-              formData.append(key, value);
-            } else if (
+            }  else if (
               key === "user_id" &&
               values.user_selection_type === "existing"
             ) {
@@ -179,39 +166,6 @@ export default function CreateAgencyPage() {
       }
     },
   });
-
-  // Transform user data for SearchSelect
-  const transformUserData = useMemo(
-    () => (data: unknown) => {
-      const apiData = data as {
-        data?: Array<{ id: string; name: string; email: string }>;
-      };
-      if (!apiData?.data) return [];
-
-      return apiData.data.map((user) => {
-        // Cache the user data
-        usersCache.current.set(user.id, user);
-
-        return {
-          label: `${user.name} (${user.email})`,
-          value: user.id,
-        };
-      });
-    },
-    []
-  );
-
-  // Handle user selection
-  const handleUserSelect = (userId: string) => {
-    formik.setFieldValue("user_id", userId);
-
-    // If a user is selected, auto-fill contact email and director name
-    if (userId && usersCache.current.has(userId)) {
-      const selectedUser = usersCache.current.get(userId);
-      formik.setFieldValue("contact_email", selectedUser.email);
-      formik.setFieldValue("director_name", selectedUser.name);
-    }
-  };
 
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -308,51 +262,7 @@ export default function CreateAgencyPage() {
             <form onSubmit={formik.handleSubmit} className="space-y-6">
               {/* User Selection */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  User Selection
-                </h3>
-
                 <div className="space-y-4">
-                  <div className="flex gap-4">
-                    <Label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="user_selection_type"
-                        value="new"
-                        checked={formik.values.user_selection_type === "new"}
-                        onChange={(e) => {
-                          formik.handleChange(e);
-                          formik.setFieldValue("user_id", "");
-                          formik.setFieldValue("contact_email", "");
-                          formik.setFieldValue("director_name", "");
-                        }}
-                        className="w-4 h-4 accent-primary"
-                      />
-                      Create new user
-                    </Label>
-                    <Label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="user_selection_type"
-                        value="existing"
-                        checked={
-                          formik.values.user_selection_type === "existing"
-                        }
-                        onChange={(e) => {
-                          formik.handleChange(e);
-                          // Clear user_id when switching to existing
-                          if (e.target.value === "existing") {
-                            formik.setFieldValue("user_id", "");
-                            formik.setFieldValue("contact_email", "");
-                            formik.setFieldValue("director_name", "");
-                          }
-                        }}
-                        className="w-4 h-4 accent-primary"
-                      />
-                      Select existing user
-                    </Label>
-                  </div>
-
                   {formik.touched.user_selection_type &&
                     formik.errors.user_selection_type && (
                       <p className="text-sm text-red-500">
@@ -360,47 +270,6 @@ export default function CreateAgencyPage() {
                       </p>
                     )}
                 </div>
-
-                {/* Existing User Selection */}
-                {formik.values.user_selection_type === "existing" && (
-                  <div className="space-y-2">
-                    <SearchSelect
-                      label="Select User *"
-                      placeholder="Type to search for users..."
-                      value={formik.values.user_id}
-                      onChange={handleUserSelect}
-                      useSearchQuery={useSearchUsersQuery}
-                      searchParams={{ limit: 20 }}
-                      transformData={transformUserData}
-                      selectedOptionLabel={
-                        formik.values.user_id &&
-                        usersCache.current.has(formik.values.user_id)
-                          ? `${
-                              usersCache.current.get(formik.values.user_id)!
-                                .name
-                            } (${
-                              usersCache.current.get(formik.values.user_id)!
-                                .email
-                            })`
-                          : undefined
-                      }
-                      className={
-                        formik.touched.user_id && formik.errors.user_id
-                          ? "border-red-500"
-                          : ""
-                      }
-                      emptyMessage="No users found matching your search"
-                    />
-                    {formik.touched.user_id && formik.errors.user_id && (
-                      <p className="text-sm text-red-500">
-                        {formik.errors.user_id}
-                      </p>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      Search for users to create an agency for them
-                    </p>
-                  </div>
-                )}
               </div>
 
               {/* Basic Information */}
@@ -446,9 +315,6 @@ export default function CreateAgencyPage() {
                       value={formik.values.director_name}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      disabled={
-                        formik.values.user_selection_type === "existing"
-                      }
                     />
                   </div>
                 </div>
@@ -584,16 +450,15 @@ export default function CreateAgencyPage() {
                       id="contact_email"
                       name="contact_email"
                       type="email"
+                      
                       placeholder="Enter contact email"
                       value={formik.values.contact_email}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
-                      disabled={
-                        formik.values.user_selection_type === "existing"
-                      }
+                      disabled
                       className={
                         formik.touched.contact_email &&
-                        formik.errors.contact_email
+                          formik.errors.contact_email
                           ? "border-red-500"
                           : ""
                       }
@@ -666,7 +531,7 @@ export default function CreateAgencyPage() {
                       onBlur={formik.handleBlur}
                       className={
                         formik.touched.facebook_url &&
-                        formik.errors.facebook_url
+                          formik.errors.facebook_url
                           ? "border-red-500"
                           : ""
                       }
@@ -692,7 +557,7 @@ export default function CreateAgencyPage() {
                     onBlur={formik.handleBlur}
                     className={
                       formik.touched.established_year &&
-                      formik.errors.established_year
+                        formik.errors.established_year
                         ? "border-red-500"
                         : ""
                     }

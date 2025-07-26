@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "@/redux/api/baseApi";
+import { tagTypes } from "@/redux/tagTypes";
 
 export const agencyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -9,7 +10,7 @@ export const agencyApi = baseApi.injectEndpoints({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["Agency"],
+      invalidatesTags: [tagTypes.Agency],
     }),
 
     getAgencyById: builder.query({
@@ -17,7 +18,7 @@ export const agencyApi = baseApi.injectEndpoints({
         url: `/agencies/${id}`,
         method: "GET",
       }),
-      providesTags: ["Agency"],
+      providesTags: [tagTypes.Agency],
     }),
 
     updateAgency: builder.mutation({
@@ -26,7 +27,7 @@ export const agencyApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["Agency"],
+      invalidatesTags: [tagTypes.Agency],
     }),
 
     getAgenciesByUserId: builder.query<any, string>({
@@ -34,7 +35,7 @@ export const agencyApi = baseApi.injectEndpoints({
         url: `/agencies?creatorId=${userId}`,
         method: "GET",
       }),
-      providesTags: ["Agency"],
+      providesTags: [tagTypes.Agency],
     }),
 
     getAllAgency: builder.query({
@@ -56,7 +57,7 @@ export const agencyApi = baseApi.injectEndpoints({
           method: "GET",
         };
       },
-      providesTags: ["Agency"],
+      providesTags: [tagTypes.Agency],
     }),
   }),
   overrideExisting: false,

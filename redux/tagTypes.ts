@@ -2,7 +2,8 @@ export const tagTypes = {
   user: "user",
   member: "member",
   blog: "blog",
-  getMe:"getme"
+  getMe:"getme",
+  Agency:"Agency"
 };
 
 export const tagTypesList = [tagTypes.member, tagTypes.user];
