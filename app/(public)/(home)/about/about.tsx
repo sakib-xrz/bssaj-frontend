@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import Image from "next/image";
+import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -12,8 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Container from "@/components/shared/container";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
+import Image from "next/image";
+import React, { useMemo, useState } from "react";
 import MemberCard, { Member } from "../members/_components/member-card";
 
 const AboutBSSAJ: React.FC = () => {
@@ -24,7 +24,7 @@ const AboutBSSAJ: React.FC = () => {
     { value: "history", label: "History" },
     { value: "EXECUTIVE", label: "Executive" },
     { value: "ADVISER", label: "Advisor" },
-    { value: "ASSOCIATE", label: "Associative" },
+    { value: "ASSOCIATE", label: "Associate" },
     { value: "HONORABLE", label: "Honorable" },
     { value: "STUDENT_REPRESENTATIVE", label: "Student Representative" },
   ];

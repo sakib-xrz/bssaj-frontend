@@ -22,7 +22,7 @@ interface News {
   date?: string;
   created_at?: string;
   description?: string;
-  content?: string; // Ensure this field holds the full news article content
+  content?: string;
 }
 
 const LatestNews: React.FC = () => {
@@ -34,11 +34,9 @@ const LatestNews: React.FC = () => {
   const handleOpenModal = (news: News) => setSelectedNews(news);
   const handleCloseModal = () => setSelectedNews(null);
 
-  // Split articles for left/right columns
   const articlesLeft = articles.slice(0, Math.ceil(articles.length / 2));
   const articlesRight = articles.slice(Math.ceil(articles.length / 2));
 
-  // Helper to format date
   const formatDate = (dateString?: string) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -83,8 +81,6 @@ const LatestNews: React.FC = () => {
                     {article.title}
                   </h3>
                   <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-1 line-clamp-2">
-                    {" "}
-                    {/* Added line-clamp for description */}
                     {article.description}
                   </p>
                   <p className="flex items-center text-xs md:text-sm text-gray-500 mb-2">
@@ -115,8 +111,6 @@ const LatestNews: React.FC = () => {
                     {article.title}
                   </h3>
                   <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-1 line-clamp-2">
-                    {" "}
-                    {/* Added line-clamp for description */}
                     {article.description}
                   </p>
                   <p className="flex items-center text-xs md:text-sm text-gray-500 mb-2">
@@ -145,9 +139,8 @@ const LatestNews: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="px-6 pb-4">
-            {/* Display selectedNews?.content here, and add scrollbar */}
             <div
-              className="text-base text-gray-700 mb-2 max-h-48 overflow-y-auto pr-2" // Added overflow-y-auto and pr-2 for scrollbar
+              className="text-base text-gray-700 mb-2 max-h-48 overflow-y-auto pr-2"
               style={{ whiteSpace: "pre-line" }}
             >
               {selectedNews?.content ||
