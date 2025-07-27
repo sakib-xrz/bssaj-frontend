@@ -1,21 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircleIcon, PlusIcon, MapPinIcon, Loader2 } from "lucide-react";
-import Container from "@/components/shared/container";
+import { CheckCircleIcon, Loader2, MapPinIcon, PlusIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 
-import { useGetAgenciesByUserIdQuery } from "@/redux/features/agency/agencyApi";
+import {
+  useGetAgenciesByUserIdQuery,
+  useGetAllAgencyQuery,
+} from "@/redux/features/agency/agencyApi";
+import { useAuthUser } from "@/redux/features/auth/authSlice";
 
 interface Agency {
   id: string;
@@ -24,7 +28,14 @@ interface Agency {
   category: string;
   location: string;
   description: string;
-  status: "Approved" | "Pending";
+  status: "Approved" | "Pending" | "APPROVED" | "PENDING";
+  user_id?: string;
+  creator_id?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 export default function AgencyPage() {
@@ -32,20 +43,67 @@ export default function AgencyPage() {
     "Approved"
   );
 
-  const userId = "your_current_user_id";
+  const user = useAuthUser();
+  const userId = user?.id;
+
+  console.log("Current user:", user);
+  console.log("User ID:", userId);
 
   const {
     data: agenciesData,
     isLoading,
     isError,
     error,
-  } = useGetAgenciesByUserIdQuery(userId);
+  } = useGetAgenciesByUserIdQuery(userId || "", {
+    skip: !userId, // Skip the query if no user ID
+  });
 
-  const allAgencies: Agency[] = agenciesData?.data || [];
-
-  const filteredAgencies = allAgencies.filter(
-    (agency) => agency.status === activeTab
+  // Also try getting all agencies to see if there's a filtering issue
+  const { data: allAgenciesData } = useGetAllAgencyQuery(
+    [{ name: "creatorId", value: userId || "" }],
+    {
+      skip: !userId,
+    }
   );
+
+  console.log("Agencies data:", agenciesData);
+  console.log("All agencies:", agenciesData?.data);
+  console.log("Alternative agencies data:", allAgenciesData);
+  console.log("Alternative all agencies:", allAgenciesData?.data);
+
+  // Use the first approach, but fall back to the alternative if needed
+  const allAgencies: Agency[] =
+    agenciesData?.data || allAgenciesData?.data || [];
+
+  // Debug: Log all unique status values
+  const uniqueStatuses = Array.from(
+    new Set(allAgencies.map((agency) => agency.status))
+  );
+  console.log("Unique status values:", uniqueStatuses);
+
+  // Filter agencies by user ID first, then by status
+  const userAgencies = allAgencies.filter((agency) => {
+    // Check if the agency belongs to the current user
+    // The agency should have a user_id or creator_id field that matches the current user's ID
+    console.log("Agency:", agency);
+    console.log("Agency user_id:", agency.user_id);
+    console.log("Agency creator_id:", agency.creator_id);
+    console.log("Current user ID:", userId);
+
+    return (
+      agency.user_id === userId ||
+      agency.creator_id === userId ||
+      agency.user?.id === userId
+    );
+  });
+
+  console.log("User agencies after filtering:", userAgencies);
+
+  const filteredAgencies = userAgencies.filter((agency) => {
+    const agencyStatus = agency.status?.toLowerCase();
+    const activeTabLower = activeTab.toLowerCase();
+    return agencyStatus === activeTabLower;
+  });
 
   // Helper function to get initials
   const getInitials = (name: string) => {
@@ -65,11 +123,24 @@ export default function AgencyPage() {
     );
   }
 
+  if (!user) {
+    return (
+      <Container className="py-12 md:py-16 text-center text-red-500">
+        Please log in to view your agencies.
+      </Container>
+    );
+  }
+
   if (isError) {
     console.error("Failed to fetch agencies:", error);
     return (
       <Container className="py-12 md:py-16 text-center text-red-500">
-        Error loading agencies. Please try again later.
+        <div className="space-y-4">
+          <p>Error loading agencies. Please try again later.</p>
+          <p className="text-sm text-gray-600">
+            Check the browser console for more details.
+          </p>
+        </div>
       </Container>
     );
   }
