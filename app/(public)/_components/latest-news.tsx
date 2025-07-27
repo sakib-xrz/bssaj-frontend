@@ -1,56 +1,62 @@
+"use client";
+
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useGetAllNewsQuery } from "@/redux/features/news/newsApi";
 import { CalendarDaysIcon } from "lucide-react";
+import { useState } from "react";
 
-interface Article {
+interface News {
+  id: string;
   title: string;
-  date: string;
-  description: string;
+  date?: string;
+  created_at?: string;
+  description?: string;
+  content?: string; // Ensure this field holds the full news article content
 }
 
-const articles: Article[] = [
-  {
-    title: "Guide to Student Life in Japan",
-    date: "May 15, 2024",
-    description:
-      "Essential tips for Bangladeshi students adjusting to life in Japan. Essential tips for Bangladeshi students adjusting to life in Japan.....",
-  },
-  {
-    title: "Scholarship Opportunities for 2024",
-    date: "May 15, 2024",
-    description:
-      "A comprehensive list of scholarships available for Bangladeshi students. A comprehensive list of scholarships available for Bangladeshi students.....",
-  },
-  {
-    title: "Understanding the Japanese Work Culture",
-    date: "May 15, 2024",
-    description:
-      "Key insights into Japanese workplace norms and expectations. Key insights into Japanese workplace norms and expectations.....",
-  },
-  {
-    title: "Guide to Student Life in Japan",
-    date: "May 15, 2024",
-    description:
-      "Essential tips for Bangladeshi students adjusting to life in Japan. Essential tips for Bangladeshi students adjusting to life in Japan.....",
-  },
-  {
-    title: "Scholarship Opportunities for 2024",
-    date: "May 15, 2024",
-    description:
-      "A comprehensive list of scholarships available for Bangladeshi students. A comprehensive list of scholarships available for Bangladeshi students.....",
-  },
-  {
-    title: "Understanding the Japanese Work Culture",
-    date: "May 15, 2024",
-    description:
-      "Key insights into Japanese workplace norms and expectations. Key insights into Japanese workplace norms and expectations.....",
-  },
-];
-
 const LatestNews: React.FC = () => {
-  const articlesLeft = articles.slice(0, articles.length / 2);
-  const articlesRight = articles.slice(articles.length / 2);
+  const { data, isLoading, isError } = useGetAllNewsQuery({});
+  const articles: News[] = data?.data || [];
+
+  const [selectedNews, setSelectedNews] = useState<News | null>(null);
+
+  const handleOpenModal = (news: News) => setSelectedNews(news);
+  const handleCloseModal = () => setSelectedNews(null);
+
+  // Split articles for left/right columns
+  const articlesLeft = articles.slice(0, Math.ceil(articles.length / 2));
+  const articlesRight = articles.slice(Math.ceil(articles.length / 2));
+
+  // Helper to format date
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  if (isLoading) {
+    return <div className="py-12 text-center">Loading latest news...</div>;
+  }
+  if (isError) {
+    return (
+      <div className="py-12 text-center text-red-500">Failed to load news.</div>
+    );
+  }
 
   return (
     <Container className="flex flex-col justify-center items-center">
@@ -67,17 +73,23 @@ const LatestNews: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1px_1fr] gap-y-0">
             {/* Left Column */}
             <div className="flex flex-col pr-3 md:pr-6">
-              {articlesLeft.map((article, index) => (
-                <div key={`left-${index}`}>
+              {articlesLeft.map((article: News, index: number) => (
+                <div
+                  key={`left-${index}`}
+                  className="cursor-pointer hover:bg-gray-100 hover:shadow-lg transition rounded p-2"
+                  onClick={() => handleOpenModal(article)}
+                >
                   <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1">
                     {article.title}
                   </h3>
+                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-1 line-clamp-2">
+                    {" "}
+                    {/* Added line-clamp for description */}
+                    {article.description}
+                  </p>
                   <p className="flex items-center text-xs md:text-sm text-gray-500 mb-2">
                     <CalendarDaysIcon className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                    {article.date}
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
-                    {article.description}
+                    {formatDate(article.date || article.created_at)}
                   </p>
                   {index < articlesLeft.length - 1 && (
                     <hr className="my-2 md:my-4 border-gray-200" />
@@ -93,17 +105,23 @@ const LatestNews: React.FC = () => {
 
             {/* Right Column */}
             <div className="flex flex-col pl-3 md:pl-6">
-              {articlesRight.map((article, index) => (
-                <div key={`right-${index}`}>
+              {articlesRight.map((article: News, index: number) => (
+                <div
+                  key={`right-${index}`}
+                  className="cursor-pointer hover:bg-gray-100 hover:shadow-lg transition rounded p-2"
+                  onClick={() => handleOpenModal(article)}
+                >
                   <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-1">
                     {article.title}
                   </h3>
+                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed mb-1 line-clamp-2">
+                    {" "}
+                    {/* Added line-clamp for description */}
+                    {article.description}
+                  </p>
                   <p className="flex items-center text-xs md:text-sm text-gray-500 mb-2">
                     <CalendarDaysIcon className="mr-2 h-3 w-3 md:h-4 md:w-4" />
-                    {article.date}
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-700 leading-relaxed">
-                    {article.description}
+                    {formatDate(article.date || article.created_at)}
                   </p>
                   {index < articlesRight.length - 1 && (
                     <hr className="my-2 md:my-4 border-gray-200" />
@@ -114,7 +132,39 @@ const LatestNews: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-      <Button className="bg-primary mt-10  text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg">
+      {/* Modal */}
+      <Dialog open={!!selectedNews} onOpenChange={handleCloseModal}>
+        <DialogContent className="max-w-md p-0 rounded-2xl shadow-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle className="text-2xl font-bold text-primary">
+              {selectedNews?.title}
+            </DialogTitle>
+            <DialogDescription className="flex items-center text-xs md:text-sm text-gray-500 mt-2">
+              <CalendarDaysIcon className="mr-2 h-4 w-4" />
+              {formatDate(selectedNews?.date || selectedNews?.created_at)}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="px-6 pb-4">
+            {/* Display selectedNews?.content here, and add scrollbar */}
+            <div
+              className="text-base text-gray-700 mb-2 max-h-48 overflow-y-auto pr-2" // Added overflow-y-auto and pr-2 for scrollbar
+              style={{ whiteSpace: "pre-line" }}
+            >
+              {selectedNews?.content ||
+                selectedNews?.description ||
+                "No full content available."}
+            </div>
+          </div>
+          <DialogFooter className="px-6 pb-4 flex justify-end">
+            <DialogClose asChild>
+              <Button className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition">
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Button className="bg-primary mt-10 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg">
         View All
       </Button>
     </Container>
