@@ -17,24 +17,31 @@ import { ChevronDown, LogOut, MenuIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import Container from "./container";
-import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
-import { useUpdateProfilePitcherMutation } from "@/redux/features/user/userApi";
 import { baseApi } from "@/redux/api/baseApi";
 import { logout } from "@/redux/features/auth/authSlice";
+import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
+import { useUpdateProfilePitcherMutation } from "@/redux/features/user/userApi";
+import Container from "./container";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
   const router = useRouter();
   const dispatch = useDispatch();
   const [updateProfilePicture] = useUpdateProfilePitcherMutation();
   const { data: user, isLoading, isError } = useGetMyInfoQuery();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Filter navLinks to hide Membership if user is authenticated
+  const filteredNavLinks = navLinks.filter(link => {
+    if (link.name === "Membership" && user?.role === "AGENCY") {
+      return false;
+    }
+    return true;
+  });
 
   const handleLogout = async () => {
     try {
@@ -86,17 +93,16 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-6">
-          {navLinks.map((link) => {
+          {filteredNavLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  isActive
+                className={`text-sm font-medium transition-colors ${isActive
                     ? "text-primary font-semibold"
                     : "text-[#868686] hover:text-primary"
-                }`}
+                  }`}
               >
                 {link.name}
               </Link>
@@ -208,18 +214,17 @@ export default function Navbar() {
               className="p-6 max-sm:w-full data-[state=open]:animate-slide-in data-[state=closed]:animate-slide-out"
             >
               <div className="flex flex-col space-y-4">
-                {navLinks.map((link) => {
+                {filteredNavLinks.map((link) => {
                   const isActive = pathname === link.href;
                   return (
                     <Link
                       key={link.name}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-lg font-medium ${
-                        isActive
+                      className={`text-lg font-medium ${isActive
                           ? "text-primary font-semibold"
                           : "text-gray-700 hover:text-primary"
-                      }`}
+                        }`}
                     >
                       {link.name}
                     </Link>
@@ -229,22 +234,17 @@ export default function Navbar() {
                 {user ? (
                   <>
                     <Link href="/dashboard" passHref>
-                      {" "}
-                      {/* Added passHref */}
                       <Button asChild className="w-full">
-                        {" "}
-                        {/* Added asChild */}
                         <span>Dashboard</span>
                       </Button>
                     </Link>
                     <Link
                       href="/dashboard"
                       onClick={() => setOpen(false)}
-                      className={`text-sm font-medium transition-colors ${
-                        pathname === "/dashboard"
+                      className={`text-sm font-medium transition-colors ${pathname === "/dashboard"
                           ? "text-primary font-semibold"
                           : "text-[#868686] hover:text-primary"
-                      }`}
+                        }`}
                     >
                       Profile
                     </Link>
@@ -254,11 +254,7 @@ export default function Navbar() {
                   </>
                 ) : (
                   <Link href="/login" passHref>
-                    {" "}
-                    {/* Added passHref */}
                     <Button asChild className="w-full">
-                      {" "}
-                      {/* Added asChild */}
                       <span>Sign In</span>
                     </Button>
                   </Link>

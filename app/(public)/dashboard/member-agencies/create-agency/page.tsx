@@ -24,8 +24,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
-import { toast } from "sonner";
 import { useAuthUser } from "@/redux/features/auth/authSlice";
+import { toast } from "sonner";
 
 const agencySchema = Yup.object({
   name: Yup.string()
@@ -106,7 +106,7 @@ export default function CreateAgencyPage() {
       try {
         const formData = new FormData();
 
-        // Append user and agency fields
+
         for (const key in values) {
           if (Object.prototype.hasOwnProperty.call(values, key)) {
             const value = values[key as keyof typeof values];
@@ -117,12 +117,11 @@ export default function CreateAgencyPage() {
             // Handle special cases
             if (key === "established_year") {
               formData.append(key, String(value));
-            } else if (
-              key === "user_id" &&
-              values.user_selection_type === "existing"
-            ) {
+            }
+            else if (key === "user_id" && values.user_selection_type === "existing") {
               formData.append(key, String(value));
-            } else if (key !== "user_selection_type") {
+            }
+            else if (key !== "user_selection_type") {
               // Convert all other values to string before appending
               formData.append(key, String(value));
             }
@@ -464,7 +463,7 @@ export default function CreateAgencyPage() {
                       disabled
                       className={
                         formik.touched.contact_email &&
-                        formik.errors.contact_email
+                          formik.errors.contact_email
                           ? "border-red-500"
                           : ""
                       }
@@ -537,7 +536,7 @@ export default function CreateAgencyPage() {
                       onBlur={formik.handleBlur}
                       className={
                         formik.touched.facebook_url &&
-                        formik.errors.facebook_url
+                          formik.errors.facebook_url
                           ? "border-red-500"
                           : ""
                       }
@@ -563,7 +562,7 @@ export default function CreateAgencyPage() {
                     onBlur={formik.handleBlur}
                     className={
                       formik.touched.established_year &&
-                      formik.errors.established_year
+                        formik.errors.established_year
                         ? "border-red-500"
                         : ""
                     }
