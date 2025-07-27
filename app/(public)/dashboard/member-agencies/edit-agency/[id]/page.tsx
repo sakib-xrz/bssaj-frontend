@@ -1,16 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, X } from "lucide-react";
-import Image from "next/image";
-import { toast } from "sonner";
-import * as Yup from "yup";
-import { useFormik } from "formik";
 import {
   Select,
   SelectContent,
@@ -18,9 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useFormik } from "formik";
+import { Loader2, Upload, X } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import * as Yup from "yup";
 
 import {
-  useCreateAgencyMutation,
+  useGetAgencyByIdQuery,
   useUpdateAgencyMutation,
 } from "@/redux/features/agency/agencyApi";
 
@@ -46,12 +47,6 @@ export type Agency = {
   updated_at: string;
 };
 
-interface AgencyFormProps {
-  initialData?: Agency;
-  onSuccess: () => void;
-  onCancel: () => void;
-}
-
 const agencySchema = Yup.object({
   name: Yup.string()
     .required("Agency name is required")
@@ -76,26 +71,39 @@ const agencySchema = Yup.object({
   facebook_url: Yup.string().url("Invalid URL format").nullable(),
 });
 
-export function AgencyForm({
-  initialData,
-  onSuccess,
-  onCancel,
-}: AgencyFormProps) {
-  const [createAgency] = useCreateAgencyMutation();
+export default function EditAgencyPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const agencyId = params.id;
+
   const [updateAgency] = useUpdateAgencyMutation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const {
+    data: agencyData,
+    isLoading,
+    isError,
+    error,
+  } = useGetAgencyByIdQuery(agencyId);
+
+  const initialData: Agency | undefined = agencyData?.data;
+
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(
-    initialData?.logo || null
-  ); // Use initialData.logo for preview
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [successStoryImages, setSuccessStoryImages] = useState<File[]>([]);
   const [successStoryPreviews, setSuccessStoryPreviews] = useState<string[]>(
-    initialData?.successStoryImages || []
+    []
   );
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const successStoriesInputRef = useRef<HTMLInputElement>(null);
+
+  // Update previews when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setLogoPreview(initialData.logo);
+      setSuccessStoryPreviews(initialData.successStoryImages || []);
+    }
+  }, [initialData]);
 
   useEffect(() => {
     return () => {
@@ -127,7 +135,10 @@ export function AgencyForm({
       facebook_url: initialData?.facebook_url || "",
     },
     validationSchema: agencySchema,
+    enableReinitialize: true, // Reinitialize when initialData changes
     onSubmit: async (values) => {
+      if (!initialData) return;
+
       setIsSubmitting(true);
       try {
         const formData = new FormData();
@@ -156,21 +167,12 @@ export function AgencyForm({
           formData.append(`successStoryImages`, file);
         });
 
-        if (initialData) {
-          await updateAgency({ id: initialData.id, data: formData }).unwrap();
-          toast.success("Agency updated successfully!");
-        } else {
-          formData.append("status", "PENDING");
-          formData.append("is_approved", "false");
-          formData.append("is_deleted", "false");
-          await createAgency(formData).unwrap();
-          toast.success("Agency created successfully!");
-        }
-
-        onSuccess();
+        await updateAgency({ id: initialData.id, data: formData }).unwrap();
+        toast.success("Agency updated successfully!");
+        router.push("/dashboard/member-agencies");
       } catch (error) {
-        console.error("Error submitting agency form:", error);
-        toast.error(`Failed to ${initialData ? "update" : "create"} agency.`);
+        console.error("Error updating agency:", error);
+        toast.error("Failed to update agency.");
       } finally {
         setIsSubmitting(false);
       }
@@ -241,11 +243,58 @@ export function AgencyForm({
     "International Organization",
   ];
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
+        <Loader2 className="w-16 h-16 border-4 border-primary border-dashed rounded-full animate-spin mb-4" />
+        <p className="text-lg text-primary font-semibold">
+          Loading agency details...
+        </p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    console.error("Failed to fetch agency details:", error);
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
+        <p className="text-lg text-red-500">
+          Error loading agency details. Please try again later.
+        </p>
+        <Button
+          onClick={() => router.push("/dashboard/member-agencies")}
+          className="mt-4"
+        >
+          Back to Agencies
+        </Button>
+      </div>
+    );
+  }
+
+  // Agency not found
+  if (!initialData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
+        <h2 className="text-2xl font-bold mb-4 text-gray-700">
+          Agency Not Found
+        </h2>
+        <p className="text-center text-gray-600 mb-4">
+          The agency you are looking for does not exist.
+        </p>
+        <Button onClick={() => router.push("/dashboard/member-agencies")}>
+          Back to Agencies
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <Card className="w-full max-w-3xl rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8 mx-auto">
       <CardHeader className="p-0 mb-6">
         <CardTitle className="text-2xl font-bold text-gray-900">
-          {initialData ? "Edit Agency" : "Create New Agency"}
+          Edit Agency
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -600,7 +649,7 @@ export function AgencyForm({
             <Button
               type="button"
               variant="outline"
-              onClick={onCancel}
+              onClick={() => router.push("/dashboard/member-agencies")}
               disabled={isSubmitting}
             >
               Cancel
@@ -610,13 +659,7 @@ export function AgencyForm({
               disabled={isSubmitting || !formik.isValid}
               className="bg-primary hover:bg-primary/90"
             >
-              {isSubmitting
-                ? initialData
-                  ? "Updating..."
-                  : "Creating..."
-                : initialData
-                  ? "Update Agency"
-                  : "Create Agency"}
+              {isSubmitting ? "Updating..." : "Update Agency"}
             </Button>
           </div>
         </form>
