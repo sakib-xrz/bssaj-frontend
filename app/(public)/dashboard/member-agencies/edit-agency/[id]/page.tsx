@@ -39,7 +39,12 @@ export type Agency = {
   established_year: number;
   address: string;
   facebook_url: string;
-  successStoryImages: string[];
+  success_stories?: Array<{
+    id: string;
+    agency_id: string;
+    image: string;
+  }>;
+  successStoryImages?: string[]; // Fallback for backward compatibility
   status: "Approved" | "Pending";
   is_approved: boolean;
   is_deleted: boolean;
@@ -100,8 +105,39 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   // Update previews when initialData changes
   useEffect(() => {
     if (initialData) {
+      console.log("Edit form - Initial data:", initialData);
+      console.log(
+        "Edit form - Success stories (success_stories):",
+        initialData.success_stories
+      );
+      console.log(
+        "Edit form - Success stories (successStoryImages):",
+        initialData.successStoryImages
+      );
+
       setLogoPreview(initialData.logo);
-      setSuccessStoryPreviews(initialData.successStoryImages || []);
+
+      // Handle both success_stories and successStoryImages
+      let existingSuccessStories: string[] = [];
+      if (
+        initialData.success_stories &&
+        initialData.success_stories.length > 0
+      ) {
+        existingSuccessStories = initialData.success_stories.map(
+          (story) => story.image
+        );
+      } else if (
+        initialData.successStoryImages &&
+        initialData.successStoryImages.length > 0
+      ) {
+        existingSuccessStories = initialData.successStoryImages;
+      }
+
+      console.log(
+        "Edit form - Processed existing success stories:",
+        existingSuccessStories
+      );
+      setSuccessStoryPreviews(existingSuccessStories);
     }
   }, [initialData]);
 
@@ -111,7 +147,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
         URL.revokeObjectURL(logoPreview);
       }
       successStoryPreviews.forEach((url) => {
-        if (!initialData?.successStoryImages?.includes(url)) {
+        if (!isExistingImage(url)) {
           URL.revokeObjectURL(url);
         }
       });
@@ -162,9 +198,20 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
           formData.append("logo", logoFile);
         }
 
-        // Append new success story images
-        successStoryImages.forEach((file) => {
-          formData.append(`successStoryImages`, file);
+        // Handle success stories - preserve existing ones and add new ones
+        const existingSuccessStories = getExistingSuccessStories();
+
+        console.log("Existing success stories:", existingSuccessStories);
+        console.log("New success story files:", successStoryImages);
+
+        // Append existing success story URLs
+        existingSuccessStories.forEach((url) => {
+          formData.append(`existingSuccessStories`, url);
+        });
+
+        // Append new success story images with indexed format
+        successStoryImages.forEach((file, index) => {
+          formData.append(`successStoryImages[${index}]`, file);
         });
 
         await updateAgency({ id: initialData.id, data: formData }).unwrap();
@@ -219,10 +266,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
 
   const handleRemoveSuccessStory = (indexToRemove: number) => {
     const previewUrlToRemove = successStoryPreviews[indexToRemove];
-    if (
-      previewUrlToRemove &&
-      !initialData?.successStoryImages?.includes(previewUrlToRemove)
-    ) {
+    if (previewUrlToRemove && !isExistingImage(previewUrlToRemove)) {
       URL.revokeObjectURL(previewUrlToRemove);
     }
 
@@ -230,6 +274,31 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
       prev.filter((_, i) => i !== indexToRemove)
     );
     setSuccessStoryImages((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
+  // Helper function to check if a preview URL is from an existing image
+  const isExistingImage = (url: string) => {
+    if (!initialData) return false;
+
+    // Check success_stories first
+    if (initialData.success_stories && initialData.success_stories.length > 0) {
+      return initialData.success_stories.some((story) => story.image === url);
+    }
+
+    // Fallback to successStoryImages
+    return initialData.successStoryImages?.includes(url) || false;
+  };
+
+  // Get existing success story images that haven't been removed
+  const getExistingSuccessStories = () => {
+    return successStoryPreviews.filter((url) => isExistingImage(url));
+  };
+
+  // Get counts for display
+  const getSuccessStoryCounts = () => {
+    const existingCount = getExistingSuccessStories().length;
+    const newCount = successStoryImages.length;
+    return { existingCount, newCount };
   };
 
   const categories = [
@@ -607,38 +676,60 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                   type="button"
                   variant="outline"
                   onClick={() => successStoriesInputRef.current?.click()}
-                  disabled={
-                    successStoryImages.length +
-                      successStoryPreviews.filter((p) =>
-                        initialData?.successStoryImages?.includes(p)
-                      ).length >=
-                    5
-                  }
+                  disabled={successStoryPreviews.length >= 5}
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Success Story Images
                 </Button>
+                {successStoryPreviews.length === 0 && (
+                  <p className="text-sm text-gray-400 italic">
+                    No success story images uploaded yet. Upload up to 5 images
+                    to showcase your agency&apos;s achievements.
+                  </p>
+                )}
                 {successStoryPreviews.length > 0 && (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {successStoryPreviews.map((url, index) => (
-                      <div key={url} className="relative w-full aspect-square">
-                        <Image
-                          src={url}
-                          alt={`Success story ${index + 1}`}
-                          fill
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="icon"
-                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                          onClick={() => handleRemoveSuccessStory(index)}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                      {successStoryPreviews.map((url, index) => (
+                        <div
+                          key={url}
+                          className="relative w-full aspect-square"
                         >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
+                          <Image
+                            src={url}
+                            alt={`Success story ${index + 1}`}
+                            fill
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                            onClick={() => handleRemoveSuccessStory(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                          {isExistingImage(url) && (
+                            <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                              Existing
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      {successStoryPreviews.length} of 5 images selected
+                      {(() => {
+                        const { existingCount, newCount } =
+                          getSuccessStoryCounts();
+                        return existingCount > 0 ? (
+                          <span className="ml-2 text-blue-600">
+                            ({existingCount} existing, {newCount} new)
+                          </span>
+                        ) : null;
+                      })()}
+                    </p>
                   </div>
                 )}
               </div>

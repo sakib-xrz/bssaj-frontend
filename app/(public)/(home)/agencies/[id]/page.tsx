@@ -1,21 +1,21 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect } from "react";
 
-import {
-  Phone,
-  Mail,
-  Globe,
-  Facebook,
-  MapPin,
-  Calendar,
-  User,
-  Loader2,
-} from "lucide-react";
 import Container from "@/components/shared/container";
+import {
+  Calendar,
+  Facebook,
+  Globe,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  User,
+} from "lucide-react";
 
 import { useGetAgencyByIdQuery } from "@/redux/features/agency/agencyApi";
 
@@ -35,7 +35,12 @@ export type Agency = {
   established_year: number | null;
   address: string | null;
   facebook_url: string | null;
-  successStoryImages: string[];
+  success_stories?: Array<{
+    id: string;
+    agency_id: string;
+    image: string;
+  }>;
+  successStoryImages?: string[]; // Fallback for backward compatibility
   status: "Approved" | "Pending";
 
   profileLink?: string;
@@ -61,6 +66,12 @@ export default function SingleAgencyProfilePage({
   useEffect(() => {
     if (agency) {
       document.title = `${agency.name}'s Profile`;
+      console.log("Agency data:", agency);
+      console.log("Success stories (success_stories):", agency.success_stories);
+      console.log(
+        "Success stories (successStoryImages):",
+        agency.successStoryImages
+      );
     } else {
       document.title = "Agency Profile";
     }
@@ -241,8 +252,15 @@ export default function SingleAgencyProfilePage({
             </CardContent>
           </Card>
 
-          {agency.successStoryImages &&
-            agency.successStoryImages.length > 0 && (
+          {(() => {
+            // Get success stories from either success_stories or successStoryImages
+            const successStories =
+              agency.success_stories || agency.successStoryImages || [];
+            const hasSuccessStories = successStories.length > 0;
+
+            if (!hasSuccessStories) return null;
+
+            return (
               <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6">
                 <CardHeader className="p-0 mb-4">
                   <CardTitle className="text-xl font-bold text-gray-900">
@@ -250,22 +268,30 @@ export default function SingleAgencyProfilePage({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {agency.successStoryImages.map((imgSrc, index) => (
-                    <div
-                      key={index}
-                      className="relative w-full aspect-video rounded-lg overflow-hidden"
-                    >
-                      <Image
-                        src={imgSrc}
-                        alt={`Success Story ${index + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
+                  {successStories.map((story, index) => {
+                    // Handle both object format (success_stories) and string format (successStoryImages)
+                    const imgSrc =
+                      typeof story === "string" ? story : story.image;
+                    const key = typeof story === "string" ? index : story.id;
+
+                    return (
+                      <div
+                        key={key}
+                        className="relative w-full aspect-video rounded-lg overflow-hidden"
+                      >
+                        <Image
+                          src={imgSrc}
+                          alt={`Success Story ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    );
+                  })}
                 </CardContent>
               </Card>
-            )}
+            );
+          })()}
         </div>
       </Container>
     </div>
