@@ -4,13 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useFormik } from "formik";
 import { Loader2, Upload, X } from "lucide-react";
@@ -56,8 +49,6 @@ const agencySchema = Yup.object({
   name: Yup.string()
     .required("Agency name is required")
     .min(2, "Name must be at least 2 characters"),
-  category: Yup.string().required("Category is required"),
-  location: Yup.string().required("Location is required"),
   description: Yup.string()
     .required("Description is required")
     .min(10, "Description must be at least 10 characters"),
@@ -158,8 +149,6 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   const formik = useFormik({
     initialValues: {
       name: initialData?.name || "",
-      category: initialData?.category || "",
-      location: initialData?.location || "",
       description: initialData?.description || "",
       contact_email: initialData?.contact_email || "",
       contact_phone: initialData?.contact_phone || "",
@@ -302,17 +291,6 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
     return { existingCount, newCount };
   };
 
-  const categories = [
-    "Education",
-    "Consultancy",
-    "Visa & Immigration",
-    "Career Guidance",
-    "Community Support",
-    "Technology Training",
-    "Government",
-    "International Organization",
-  ];
-
   // Loading state
   if (isLoading) {
     return (
@@ -442,60 +420,6 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                 />
               </div>
             )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="category">Select Category *</Label>
-              <Select
-                value={formik.values.category}
-                onValueChange={(value) =>
-                  formik.setFieldValue("category", value)
-                }
-                onOpenChange={() => formik.setFieldTouched("category", true)}
-              >
-                <SelectTrigger
-                  className={
-                    formik.touched.category && formik.errors.category
-                      ? "border-red-500"
-                      : ""
-                  }
-                >
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {formik.touched.category && formik.errors.category && (
-                <p className="text-sm text-red-500">{formik.errors.category}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location">Location *</Label>
-              <Input
-                id="location"
-                name="location"
-                type="text"
-                placeholder="Enter location (e.g., Tokyo)"
-                value={formik.values.location}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                className={
-                  formik.touched.location && formik.errors.location
-                    ? "border-red-500"
-                    : ""
-                }
-              />
-              {formik.touched.location && formik.errors.location && (
-                <p className="text-sm text-red-500">{formik.errors.location}</p>
-              )}
-            </div>
           </div>
 
           <div className="space-y-2">
