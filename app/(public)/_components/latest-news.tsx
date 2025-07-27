@@ -164,9 +164,6 @@ const LatestNews: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Button className="bg-primary mt-10 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg">
-        View All
-      </Button>
     </Container>
   );
 };
