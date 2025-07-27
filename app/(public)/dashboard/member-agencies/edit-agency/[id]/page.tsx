@@ -152,6 +152,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
         }
       });
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logoPreview, successStoryPreviews, initialData]);
 
   const formik = useFormik({
