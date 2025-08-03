@@ -64,3 +64,24 @@ export type Blog = {
     profile_picture:string;
   };
 };
+
+export interface EventAuthor {
+  id: string;
+  name: string;
+  email: string;
+  profile_picture: string | null;
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  description: string;
+  cover_image: string;
+  location: string;
+  author_id: string;
+  author: EventAuthor;
+  event_date: string;     
+  created_at: string;    
+  updated_at: string;     
+  is_deleted: boolean;
+}
