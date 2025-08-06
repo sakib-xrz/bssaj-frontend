@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { stripHtml } from '@/lib/RemoveHtml'
 import { Event } from '@/lib/types'
 import { CalendarDaysIcon, MapPinIcon } from 'lucide-react'
+import Link from 'next/link'
 
 function EventCard({ event }: { event: Event }) {
     return (
@@ -29,9 +30,11 @@ function EventCard({ event }: { event: Event }) {
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-0 mt-auto">
+               <Link href= {`/events/${event.id}`}>
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200">
                     Learn more
                 </Button>
+                </Link>
             </CardContent>
         </Card>
     )
