@@ -26,6 +26,7 @@ import * as Yup from "yup";
 
 import { useAuthUser } from "@/redux/features/auth/authSlice";
 import { toast } from "sonner";
+import { RichTextEditor } from "@/components/shared/rich-text-editor";
 
 const agencySchema = Yup.object({
   name: Yup.string()
@@ -415,15 +416,20 @@ export default function CreateAgencyPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Enter agency description"
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    rows={4}
+                  <RichTextEditor
+                    content={formik.values.description}
+                    placeholder="Start writing your Agency Description..."
+                    className={
+                      formik.touched.description && formik.errors.description
+                        ? "border-red-500"
+                        : ""
+                    }
                   />
+                  {formik.touched.description && formik.errors.description && (
+                    <p className="text-sm text-red-500">
+                      {formik.errors.description}
+                    </p>
+                  )}
                 </div>
               </div>
 

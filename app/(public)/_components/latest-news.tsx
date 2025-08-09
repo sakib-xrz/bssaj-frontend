@@ -100,7 +100,7 @@ const LatestNews: React.FC = () => {
             </div>
 
             {/* Right Column */}
-            <div className="flex flex-col pl-3 md:pl-6">
+            <div className="flex flex-col md:pl-6">
               {articlesRight.map((article: News, index: number) => (
                 <div
                   key={`right-${index}`}
@@ -128,7 +128,7 @@ const LatestNews: React.FC = () => {
       </Card>
       {/* Modal */}
       <Dialog open={!!selectedNews} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-md p-0 rounded-2xl shadow-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl p-0 rounded-2xl shadow-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader className="p-6 pb-2">
             <DialogTitle className="text-2xl font-bold text-primary">
               {selectedNews?.title}
