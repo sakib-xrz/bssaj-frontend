@@ -1,37 +1,54 @@
 "use client";
 
-import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Container from "@/components/shared/container";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const CertificateCheck: React.FC = () => {
-  const [certificateCode, setCertificateCode] = useState<string>("");
-  const [certificateDetails, setCertificateDetails] = useState<string | null>(
-    null
-  );
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [certificateCode, setCertificateCode] = useState("");
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleCertificateCheck = () => {
-    setErrorMessage(null);
-    setCertificateDetails(null);
-
-    if (!certificateCode) {
-      setErrorMessage("Please enter your Certificate Code.");
-      return;
+  const validateCertificate = (code: string): boolean => {
+    // Check if empty
+    if (!code.trim()) {
+      setError("Certificate code is required");
+      return false;
     }
 
-    if (certificateCode === "12345") {
-      setCertificateDetails(
-        "Certificate Holder: John Doe, Issued: 2023-01-15, Course: Advanced Japanese"
-      );
-    } else if (certificateCode === "67890") {
-      setCertificateDetails(
-        "Certificate Holder: Jane Smith, Issued: 2022-11-01, Course: Business Japanese"
-      );
-    } else {
-      setErrorMessage("Certificate not found or invalid.");
+    // Check if starts with BSSAJ
+    if (!code.startsWith("BSSAJ")) {
+      setError("Certificate code must start with BSSAJ");
+      return false;
+    }
+
+    // Check if all characters are uppercase
+    if (code !== code.toUpperCase()) {
+      setError("Certificate code must be in uppercase");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  const handleVerify = () => {
+    if (validateCertificate(certificateCode)) {
+      // Redirect to verification page with certificate code
+      router.push(`/verify-certificate?sl=${certificateCode}`);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCertificateCode(value);
+
+    // Clear error when user starts typing
+    if (error) {
+      setError("");
     }
   };
 
@@ -49,27 +66,19 @@ const CertificateCheck: React.FC = () => {
         <div className="mb-6">
           <Input
             type="text"
-            placeholder="Enter your Certificate Code"
-            className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base"
+            placeholder="Enter your Certificate Code (e.g., BSSAJ-SB-0825-0001)"
             value={certificateCode}
-            onChange={(e) => setCertificateCode(e.target.value)}
+            onChange={handleInputChange}
+            className={`w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-base ${
+              error ? "border-red-500" : "border-gray-300"
+            }`}
           />
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
 
-        {errorMessage && (
-          <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
-        )}
-
-        {certificateDetails && (
-          <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-md shadow-sm">
-            <p className="font-semibold">Certificate Found!</p>
-            <p>{certificateDetails}</p>
-          </div>
-        )}
-
         <Button
-          onClick={handleCertificateCheck}
-          className="w-full  bg-primary text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg shadow-md"
+          onClick={handleVerify}
+          className="w-full bg-primary text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg shadow-md hover:bg-primary/90"
         >
           Verify Certificate
         </Button>

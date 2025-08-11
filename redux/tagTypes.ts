@@ -5,6 +5,11 @@ export const tagTypes = {
   getMe: "getme",
   Agency: "Agency",
   News: "news",
+  certificate: "certificate",
 };
 
-export const tagTypesList = [tagTypes.member, tagTypes.user];
+export const tagTypesList = [
+  tagTypes.member,
+  tagTypes.user,
+  tagTypes.certificate,
+];
