@@ -38,6 +38,15 @@ export const agencyApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.Agency],
     }),
 
+    getMyAgencies: builder.query({
+      query: () => ({
+        url: `/agencies/my-agency`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.Agency],
+    }),
+
+
     getAllAgency: builder.query({
       query: (args: any) => {
         const queryString = new URLSearchParams(
@@ -69,4 +78,5 @@ export const {
   useUpdateAgencyMutation,
   useGetAgenciesByUserIdQuery,
   useGetAllAgencyQuery,
+  useGetMyAgenciesQuery
 } = agencyApi;

@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Users, FileText } from "lucide-react";
+import { LayoutDashboard, Users, FileText , Award} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,6 +10,7 @@ const navigation = [
   { name: "My Blogs", href: "/dashboard/blog", icon: FileText },
   { name: "My Membership", href: "/dashboard/my-membership", icon: Users },
   { name: "My Agencies", href: "/dashboard/member-agencies", icon: Users },
+    { name: "Certificate", href: "/dashboard/certificate", icon: Award },
 ];
 
 export function SidebarContent() {

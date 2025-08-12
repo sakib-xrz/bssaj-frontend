@@ -9,7 +9,15 @@ export const certificateApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.certificate],
     }),
+    createCertificate: builder.mutation({
+      query: (data) => ({
+        url: `/certifications`,
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: [tagTypes.certificate],
+    }),
   }),
 });
 
-export const { useVerifyCertificateQuery } = certificateApi;
+export const { useVerifyCertificateQuery, useCreateCertificateMutation } = certificateApi;
