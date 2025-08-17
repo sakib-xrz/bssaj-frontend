@@ -16,6 +16,8 @@ import * as Yup from "yup";
 import {
   useGetAgencyByIdQuery,
   useUpdateAgencyMutation,
+  useUploadSuccessStoryMutation,
+  useDeleteSuccessStoryMutation,
 } from "@/redux/features/agency/agencyApi";
 
 export type Agency = {
@@ -37,7 +39,7 @@ export type Agency = {
     agency_id: string;
     image: string;
   }>;
-  successStoryImages?: string[]; // Fallback for backward compatibility
+  successStoryImages?: string[];
   status: "Approved" | "Pending";
   is_approved: boolean;
   is_deleted: boolean;
@@ -71,7 +73,11 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const agencyId = params.id;
 
+  // Destructure all necessary mutations
   const [updateAgency] = useUpdateAgencyMutation();
+  const [uploadSuccessStory] = useUploadSuccessStoryMutation();
+  const [deleteSuccessStory] = useDeleteSuccessStoryMutation();
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -85,10 +91,15 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [successStoryImages, setSuccessStoryImages] = useState<File[]>([]);
-  const [successStoryPreviews, setSuccessStoryPreviews] = useState<string[]>(
-    []
-  );
+
+  // States to manage success stories
+  const [newSuccessStoryFiles, setNewSuccessStoryFiles] = useState<File[]>([]);
+  const [removedSuccessStoryIds, setRemovedSuccessStoryIds] = useState<
+    string[]
+  >([]);
+  const [successStoryPreviews, setSuccessStoryPreviews] = useState<
+    Array<{ id: string | null; url: string }>
+  >([]);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const successStoriesInputRef = useRef<HTMLInputElement>(null);
@@ -96,52 +107,45 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   // Update previews when initialData changes
   useEffect(() => {
     if (initialData) {
-      console.log("Edit form - Initial data:", initialData);
-      console.log(
-        "Edit form - Success stories (success_stories):",
-        initialData.success_stories
-      );
-      console.log(
-        "Edit form - Success stories (successStoryImages):",
-        initialData.successStoryImages
-      );
-
       setLogoPreview(initialData.logo);
 
-      // Handle both success_stories and successStoryImages
-      let existingSuccessStories: string[] = [];
+      let existingSuccessStories = initialData.success_stories || [];
+      // Fallback for backward compatibility
       if (
-        initialData.success_stories &&
-        initialData.success_stories.length > 0
-      ) {
-        existingSuccessStories = initialData.success_stories.map(
-          (story) => story.image
-        );
-      } else if (
         initialData.successStoryImages &&
         initialData.successStoryImages.length > 0
       ) {
-        existingSuccessStories = initialData.successStoryImages;
+        existingSuccessStories = initialData.successStoryImages.map((url) => ({
+          id: url.split("/").pop() || "", // Use a unique identifier from the URL
+          agency_id: initialData.id,
+          image: url,
+        }));
       }
 
-      console.log(
-        "Edit form - Processed existing success stories:",
-        existingSuccessStories
+      setSuccessStoryPreviews(
+        existingSuccessStories.map((story) => ({
+          id: story.id,
+          url: story.image,
+        }))
       );
-      setSuccessStoryPreviews(existingSuccessStories);
     }
   }, [initialData]);
 
   useEffect(() => {
     return () => {
+      // Cleanup for new blob URLs
+      successStoryPreviews.forEach((preview) => {
+        if (
+          !initialData?.success_stories?.some(
+            (story) => story.id === preview.id
+          )
+        ) {
+          URL.revokeObjectURL(preview.url);
+        }
+      });
       if (logoPreview && !initialData?.logo) {
         URL.revokeObjectURL(logoPreview);
       }
-      successStoryPreviews.forEach((url) => {
-        if (!isExistingImage(url)) {
-          URL.revokeObjectURL(url);
-        }
-      });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [logoPreview, successStoryPreviews, initialData]);
@@ -161,51 +165,56 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
       facebook_url: initialData?.facebook_url || "",
     },
     validationSchema: agencySchema,
-    enableReinitialize: true, // Reinitialize when initialData changes
+    enableReinitialize: true,
     onSubmit: async (values) => {
       if (!initialData) return;
 
       setIsSubmitting(true);
       try {
-        const formData = new FormData();
-
-        // Append all form values
+        // Step 1: Update main agency data
+        const agencyFormData = new FormData();
         for (const key in values) {
           if (Object.prototype.hasOwnProperty.call(values, key)) {
             const value = values[key as keyof typeof values];
             if (key === "established_year") {
               if (value) {
-                formData.append(key, String(Number(value)));
+                agencyFormData.append(key, String(Number(value)));
               }
             } else if (value !== null && value !== undefined) {
-              formData.append(key, value);
+              agencyFormData.append(key, value);
             }
           }
         }
-
-        // Append logo file if changed
         if (logoFile) {
-          formData.append("logo", logoFile);
+          agencyFormData.append("logo", logoFile);
         }
 
-        // Handle success stories - preserve existing ones and add new ones
-        const existingSuccessStories = getExistingSuccessStories();
+        await updateAgency({
+          id: initialData.id,
+          data: agencyFormData,
+        }).unwrap();
+        toast.success("Agency details updated successfully!");
 
-        console.log("Existing success stories:", existingSuccessStories);
-        console.log("New success story files:", successStoryImages);
+        // Step 2: Handle deletions of old success stories
+        if (removedSuccessStoryIds.length > 0) {
+          await Promise.all(
+            removedSuccessStoryIds.map((id) => deleteSuccessStory(id).unwrap())
+          );
+          toast.success("Removed old success stories!");
+        }
 
-        // Append existing success story URLs
-        existingSuccessStories.forEach((url) => {
-          formData.append(`existingSuccessStories`, url);
-        });
+        // Step 3: Handle uploads of new success stories
+        if (newSuccessStoryFiles.length > 0) {
+          const uploadPromises = newSuccessStoryFiles.map((file) => {
+            const storyFormData = new FormData();
+            storyFormData.append("agency_id", initialData.id);
+            storyFormData.append("image", file);
+            return uploadSuccessStory(storyFormData).unwrap();
+          });
+          await Promise.all(uploadPromises);
+          toast.success("Uploaded new success stories!");
+        }
 
-        // Append new success story images with indexed format
-        successStoryImages.forEach((file, index) => {
-          formData.append(`successStoryImages[${index}]`, file);
-        });
-
-        await updateAgency({ id: initialData.id, data: formData }).unwrap();
-        toast.success("Agency updated successfully!");
         router.push("/dashboard/member-agencies");
       } catch (error) {
         console.error("Error updating agency:", error);
@@ -246,49 +255,42 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const selectedFiles = Array.from(event.target.files || []);
-    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+    setNewSuccessStoryFiles((prev) => [...prev, ...selectedFiles]);
 
+    const newPreviews = selectedFiles.map((file) => ({
+      id: null, // New files have no existing ID
+      url: URL.createObjectURL(file),
+    }));
     setSuccessStoryPreviews((prev) => [...prev, ...newPreviews]);
-    setSuccessStoryImages((prev) => [...prev, ...selectedFiles]);
 
     event.target.value = ""; // Clear input to allow re-selection of same files
   };
 
   const handleRemoveSuccessStory = (indexToRemove: number) => {
-    const previewUrlToRemove = successStoryPreviews[indexToRemove];
-    if (previewUrlToRemove && !isExistingImage(previewUrlToRemove)) {
-      URL.revokeObjectURL(previewUrlToRemove);
+    const storyToRemove = successStoryPreviews[indexToRemove];
+
+    if (storyToRemove.id) {
+      // If the story has an ID, it's an existing one to be deleted
+      setRemovedSuccessStoryIds((prev) => [
+        ...prev,
+        storyToRemove.id as string,
+      ]);
+    } else {
+      // If it doesn't have an ID, it's a new file to be removed from the upload queue
+      const fileIndex = newSuccessStoryFiles.findIndex(
+        (file) => file.name === storyToRemove.url.split("/").pop() // Find by name, a simple way to match
+      );
+      if (fileIndex > -1) {
+        URL.revokeObjectURL(storyToRemove.url);
+        setNewSuccessStoryFiles((prev) =>
+          prev.filter((_, i) => i !== fileIndex)
+        );
+      }
     }
 
     setSuccessStoryPreviews((prev) =>
       prev.filter((_, i) => i !== indexToRemove)
     );
-    setSuccessStoryImages((prev) => prev.filter((_, i) => i !== indexToRemove));
-  };
-
-  // Helper function to check if a preview URL is from an existing image
-  const isExistingImage = (url: string) => {
-    if (!initialData) return false;
-
-    // Check success_stories first
-    if (initialData.success_stories && initialData.success_stories.length > 0) {
-      return initialData.success_stories.some((story) => story.image === url);
-    }
-
-    // Fallback to successStoryImages
-    return initialData.successStoryImages?.includes(url) || false;
-  };
-
-  // Get existing success story images that haven't been removed
-  const getExistingSuccessStories = () => {
-    return successStoryPreviews.filter((url) => isExistingImage(url));
-  };
-
-  // Get counts for display
-  const getSuccessStoryCounts = () => {
-    const existingCount = getExistingSuccessStories().length;
-    const newCount = successStoryImages.length;
-    return { existingCount, newCount };
   };
 
   // Loading state
@@ -337,6 +339,13 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  const { newCount } = {
+    newCount: newSuccessStoryFiles.length,
+  };
+
+  const existingCount =
+    (initialData?.success_stories?.length || 0) - removedSuccessStoryIds.length;
 
   return (
     <Card className="w-full max-w-3xl rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8 mx-auto">
@@ -615,13 +624,13 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                 {successStoryPreviews.length > 0 && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {successStoryPreviews.map((url, index) => (
+                      {successStoryPreviews.map((preview, index) => (
                         <div
-                          key={url}
+                          key={preview.url}
                           className="relative w-full aspect-square"
                         >
                           <Image
-                            src={url}
+                            src={preview.url}
                             alt={`Success story ${index + 1}`}
                             fill
                             className="w-full h-full object-cover rounded-lg"
@@ -635,7 +644,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                           >
                             <X className="h-4 w-4" />
                           </Button>
-                          {isExistingImage(url) && (
+                          {preview.id && (
                             <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                               Existing
                             </div>
@@ -645,15 +654,9 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                     </div>
                     <p className="text-sm text-gray-500">
                       {successStoryPreviews.length} of 5 images selected
-                      {(() => {
-                        const { existingCount, newCount } =
-                          getSuccessStoryCounts();
-                        return existingCount > 0 ? (
-                          <span className="ml-2 text-blue-600">
-                            ({existingCount} existing, {newCount} new)
-                          </span>
-                        ) : null;
-                      })()}
+                      <span className="ml-2 text-blue-600">
+                        ({existingCount} existing, {newCount} new)
+                      </span>
                     </p>
                   </div>
                 )}

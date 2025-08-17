@@ -25,6 +25,7 @@ export type Agency = {
   id: string;
   name: string;
   logo: string | null;
+  cover_photo: string | null; // Added cover_photo field
   category: string;
   location: string;
   description: string;
@@ -40,7 +41,7 @@ export type Agency = {
     agency_id: string;
     image: string;
   }>;
-  successStoryImages?: string[]; // Fallback for backward compatibility
+  successStoryImages?: string[];
   status: "Approved" | "Pending";
 
   profileLink?: string;
@@ -114,8 +115,26 @@ export default function SingleAgencyProfilePage({
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="bg-blue-900 text-white py-8 px-4 md:px-8">
-        <Container className="flex items-center">
+      {/* Dynamic Header Section with Cover Photo */}
+      <div
+        className={`relative py-8 px-4 md:px-8 text-white ${
+          agency.cover_photo ? "" : "bg-blue-900"
+        }`}
+        style={
+          agency.cover_photo
+            ? {
+                backgroundImage: `url(${agency.cover_photo})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }
+            : {}
+        }
+      >
+        {/* Semi-transparent overlay to ensure text readability */}
+        {agency.cover_photo && (
+          <div className="absolute inset-0 bg-blue-900/70"></div>
+        )}
+        <Container className="flex items-center relative z-10">
           <div className="relative w-20 h-20 rounded-full overflow-hidden mr-4 flex-shrink-0">
             <Image
               src={agency.logo || deafultImage}
@@ -253,7 +272,6 @@ export default function SingleAgencyProfilePage({
           </Card>
 
           {(() => {
-            // Get success stories from either success_stories or successStoryImages
             const successStories =
               agency.success_stories || agency.successStoryImages || [];
             const hasSuccessStories = successStories.length > 0;
@@ -269,7 +287,6 @@ export default function SingleAgencyProfilePage({
                 </CardHeader>
                 <CardContent className="p-0 grid grid-cols-2 md:grid-cols-3 gap-4">
                   {successStories.map((story, index) => {
-                    // Handle both object format (success_stories) and string format (successStoryImages)
                     const imgSrc =
                       typeof story === "string" ? story : story.image;
                     const key = typeof story === "string" ? index : story.id;
