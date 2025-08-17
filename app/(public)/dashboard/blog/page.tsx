@@ -19,9 +19,11 @@ const Blogs = () => {
   const isApprovedParam = activeTab === "Approved";
   const user = useAuthUser();
 
-  const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery({
-    is_approved: isApprovedParam,
-  });
+  const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery([
+    {
+      name: "is_approved",value:true
+    },
+  ]);
 
   const blogs = data?.data || [];
   const [deleteBlog] = useDeleteBlogMutation();

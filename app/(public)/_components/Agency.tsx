@@ -37,15 +37,23 @@ function Agency({ agency }: { agency: AgencyType }) {
 
         <CardContent className="p-0 flex flex-col justify-between h-full">
           <div>
+            {/* Location/Address Section */}
             <p className="flex items-center text-sm text-gray-700 mb-2">
               <MapPinIcon className="h-4 w-4 mr-2 text-gray-500" />
-              {agency?.location || agency?.address || "Location not specified"}
+              <span className="line-clamp-2">
+                {agency?.location ||
+                  agency?.address ||
+                  "Location not specified"}
+              </span>
             </p>
-            <p className="text-sm text-muted-foreground line-clamp-1 mb-4">
+
+            {/* Description Section */}
+            <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
               {agency?.description || "No description available"}
             </p>
           </div>
 
+          {/* Buttons Section */}
           <div className="flex flex-col sm:flex-row gap-3 mt-auto w-full">
             <Button
               asChild

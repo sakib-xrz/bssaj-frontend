@@ -30,7 +30,9 @@ import { Certificate } from "@/lib/types";
 
 function Page() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isLoading, isError, data } = useGetAllCartificateQuery(undefined);
+  const { isLoading, isError, data } = useGetAllCartificateQuery(undefined,{
+    refetchOnMountOrArgChange:true
+  });
 
   const downloadQRCode = (sl_no: string) => {
     const canvas = document.querySelector(`#qrcode-${sl_no} canvas`);
@@ -59,9 +61,6 @@ function Page() {
     return <Error error="Something went wrong" />;
   }
 
-  if (!isLoading && !isError && data?.data?.length === 0) {
-    return <Error error="No certificates found" />;
-  }
 
   return (
     <>

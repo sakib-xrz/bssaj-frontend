@@ -3,18 +3,19 @@
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+
+import { Skeleton } from "@/components/ui/skeleton";
 import { Event } from "@/lib/types";
 import { useGetAllEventQuery } from "@/redux/features/event/eventApi";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import Error from "../../_components/error";
 import EventCard from "../../_components/EventCard";
-import Loading from "../../_components/loading";
+import { CustomPagination } from "../../_components/CustomPagination";
 
 const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [limit] = useState(6);
+  const [limit] = useState(9);
   const [page, setPage] = useState(1);
 
   const { isLoading, isError, data } = useGetAllEventQuery([
@@ -23,23 +24,17 @@ const EventsPage = () => {
     { name: "page", value: page },
   ]);
 
-  if (isLoading) return <Loading />;
-
   if (isError) {
     return (
       <Error error="This might be a temporary issue. You can try refreshing the page or come back later." />
     );
   }
 
-  if (!data?.data?.length) {
-    return <Error error="No Data Found" />;
-  }
-
-  const totalPages = Math.ceil(data?.meta?.total / limit);
+  const totalPages = Math.ceil((data?.meta?.total || 0) / limit);
 
   return (
-    <div>
-      {/* SEARCH + HERO */}
+    <div className="min-h-screen flex flex-col">
+      {/* Header Section */}
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20 text-center">
         <SectionHeader
           title="Events"
@@ -60,53 +55,68 @@ const EventsPage = () => {
         </div>
       </div>
 
-      {/* LIST */}
-      <Container className="py-12 md:py-16">
-        <SectionHeader
-          className="mb-8"
-          title="Our Upcoming Events"
-          description="Join us for these exciting upcoming events and activities."
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mb-12">
-          {data?.data?.map((item: Event) => (
-            <EventCard event={item} key={item.id} />
-          ))}
-        </div>
+      {/* Content Section with min-height */}
+      <div className="flex-grow">
+        <Container className="py-12 md:py-16">
+          {isLoading ? (
+            <>
+              <div className="mb-8 space-y-4">
+                <Skeleton className="h-8 w-64 mx-auto" />
+                <Skeleton className="h-4 w-96 mx-auto" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mb-12">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="space-y-4">
+                    <Skeleton className="h-48 w-full rounded-lg" />
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <SectionHeader
+                className="mb-8"
+                title={
+                  data?.data?.length ? "Our Upcoming Events" : "No Events Found"
+                }
+                description={
+                  data?.data?.length
+                    ? "Join us for these exciting upcoming events and activities."
+                    : "There are currently no events matching your search. Please try different keywords."
+                }
+              />
 
-        {/* PAGINATION */}
-        <div className="flex justify-center">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => page > 1 && setPage(page - 1)}
-                  className={page === 1 ? "pointer-events-none opacity-50" : ""}
-                />
-              </PaginationItem>
+              {data?.data?.length ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-6xl mx-auto mb-12">
+                    {data.data.map((item: Event) => (
+                      <EventCard event={item} key={item.id} />
+                    ))}
+                  </div>
 
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
-                    isActive={page === i + 1}
-                    onClick={() => setPage(i + 1)}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => page < totalPages && setPage(page + 1)}
-                  className={
-                    page === totalPages ? "pointer-events-none opacity-50" : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      </Container>
+                  {totalPages > 1 && (
+                    <CustomPagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      onPageChange={setPage}
+                      className="mb-10"
+                    />
+                  )}
+                </>
+              ) : (
+                <div className="min-h-[300px] flex items-center justify-center">
+                  <p className="text-gray-500 text-lg">
+                    No events match your search criteria.
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+        </Container>
+      </div>
     </div>
   );
 };

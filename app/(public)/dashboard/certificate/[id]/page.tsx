@@ -196,7 +196,6 @@ console.log(singleCartificate)
       <CardContent className="space-y-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
                 Personal Information
@@ -295,7 +294,7 @@ console.log(singleCartificate)
                   name="father_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Father's Name</FormLabel>
+                      <FormLabel>Father&apos;s Name</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter father's full name"
@@ -312,7 +311,7 @@ console.log(singleCartificate)
                   name="mother_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mother's Name</FormLabel>
+                      <FormLabel>Mother&apos;s Name</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter mother's full name"
@@ -353,7 +352,7 @@ console.log(singleCartificate)
                   name="agency_id"
                   render={({ field }) => {
                     const defaultAgency = allMyAgency?.find(
-                      (agency:any) =>
+                      (agency: any) =>
                         agency.value === singleCartificate?.data?.agency_id
                     );
 

@@ -1,34 +1,58 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import MemberCard from "./_components/member-card";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
 import { Member } from "./_components/member-card";
+import { Input } from "@/components/ui/input";
+import { CustomPagination } from "../../_components/CustomPagination";
 
 export default function Members() {
-  const memberKindPriority = {
-    ADVISER: 1,
-    HONORABLE: 2,
-    EXECUTIVE: 3,
-    ASSOCIATE: 4,
-    STUDENT_REPRESENTATIVE: 5,
-  };
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [limit, setLimit] = useState(8);
+  const [page, setPage] = useState(1);
 
-  const { data, isLoading, isError, error } = useGetMembersQuery({});
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1); // Reset to first page when search changes
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const { data, isLoading, isError, error } = useGetMembersQuery([
+    {
+      name: "search",
+      value: debouncedSearch,
+    },
+    {
+      name: "limit",
+      value: limit,
+    },
+    {
+      name: "page",
+      value: page,
+    },
+    {
+      name: "status",
+      value: "APPROVED",
+    },
+  ]);
+
   const fetchedMembers: Member[] = data?.data || [];
+  const totalItems = data?.meta?.total || 0;
+  const totalPages = Math.ceil(totalItems / limit);
 
   // Sort & filter approved members
   const approvedMembers = useMemo(() => {
-    return [...fetchedMembers]
-      .filter((member) => member.status === "APPROVED")
-      .sort(
-        (a, b) =>
-          memberKindPriority[a.kind as keyof typeof memberKindPriority] -
-          memberKindPriority[b.kind as keyof typeof memberKindPriority]
-      );
+    return [...fetchedMembers].filter((member) => member.status === "APPROVED");
   }, [fetchedMembers]);
+
 
   if (isLoading) {
     return (
@@ -66,12 +90,25 @@ export default function Members() {
           description="Explore our network of member agencies supporting Bangladeshi students in Japan."
         />
       </div>
-
+      <div className="max-w-lg mx-auto text-center my-10">
+        <Input
+          placeholder="Search member"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
       <Container className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-12 md:py-16">
         {approvedMembers.map((member) => (
           <MemberCard key={member.id} member={member} />
         ))}
       </Container>
+
+      <CustomPagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        className="mb-10"
+      />
     </div>
   );
 }

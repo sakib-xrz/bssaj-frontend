@@ -11,7 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const user = useAuthUser()
   let sidebar = null 
 
-  if(user?.role === "USER"){
+  if(user?.role === "STUDENT"){
     sidebar = <UserSidebar />
   }else if(user?.role === "AGENCY"){
     sidebar = <AgencySidebar />

@@ -1,6 +1,9 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
-
+interface IQueryItem {
+  name: string;
+  value: string | number | boolean | undefined;
+}
 export const memberApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createMember: builder.mutation({
@@ -12,11 +15,21 @@ export const memberApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.member],
     }),
     getMembers: builder.query({
-      query: (query) => ({
-        url: `/members`,
-        method: "GET",
-        params: query,
-      }),
+      query: (args: IQueryItem[]) => {
+        const queryString = new URLSearchParams(
+          args.reduce((acc: Record<string, any>, { name, value }) => {
+            if (value !== undefined && value !== null) {
+              acc[name] = value;
+            }
+            return acc;
+          }, {})
+        ).toString();
+
+        return {
+          url: `/members?${queryString}`,
+          method: "GET",
+        };
+      },
       providesTags: [tagTypes.member],
     }),
     getMemberById: builder.query({

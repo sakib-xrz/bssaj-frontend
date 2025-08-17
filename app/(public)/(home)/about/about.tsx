@@ -33,7 +33,7 @@ const AboutBSSAJ: React.FC = () => {
     return classes.filter(Boolean).join(" ");
   }
 
-  const { data, isLoading, isError } = useGetMembersQuery({});
+  const { data, isLoading, isError } = useGetMembersQuery([]);
   const allMembers: Member[] = useMemo(() => data?.data || [], [data]);
 
   return (

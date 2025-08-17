@@ -51,7 +51,7 @@ const memberKindLabels = {
 };
 
 export default function OurMembers() {
-  const { data, isLoading, isError, error } = useGetMembersQuery({});
+  const { data, isLoading, isError, error } = useGetMembersQuery([{name:'status',value:'APPROVED'}]);
   const fetchedMembers: Member[] = data?.data || [];
 
   const memberKindPriority = {
