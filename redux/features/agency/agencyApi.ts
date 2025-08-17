@@ -4,6 +4,7 @@ import { tagTypes } from "@/redux/tagTypes";
 
 export const agencyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Agency Endpoints
     createAgency: builder.mutation({
       query: (data) => ({
         url: `/agencies`,
@@ -46,7 +47,6 @@ export const agencyApi = baseApi.injectEndpoints({
       providesTags: [tagTypes.Agency],
     }),
 
-
     getAllAgency: builder.query({
       query: (args: any) => {
         const queryString = new URLSearchParams(
@@ -68,6 +68,41 @@ export const agencyApi = baseApi.injectEndpoints({
       },
       providesTags: [tagTypes.Agency],
     }),
+
+    // Success Story Endpoints
+    uploadSuccessStory: builder.mutation({
+      query: (data) => ({
+        url: `/agencies/success-stories`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: [tagTypes.Agency],
+    }),
+
+    updateSuccessStory: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/agencies/success-stories/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [tagTypes.Agency],
+    }),
+
+    deleteSuccessStory: builder.mutation({
+      query: (id) => ({
+        url: `/agencies/success-stories/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [tagTypes.Agency],
+    }),
+
+    getAgencySuccessStories: builder.query({
+      query: (agencyId) => ({
+        url: `/agencies/${agencyId}/success-stories`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.Agency],
+    }),
   }),
   overrideExisting: false,
 });
@@ -78,5 +113,9 @@ export const {
   useUpdateAgencyMutation,
   useGetAgenciesByUserIdQuery,
   useGetAllAgencyQuery,
-  useGetMyAgenciesQuery
+  useGetMyAgenciesQuery,
+  useUploadSuccessStoryMutation,
+  useUpdateSuccessStoryMutation,
+  useDeleteSuccessStoryMutation,
+  useGetAgencySuccessStoriesQuery,
 } = agencyApi;
