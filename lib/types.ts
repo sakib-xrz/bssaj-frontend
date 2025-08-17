@@ -85,3 +85,28 @@ export interface Event {
   updated_at: string;     
   is_deleted: boolean;
 }
+
+export interface Certificate {
+  id: string;
+  sl_no: string;
+  name: string;
+  father_name: string;
+  mother_name: string;
+  gender: string;
+  date_of_birth: string; // ISO string
+  student_id: string;
+  institute_name: string;
+  grade: string;
+  course_duration: string;
+  completed_hours: string;
+  issued_at: string; // ISO string
+  created_at: string; // ISO string
+  updated_at: string; // ISO string
+  certificate_url: string | null;
+
+  agency_id: string;
+  agency: {
+    id: string;
+    name: string;
+  };
+}

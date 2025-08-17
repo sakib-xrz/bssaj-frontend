@@ -12,12 +12,38 @@ export const certificateApi = baseApi.injectEndpoints({
     createCertificate: builder.mutation({
       query: (data) => ({
         url: `/certifications`,
-        method: 'POST',
-        body: data
+        method: "POST",
+        body: data,
       }),
       invalidatesTags: [tagTypes.certificate],
+    }),
+    updateCertificate: builder.mutation({
+      query: ({data,id}) => ({
+        url: `/certifications/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [tagTypes.certificate],
+    }),
+    getAllCartificate: builder.query({
+      query: () => ({
+        url: `/certifications/my-agencies`,
+      }),
+      providesTags: [tagTypes.certificate],
+    }),
+    getSingleCartificate: builder.query({
+      query: (id) => ({
+        url: `/certifications/${id}`,
+      }),
+      providesTags: [tagTypes.certificate],
     }),
   }),
 });
 
-export const { useVerifyCertificateQuery, useCreateCertificateMutation } = certificateApi;
+export const {
+  useVerifyCertificateQuery,
+  useCreateCertificateMutation,
+  useGetAllCartificateQuery,
+  useGetSingleCartificateQuery,
+  useUpdateCertificateMutation
+} = certificateApi;
