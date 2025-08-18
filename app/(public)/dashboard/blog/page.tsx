@@ -3,32 +3,44 @@
 
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Blog } from "@/lib/types";
 import { useAuthUser } from "@/redux/features/auth/authSlice";
-import { useDeleteBlogMutation, useGetAllBlogsQuery } from "@/redux/features/blog/blogApi";
-import { CheckCircleIcon, Loader2, PlusIcon, XCircleIcon } from "lucide-react";
+import {
+  useDeleteBlogMutation,
+  useGetAllBlogsQuery,
+} from "@/redux/features/blog/blogApi";
+import { CheckCircleIcon, PlusIcon, XCircleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
 
 const Blogs = () => {
-  const [activeTab, setActiveTab] = useState<"Approved" | "Pending">("Approved");
+  const [activeTab, setActiveTab] = useState<"Approved" | "Pending">(
+    "Approved"
+  );
   const isApprovedParam = activeTab === "Approved";
   const user = useAuthUser();
 
   const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery([
     {
-      name: "is_approved",value:true
+      name: "is_approved",
+      value: true,
     },
   ]);
 
   const blogs = data?.data || [];
   const [deleteBlog] = useDeleteBlogMutation();
 
-  // delete 
+  // delete
   const handleDelete = async (blogId: string) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
@@ -37,7 +49,8 @@ const Blogs = () => {
           toast.success(res?.data?.message);
           refetch();
         } else {
-          const errorMessage = (res as any)?.error?.data?.message || "Something went wrong";
+          const errorMessage =
+            (res as any)?.error?.data?.message || "Something went wrong";
           toast.error(errorMessage);
         }
       } catch (err) {
@@ -49,9 +62,8 @@ const Blogs = () => {
 
   if (isLoading) {
     return (
-      <Container className="py-12 md:py-16 flex justify-center items-center min-h-[50vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="ml-4 text-lg text-gray-700">Loading blogs...</p>
+      <Container>
+        <DashboardLoading message="Loading blogs..." />
       </Container>
     );
   }
@@ -65,7 +77,7 @@ const Blogs = () => {
     );
   }
 
-  // filter 
+  // filter
   const filteredBlogs = blogs.filter(
     (blog: Blog) =>
       blog.author?.id === user?.id &&
@@ -75,7 +87,9 @@ const Blogs = () => {
   return (
     <Container className="py-12 md:py-16">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Manage Blogs</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+          Manage Blogs
+        </h1>
         <Link href="/dashboard/blog/create-blog">
           <Button className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2">
             <PlusIcon className="h-4 w-4" />
@@ -138,14 +152,17 @@ const Blogs = () => {
                       {blog.title}
                     </CardTitle>
                     <CardDescription className="text-sm text-gray-600 line-clamp-3 mb-4">
-                      {blog.content.replace(/<[^>]*>/g, "").substring(0, 100)}...
+                      {blog.content.replace(/<[^>]*>/g, "").substring(0, 100)}
+                      ...
                     </CardDescription>
                     <div className="flex gap-3">
                       <Button
                         asChild
                         className="flex-1 bg-primary hover:bg-primary/90 text-white"
                       >
-                        <Link href={`/dashboard/blog/edit/${blog.id}`}>Edit</Link>
+                        <Link href={`/dashboard/blog/edit/${blog.id}`}>
+                          Edit
+                        </Link>
                       </Button>
                       <Button
                         variant="destructive"

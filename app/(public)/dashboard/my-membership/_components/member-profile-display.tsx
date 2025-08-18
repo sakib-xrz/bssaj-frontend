@@ -1,24 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import QRCode from "qrcode";
+import MemberCard from "@/app/(public)/(home)/members/_components/member-card";
+import { DashboardFullPageLoading } from "@/app/(public)/_components/dashboard-loading";
+import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useAuthUser } from "@/redux/features/auth/authSlice";
+import { useGetOwnMemberQuery } from "@/redux/features/member/memberApi";
 import {
-  Phone,
-  Mail,
   Calendar,
-  Share2,
-  Download,
-  QrCode,
   CheckCircle,
+  Download,
+  Mail,
+  Phone,
+  QrCode,
+  Share2,
   User,
 } from "lucide-react";
-import Container from "@/components/shared/container";
-import { useGetOwnMemberQuery } from "@/redux/features/member/memberApi";
-import MemberCard from "@/app/(public)/(home)/members/_components/member-card";
-import { useAuthUser } from "@/redux/features/auth/authSlice";
+import QRCode from "qrcode";
+import { useEffect, useState } from "react";
 
 const memberKindLabels = {
   ADVISER: "Adviser",
@@ -65,11 +66,8 @@ export default function SingleMemberProfilePage() {
 
   if (isLoading) {
     return (
-      <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
-        <div className="w-16 h-16 border-4 border-primary border-dashed rounded-full animate-spin mb-4" />
-        <p className="text-lg text-primary font-semibold">
-          Loading your profile...
-        </p>
+      <Container>
+        <DashboardFullPageLoading message="Loading your profile..." />
       </Container>
     );
   }

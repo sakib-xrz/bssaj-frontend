@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import { DashboardInlineLoading } from "@/app/(public)/_components/dashboard-loading";
+import { RichTextEditor } from "@/components/shared/rich-text-editor";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,15 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { RichTextEditor } from "@/components/shared/rich-text-editor";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   useCreateBlogMutation,
   useUpdateBlogMutation,
 } from "@/redux/features/blog/blogApi";
-import { Loader2, Upload, X } from "lucide-react";
-import { toast } from "sonner";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useFormik } from "formik";
+import { Upload, X } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
+import * as Yup from "yup";
 
 interface BlogFormData {
   title: string;
@@ -282,7 +283,7 @@ export function BlogForm({ initialData, onSuccess, onCancel }: BlogFormProps) {
               disabled={isLoading}
               className="bg-primary hover:bg-primary/90"
             >
-              {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              {isLoading && <DashboardInlineLoading />}
               {isEditing
                 ? isLoading
                   ? "Updating Blog..."

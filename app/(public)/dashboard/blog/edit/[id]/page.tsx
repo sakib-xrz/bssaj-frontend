@@ -1,11 +1,12 @@
 "use client";
 
-import { useRouter, useParams } from "next/navigation";
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from "next/navigation";
 
+import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
 import { useGetSingleBlogQuery } from "@/redux/features/blog/blogApi";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { BlogForm } from "../../_components/blog-form";
 
@@ -44,10 +45,7 @@ export default function EditBlogPage() {
             </div>
           </div>
           <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-              <p className="text-gray-600">Loading blog...</p>
-            </div>
+            <DashboardLoading message="Loading blog..." size="sm" />
           </div>
         </div>
       </Container>

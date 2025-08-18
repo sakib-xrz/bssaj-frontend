@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useFormik } from "formik";
-import { Loader2, Upload, X } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -14,10 +14,15 @@ import { toast } from "sonner";
 import * as Yup from "yup";
 
 import {
+  DashboardFullPageLoading,
+  DashboardInlineLoading,
+} from "@/app/(public)/_components/dashboard-loading";
+import { BASE_URL } from "@/lib/constant";
+import {
+  useDeleteSuccessStoryMutation,
   useGetAgencyByIdQuery,
   useUpdateAgencyMutation,
   useUploadSuccessStoryMutation,
-  useDeleteSuccessStoryMutation,
 } from "@/redux/features/agency/agencyApi";
 
 export type Agency = {
@@ -37,7 +42,8 @@ export type Agency = {
   success_stories?: Array<{
     id: string;
     agency_id: string;
-    image: string;
+    image?: string;
+    images?: string; // For backward compatibility
   }>;
   successStoryImages?: string[]; // Fallback for backward compatibility
   status: "Approved" | "Pending";
@@ -79,6 +85,8 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   const [deleteSuccessStory] = useDeleteSuccessStoryMutation();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingSuccessStories, setIsUploadingSuccessStories] =
+    useState(false);
 
   const {
     data: agencyData,
@@ -93,21 +101,59 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   // States to manage success stories
-  const [newSuccessStoryFiles, setNewSuccessStoryFiles] = useState<File[]>([]);
   const [removedSuccessStoryIds, setRemovedSuccessStoryIds] = useState<
     string[]
   >([]);
   const [successStoryPreviews, setSuccessStoryPreviews] = useState<
-    Array<{ id: string | null; url: string }>
+    Array<{ id: string | null; url: string; file?: File }>
   >([]);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const successStoriesInputRef = useRef<HTMLInputElement>(null);
 
+  // Handle image loading errors
+  const handleImageError = (
+    event: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    const img = event.target as HTMLImageElement;
+    img.src = "/images/member1.png"; // Fallback image
+  };
+
+  // Utility function to construct proper image URLs
+  const getImageUrl = (imagePath: string): string => {
+    if (!imagePath) return "/images/member1.png";
+
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      return imagePath;
+    }
+
+    // If it's a blob URL, return as is
+    if (imagePath.startsWith("blob:")) {
+      return imagePath;
+    }
+
+    // If it's a relative path, construct full URL
+    if (imagePath.startsWith("/")) {
+      return `${BASE_URL}${imagePath}`;
+    }
+
+    // If it's just a filename, construct full URL
+    const fullUrl = `${BASE_URL}/uploads/${imagePath}`;
+    console.log(`Constructed image URL: ${imagePath} -> ${fullUrl}`);
+    return fullUrl;
+  };
+
   // Update previews when initialData changes
   useEffect(() => {
     if (initialData) {
-      setLogoPreview(initialData.logo);
+      setLogoPreview(initialData.logo ? getImageUrl(initialData.logo) : null);
+
+      console.log("Initial data success stories:", initialData.success_stories);
+      console.log(
+        "Initial data successStoryImages:",
+        initialData.successStoryImages
+      );
 
       let existingSuccessStories = initialData.success_stories || [];
       // Fallback for backward compatibility
@@ -122,12 +168,13 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
         }));
       }
 
-      setSuccessStoryPreviews(
-        existingSuccessStories.map((story) => ({
-          id: story.id,
-          url: story.image,
-        }))
-      );
+      const previews = existingSuccessStories.map((story) => ({
+        id: story.id,
+        url: getImageUrl(story.image || story.images || ""), // Handle both field names for backward compatibility
+      }));
+
+      console.log("Processed success story previews:", previews);
+      setSuccessStoryPreviews(previews);
     }
   }, [initialData]);
 
@@ -195,25 +242,8 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
         }).unwrap();
         toast.success("Agency details updated successfully!");
 
-        // Step 2: Handle deletions of old success stories
-        if (removedSuccessStoryIds.length > 0) {
-          await Promise.all(
-            removedSuccessStoryIds.map((id) => deleteSuccessStory(id).unwrap())
-          );
-          toast.success("Removed old success stories!");
-        }
-
-        // Step 3: Handle uploads of new success stories
-        if (newSuccessStoryFiles.length > 0) {
-          const uploadPromises = newSuccessStoryFiles.map((file) => {
-            const storyFormData = new FormData();
-            storyFormData.append("agency_id", initialData.id);
-            storyFormData.append("image", file);
-            return uploadSuccessStory(storyFormData).unwrap();
-          });
-          await Promise.all(uploadPromises);
-          toast.success("Uploaded new success stories!");
-        }
+        // Step 2: Handle success story operations
+        await handleSuccessStoryOperations();
 
         router.push("/dashboard/member-agencies");
       } catch (error) {
@@ -225,6 +255,71 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
     },
   });
 
+  // Handle success story operations separately
+  const handleSuccessStoryOperations = async () => {
+    if (!initialData) return;
+
+    setIsUploadingSuccessStories(true);
+    let hasErrors = false;
+
+    try {
+      // Step 1: Delete removed success stories
+      if (removedSuccessStoryIds.length > 0) {
+        toast.info("Deleting removed success stories...");
+        for (const storyId of removedSuccessStoryIds) {
+          try {
+            await deleteSuccessStory(storyId).unwrap();
+            console.log(`Success story ${storyId} deleted successfully`);
+          } catch (error) {
+            console.error(`Failed to delete success story ${storyId}:`, error);
+            toast.error(`Failed to delete success story ${storyId}`);
+            hasErrors = true;
+          }
+        }
+      }
+
+      // Step 2: Upload new success stories
+      const newStories = successStoryPreviews.filter(
+        (preview) => !preview.id && preview.file
+      );
+
+      if (newStories.length > 0) {
+        toast.info("Uploading new success stories...");
+        for (const story of newStories) {
+          if (story.file) {
+            try {
+              const formData = new FormData();
+              formData.append("agency_id", initialData.id);
+              formData.append("images", story.file);
+
+              await uploadSuccessStory(formData).unwrap();
+              console.log("Success story uploaded successfully");
+            } catch (error) {
+              console.error("Failed to upload success story:", error);
+              toast.error(`Failed to upload ${story.file.name}`);
+              hasErrors = true;
+            }
+          }
+        }
+      }
+
+      if (removedSuccessStoryIds.length > 0 || newStories.length > 0) {
+        if (hasErrors) {
+          toast.warning(
+            "Agency updated but some success story operations failed. Please check the errors above."
+          );
+        } else {
+          toast.success("Success stories updated successfully!");
+        }
+      }
+    } catch (error) {
+      console.error("Error handling success story operations:", error);
+      toast.error("Failed to update success stories.");
+    } finally {
+      setIsUploadingSuccessStories(false);
+    }
+  };
+
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (logoPreview && !initialData?.logo) {
@@ -235,7 +330,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
       setLogoPreview(previewUrl);
       setLogoFile(file);
     } else {
-      setLogoPreview(initialData?.logo || null);
+      setLogoPreview(initialData?.logo ? getImageUrl(initialData.logo) : null);
       setLogoFile(null);
     }
   };
@@ -255,12 +350,39 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const selectedFiles = Array.from(event.target.files || []);
-    setNewSuccessStoryFiles((prev) => [...prev, ...selectedFiles]);
 
-    const newPreviews = selectedFiles.map((file) => ({
+    // Check if adding these files would exceed the 5 image limit
+    if (successStoryPreviews.length + selectedFiles.length > 5) {
+      toast.error("Maximum 5 success story images allowed");
+      event.target.value = "";
+      return;
+    }
+
+    // Validate file types and sizes
+    const validFiles = selectedFiles.filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not an image file`);
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        // 10MB limit
+        toast.error(`${file.name} is too large. Maximum size is 10MB`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validFiles.length === 0) {
+      event.target.value = "";
+      return;
+    }
+
+    const newPreviews = validFiles.map((file) => ({
       id: null, // New files have no existing ID
       url: URL.createObjectURL(file),
+      file: file, // Store the file reference
     }));
+
     setSuccessStoryPreviews((prev) => [...prev, ...newPreviews]);
 
     event.target.value = ""; // Clear input to allow re-selection of same files
@@ -277,15 +399,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
       ]);
     } else {
       // If it doesn't have an ID, it's a new file to be removed from the upload queue
-      const fileIndex = newSuccessStoryFiles.findIndex(
-        (file) => file.name === storyToRemove.url.split("/").pop() // Find by name, a simple way to match
-      );
-      if (fileIndex > -1) {
-        URL.revokeObjectURL(storyToRemove.url);
-        setNewSuccessStoryFiles((prev) =>
-          prev.filter((_, i) => i !== fileIndex)
-        );
-      }
+      URL.revokeObjectURL(storyToRemove.url);
     }
 
     setSuccessStoryPreviews((prev) =>
@@ -295,14 +409,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
-        <Loader2 className="w-16 h-16 border-4 border-primary border-dashed rounded-full animate-spin mb-4" />
-        <p className="text-lg text-primary font-semibold">
-          Loading agency details...
-        </p>
-      </div>
-    );
+    return <DashboardFullPageLoading message="Loading agency details..." />;
   }
 
   // Error state
@@ -340,12 +447,10 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
     );
   }
 
-  const { newCount } = {
-    newCount: newSuccessStoryFiles.length,
-  };
-
-  const existingCount =
-    (initialData?.success_stories?.length || 0) - removedSuccessStoryIds.length;
+  const newCount = successStoryPreviews.filter((preview) => !preview.id).length;
+  const existingCount = successStoryPreviews.filter(
+    (preview) => preview.id
+  ).length;
 
   return (
     <Card className="w-full max-w-3xl rounded-xl shadow-lg border border-gray-200 bg-white p-6 md:p-8 mx-auto">
@@ -422,10 +527,11 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
             {(logoPreview || initialData?.logo) && (
               <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
                 <Image
-                  src={logoPreview || initialData?.logo || "/placeholder.svg"}
+                  src={logoPreview || getImageUrl(initialData?.logo || "")}
                   alt="Logo preview"
                   fill
                   className="object-contain" // Use object-contain for logos
+                  onError={handleImageError}
                 />
               </div>
             )}
@@ -630,10 +736,12 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                           className="relative w-full aspect-square"
                         >
                           <Image
-                            src={preview.url}
+                            src={getImageUrl(preview.url)}
                             alt={`Success story ${index + 1}`}
                             fill
                             className="w-full h-full object-cover rounded-lg"
+                            onError={handleImageError}
+                            unoptimized={preview.url?.startsWith("blob:")}
                           />
                           <Button
                             type="button"
@@ -644,9 +752,18 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
                           >
                             <X className="h-4 w-4" />
                           </Button>
-                          {preview.id && (
+                          {preview.id ? (
                             <div className="absolute top-2 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                               Existing
+                            </div>
+                          ) : (
+                            <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                              New
+                            </div>
+                          )}
+                          {!preview.id && preview.file && (
+                            <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded truncate">
+                              {preview.file.name}
                             </div>
                           )}
                         </div>
@@ -675,10 +792,21 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting || !formik.isValid}
+              disabled={
+                isSubmitting || isUploadingSuccessStories || !formik.isValid
+              }
               className="bg-primary hover:bg-primary/90"
             >
-              {isSubmitting ? "Updating..." : "Update Agency"}
+              {isSubmitting || isUploadingSuccessStories ? (
+                <>
+                  <DashboardInlineLoading />
+                  {isSubmitting
+                    ? "Updating Agency..."
+                    : "Updating Success Stories..."}
+                </>
+              ) : (
+                "Update Agency"
+              )}
             </Button>
           </div>
         </form>

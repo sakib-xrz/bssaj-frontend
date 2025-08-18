@@ -3,7 +3,7 @@
 
 import Container from "@/components/shared/container";
 import { useGetMyInfoQuery } from "@/redux/features/get-me/get_me";
-import { Loader2 } from "lucide-react";
+import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
 import MemberProfileDisplay from "./_components/member-profile-display";
 import MembershipApplicationForm from "./_components/membership-application-form";
 import MembershipPendingStatus from "./_components/membership-pending-status";
@@ -16,19 +16,18 @@ export default function MyMembershipPage() {
 
   if (isLoading) {
     return (
-      <Container className="py-12 md:py-16 flex justify-center items-center min-h-[50vh]">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="ml-4 text-lg text-gray-700">
-          Loading membership status...
-        </p>
+      <Container>
+        <DashboardLoading message="Loading membership status..." />
       </Container>
     );
   }
-  console.log(user)
+  console.log(user);
   let content = null;
 
   if (!user?.is_member && !user?.has_pending_member_request) {
-    content = <MembershipApplicationForm onSuccess={handleApplicationSuccess} />;;
+    content = (
+      <MembershipApplicationForm onSuccess={handleApplicationSuccess} />
+    );
   } else if (!user?.is_member && user?.has_pending_member_request) {
     content = <MembershipPendingStatus />;
   } else if (user?.is_member) {

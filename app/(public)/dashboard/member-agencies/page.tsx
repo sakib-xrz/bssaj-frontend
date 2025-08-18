@@ -2,13 +2,20 @@
 
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircleIcon, Loader2, MapPinIcon, PlusIcon } from "lucide-react";
+import {
+  Building2Icon,
+  CheckCircleIcon,
+  MapPinIcon,
+  PlusIcon,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
+import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
+import { BASE_URL } from "@/lib/constant";
 import {
   useGetAgenciesByUserIdQuery,
   useGetAllAgencyQuery,
@@ -99,20 +106,41 @@ export default function AgencyPage() {
     return agencyStatus === activeTabLower;
   });
 
-  // Helper function to get initials
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+  // Utility function to construct proper image URLs
+  const getImageUrl = (imagePath: string | null): string => {
+    if (!imagePath) return "/images/member1.png";
+
+    // If it's already a full URL, return as is
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      return imagePath;
+    }
+
+    // If it's a blob URL, return as is
+    if (imagePath.startsWith("blob:")) {
+      return imagePath;
+    }
+
+    // If it's a relative path, construct full URL
+    if (imagePath.startsWith("/")) {
+      return `${BASE_URL}${imagePath}`;
+    }
+
+    // If it's just a filename, construct full URL
+    return `${BASE_URL}/uploads/${imagePath}`;
+  };
+
+  // Handle image loading errors
+  const handleImageError = (
+    event: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    const img = event.target as HTMLImageElement;
+    img.src = "/images/member1.png"; // Fallback image
   };
 
   if (isLoading) {
     return (
-      <Container className="py-12 md:py-16 flex justify-center items-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="ml-4 text-lg text-primary">Loading agencies...</p>
+      <Container>
+        <DashboardLoading message="Loading agencies..." />
       </Container>
     );
   }
@@ -174,68 +202,82 @@ export default function AgencyPage() {
         </TabsList>
 
         <TabsContent value="Approved">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAgencies.length > 0 ? (
               filteredAgencies.map((agency) => (
-                <Card
-                  key={agency.id}
-                  className="rounded-xl shadow-lg border border-gray-200 bg-white overflow-hidden"
-                >
-                  <CardHeader className="p-4 flex flex-row items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
-                        {agency.logo ? (
-                          <Image
-                            src={agency.logo}
-                            alt={`${agency.name} logo`}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="text-xl font-semibold text-gray-600">
-                            {getInitials(agency.name)}
+                <div key={agency.id} className="max-w-md mx-auto w-full">
+                  <Card className="overflow-hidden border-0 shadow-lg group h-full flex flex-col transition duration-300 transform hover:-translate-y-1">
+                    {/* Agency Logo/Image */}
+                    <div className="relative h-48 bg-gradient-to-br from-blue-50 to-indigo-100">
+                      {agency.logo ? (
+                        <Image
+                          src={getImageUrl(agency.logo)}
+                          alt={`${agency.name} logo`}
+                          fill
+                          className="object-cover"
+                          onError={handleImageError}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Building2Icon className="h-16 w-16 text-gray-400" />
+                        </div>
+                      )}
+
+                      {/* Status Badge */}
+                      <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                        <CheckCircleIcon className="h-3 w-3" />
+                        {agency.status}
+                      </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-6 bg-white flex flex-col flex-grow">
+                      <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 leading-tight">
+                        {agency.name}
+                      </h2>
+
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                        {agency.description}
+                      </p>
+
+                      {/* Agency Details */}
+                      <div className="space-y-2 mb-6 flex-grow">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
+                          <span className="line-clamp-1">
+                            {agency.location}
                           </span>
-                        )}
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg font-bold text-gray-900 line-clamp-1">
-                          {agency.name}
-                        </CardTitle>
-                        <CardDescription className="text-sm text-gray-600">
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          <span className="font-medium text-gray-700">
+                            Category:
+                          </span>{" "}
                           {agency.category}
-                        </CardDescription>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-3 mt-auto">
+                        <Button
+                          asChild
+                          className="flex-1 bg-primary hover:bg-primary/90 text-white font-medium"
+                        >
+                          <Link
+                            href={`/dashboard/member-agencies/edit-agency/${agency.id}`}
+                          >
+                            Edit
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1 font-medium"
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </div>
-                    <div className="bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
-                      <CheckCircleIcon className="h-3 w-3" />
-                      {agency.status}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0">
-                    <p className="flex items-center text-sm text-gray-700 mb-3">
-                      <MapPinIcon className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0" />
-                      {agency.location}
-                    </p>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
-                      {agency.description}
-                    </p>
-                    <div className="flex gap-3">
-                      <Button
-                        asChild
-                        className="flex-1 bg-primary hover:bg-primary/90 text-white"
-                      >
-                        <Link
-                          href={`/dashboard/member-agencies/edit-agency/${agency.id}`}
-                        >
-                          Edit
-                        </Link>
-                      </Button>
-                      <Button variant="destructive" className="flex-1">
-                        Delete
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </Card>
+                </div>
               ))
             ) : (
               <p className="col-span-full text-center text-gray-600 py-8">
@@ -246,68 +288,82 @@ export default function AgencyPage() {
         </TabsContent>
 
         <TabsContent value="Pending">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAgencies.length > 0 ? (
               filteredAgencies.map((agency) => (
-                <Card
-                  key={agency.id}
-                  className="rounded-xl shadow-lg border border-gray-200 bg-white overflow-hidden"
-                >
-                  <CardHeader className="p-4 flex flex-row items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0 bg-gray-200 flex items-center justify-center">
-                        {agency.logo ? (
-                          <Image
-                            src={agency.logo}
-                            alt={`${agency.name} logo`}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="text-xl font-semibold text-gray-600">
-                            {getInitials(agency.name)}
+                <div key={agency.id} className="max-w-md mx-auto w-full">
+                  <Card className="overflow-hidden border-0 shadow-lg group h-full flex flex-col transition duration-300 transform hover:-translate-y-1">
+                    {/* Agency Logo/Image */}
+                    <div className="relative h-48 bg-gradient-to-br from-yellow-50 to-orange-100">
+                      {agency.logo ? (
+                        <Image
+                          src={getImageUrl(agency.logo)}
+                          alt={`${agency.name} logo`}
+                          fill
+                          className="object-cover"
+                          onError={handleImageError}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Building2Icon className="h-16 w-16 text-gray-400" />
+                        </div>
+                      )}
+
+                      {/* Status Badge */}
+                      <div className="absolute top-4 right-4 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                        <CheckCircleIcon className="h-3 w-3" />
+                        {agency.status}
+                      </div>
+                    </div>
+
+                    {/* Content Section */}
+                    <div className="p-6 bg-white flex flex-col flex-grow">
+                      <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 leading-tight">
+                        {agency.name}
+                      </h2>
+
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+                        {agency.description}
+                      </p>
+
+                      {/* Agency Details */}
+                      <div className="space-y-2 mb-6 flex-grow">
+                        <div className="flex items-center text-sm text-gray-500">
+                          <MapPinIcon className="h-4 w-4 mr-2 text-gray-400" />
+                          <span className="line-clamp-1">
+                            {agency.location}
                           </span>
-                        )}
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg font-bold text-gray-900 line-clamp-1">
-                          {agency.name}
-                        </CardTitle>
-                        <CardDescription className="text-sm text-gray-600">
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          <span className="font-medium text-gray-700">
+                            Category:
+                          </span>{" "}
                           {agency.category}
-                        </CardDescription>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-3 mt-auto">
+                        <Button
+                          asChild
+                          className="flex-1 bg-primary hover:bg-primary/90 text-white font-medium"
+                        >
+                          <Link
+                            href={`/dashboard/member-agencies/edit-agency/${agency.id}`}
+                          >
+                            Edit
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1 font-medium"
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </div>
-                    <div className="bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-full flex items-center gap-1">
-                      <CheckCircleIcon className="h-3 w-3" />
-                      {agency.status}
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4 pt-0">
-                    <p className="flex items-center text-sm text-gray-700 mb-3">
-                      <MapPinIcon className="h-4 w-4 mr-2 text-gray-500 flex-shrink-0" />
-                      {agency.location}
-                    </p>
-                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                      {agency.description}
-                    </p>
-                    <div className="flex gap-3">
-                      <Button
-                        asChild
-                        className="flex-1 bg-primary hover:bg-primary/90 text-white"
-                      >
-                        <Link
-                          href={`/dashboard/member-agencies/edit-agency/${agency.id}`}
-                        >
-                          Edit
-                        </Link>
-                      </Button>
-                      <Button variant="destructive" className="flex-1">
-                        Delete
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  </Card>
+                </div>
               ))
             ) : (
               <p className="col-span-full text-center text-gray-600 py-8">
