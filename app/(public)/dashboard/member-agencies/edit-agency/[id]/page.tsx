@@ -39,7 +39,7 @@ export type Agency = {
     agency_id: string;
     image: string;
   }>;
-  successStoryImages?: string[];
+  successStoryImages?: string[]; // Fallback for backward compatibility
   status: "Approved" | "Pending";
   is_approved: boolean;
   is_deleted: boolean;
