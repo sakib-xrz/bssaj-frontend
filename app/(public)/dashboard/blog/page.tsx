@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
 import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,13 +22,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
 
 const Blogs = () => {
   const [activeTab, setActiveTab] = useState<"Approved" | "Pending">(
     "Approved"
   );
-  const isApprovedParam = activeTab === "Approved";
+
   const user = useAuthUser();
 
   const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery([

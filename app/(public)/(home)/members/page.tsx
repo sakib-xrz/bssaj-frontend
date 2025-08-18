@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
-import MemberCard from "./_components/member-card";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
-import { useGetMembersQuery } from "@/redux/features/member/memberApi";
-import { Member } from "./_components/member-card";
 import { Input } from "@/components/ui/input";
+import { useGetMembersQuery } from "@/redux/features/member/memberApi";
+import { useEffect, useMemo, useState } from "react";
 import { CustomPagination } from "../../_components/CustomPagination";
+import MemberCard, { Member } from "./_components/member-card";
 
 export default function Members() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [limit, setLimit] = useState(8);
+  const [limit] = useState(8);
   const [page, setPage] = useState(1);
 
   // Debounce search input
@@ -44,15 +43,14 @@ export default function Members() {
     },
   ]);
 
-  const fetchedMembers: Member[] = data?.data || [];
   const totalItems = data?.meta?.total || 0;
   const totalPages = Math.ceil(totalItems / limit);
 
   // Sort & filter approved members
   const approvedMembers = useMemo(() => {
+    const fetchedMembers: Member[] = data?.data || [];
     return [...fetchedMembers].filter((member) => member.status === "APPROVED");
-  }, [fetchedMembers]);
-
+  }, [data?.data]);
 
   if (isLoading) {
     return (

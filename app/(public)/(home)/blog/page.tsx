@@ -3,19 +3,19 @@
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Blog } from "@/lib/types";
 import { useGetAllBlogsQuery } from "@/redux/features/blog/blogApi";
 import { SearchIcon } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import BlogCard from "../../_components/blog-card";
-import Error from "../../_components/error";
-import { Skeleton } from "@/components/ui/skeleton";
 import { CustomPagination } from "../../_components/CustomPagination";
+import Error from "../../_components/error";
 
 const BlogPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(8);
+  const [limit] = useState(8);
   const { isLoading, isError, data } = useGetAllBlogsQuery([
     { name: "page", value: page },
     { name: "limit", value: limit },

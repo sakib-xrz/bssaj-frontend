@@ -41,9 +41,9 @@ import {
   useGetSingleCartificateQuery,
   useUpdateCertificateMutation,
 } from "@/redux/features/certificate/certificateApi";
-import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface FormValues {
   name: string;
@@ -95,7 +95,6 @@ export default function StudentCertificateEditForm() {
     },
   });
 
-
   useEffect(() => {
     if (singleCartificate?.data) {
       const certificate = singleCartificate.data;
@@ -138,7 +137,6 @@ export default function StudentCertificateEditForm() {
     try {
       const formData = new FormData();
 
-    
       formData.append("name", values.name);
       formData.append(
         "date_of_birth",
@@ -148,7 +146,10 @@ export default function StudentCertificateEditForm() {
       formData.append("father_name", values.father_name);
       formData.append("mother_name", values.mother_name);
       formData.append("student_id", values.student_id);
-      formData.append("agency_id", values.agency_id || singleCartificate?.data?.agency_id);
+      formData.append(
+        "agency_id",
+        values.agency_id || singleCartificate?.data?.agency_id
+      );
       formData.append("completed_hours", values.completed_hours);
       formData.append("grade", values.grade);
       formData.append("course_duration", values.course_duration);
@@ -182,7 +183,7 @@ export default function StudentCertificateEditForm() {
   if (isCertificateLoading) {
     return <div>Loading certificate data...</div>;
   }
-console.log(singleCartificate)
+  console.log(singleCartificate);
   return (
     <Card className="container mx-auto shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
       <CardHeader className="space-y-1 pb-6 sticky top-0 bg-white/80 dark:bg-gray-800/80 z-10">
@@ -499,7 +500,7 @@ console.log(singleCartificate)
               <FormField
                 control={form.control}
                 name="certificate_file"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
                     <FormLabel>Certificate File (PDF or Image)</FormLabel>
                     <FormControl>

@@ -3,13 +3,7 @@
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { Agency as AgencyType } from "@/lib/types";
 import { useGetAllAgencyQuery } from "@/redux/features/agency/agencyApi";
@@ -19,7 +13,7 @@ import Agency from "../../_components/Agency";
 
 const MemberAgencies = () => {
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("default");
+  const [sort] = useState("default");
 
   const { isLoading, isError, data } = useGetAllAgencyQuery([
     { name: "search", value: search },
