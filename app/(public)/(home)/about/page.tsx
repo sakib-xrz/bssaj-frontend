@@ -17,7 +17,7 @@ import { useGetMembersQuery } from "@/redux/features/member/memberApi";
 import MemberCard from "../members/_components/member-card";
 import { MemberType } from "@/lib/types";
 
-const about: React.FC = () => {
+const Page = () => {
   const [activeTab, setActiveTab] = useState("mission-vision");
 
   const tabItems = [
@@ -206,4 +206,4 @@ const about: React.FC = () => {
   );
 };
 
-export default about;
+export default Page;
