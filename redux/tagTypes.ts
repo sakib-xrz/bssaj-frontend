@@ -6,6 +6,7 @@ export const tagTypes = {
   Agency: "Agency",
   News: "news",
   certificate: "certificate",
+  banners:"banners"
 };
 
 export const tagTypesList = [

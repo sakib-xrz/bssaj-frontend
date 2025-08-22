@@ -228,12 +228,12 @@ export default function VerifyCertificate() {
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div>
+                    {/* <div>
                       <label className="text-sm text-gray-600">Institute</label>
                       <p className="font-semibold text-gray-800 bg-gray-50 p-3 rounded border mt-1">
                         {certificate.institute_name}
                       </p>
-                    </div>
+                    </div> */}
                     <div>
                       <label className="text-sm text-gray-600">Grade</label>
                       <p className="text-gray-800 bg-gray-50 p-3 rounded border mt-1">
@@ -256,7 +256,7 @@ export default function VerifyCertificate() {
                         {certificate.course_duration} months
                       </p>
                     </div>
-                    <div className="md:col-span-2">
+                    <div >
                       <label className="text-sm text-gray-600">
                         Issue Date
                       </label>

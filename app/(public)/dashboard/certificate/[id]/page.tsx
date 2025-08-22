@@ -480,15 +480,12 @@ export default function StudentCertificateEditForm() {
 
                 <FormField
                   control={form.control}
-                  name="institute_name"
+                  name="grade"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Institute Name</FormLabel>
+                      <FormLabel>Grade</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter institute/university name"
-                          {...field}
-                        />
+                        <Input placeholder="Enter institute Grade" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

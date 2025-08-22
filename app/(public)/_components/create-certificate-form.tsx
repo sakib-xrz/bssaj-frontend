@@ -140,7 +140,9 @@ export function StudentCertificateForm() {
                                 !field.value && "text-muted-foreground"
                               )}
                             >
-                              {field.value ? format(field.value, "PPP") : "Pick a date"}
+                              {field.value
+                                ? format(field.value, "PPP")
+                                : "Pick a date"}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
@@ -199,7 +201,10 @@ export function StudentCertificateForm() {
                     <FormItem>
                       <FormLabel>Fathers Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter father's full name" {...field} />
+                        <Input
+                          placeholder="Enter father's full name"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -213,7 +218,10 @@ export function StudentCertificateForm() {
                     <FormItem>
                       <FormLabel>Mothers Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter mother's full name" {...field} />
+                        <Input
+                          placeholder="Enter mother's full name"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -260,11 +268,16 @@ export function StudentCertificateForm() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {allMyAgency?.map((agency: { name: string, value: string }) => (
-                            <SelectItem key={agency.value} value={agency.value}>
-                              {agency.name}
-                            </SelectItem>
-                          ))}
+                          {allMyAgency?.map(
+                            (agency: { name: string; value: string }) => (
+                              <SelectItem
+                                key={agency.value}
+                                value={agency.value}
+                              >
+                                {agency.name}
+                              </SelectItem>
+                            )
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -281,7 +294,10 @@ export function StudentCertificateForm() {
                     <FormItem>
                       <FormLabel>Completed Hours</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter completed credit hours" {...field} />
+                        <Input
+                          placeholder="Enter completed credit hours"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -295,7 +311,10 @@ export function StudentCertificateForm() {
                     <FormItem>
                       <FormLabel>Course Duration</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter course duration (e.g., 4 years)" {...field} />
+                        <Input
+                          placeholder="Enter course duration (e.g., 4 years)"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -327,7 +346,9 @@ export function StudentCertificateForm() {
                                 !field.value && "text-muted-foreground"
                               )}
                             >
-                              {field.value ? format(field.value, "PPP") : "Pick issue date"}
+                              {field.value
+                                ? format(field.value, "PPP")
+                                : "Pick issue date"}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
@@ -351,12 +372,15 @@ export function StudentCertificateForm() {
 
                 <FormField
                   control={form.control}
-                  name="institute_name"
+                  name="grade"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Institute Name</FormLabel>
+                      <FormLabel>Grade</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter institute/university name" {...field} />
+                        <Input
+                          placeholder="Enter institute grade"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -378,5 +402,5 @@ export function StudentCertificateForm() {
         </Form>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -4,21 +4,21 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
 
-export const GetMe = baseApi.injectEndpoints({
+export const Banner = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllBanner: builder.query<any, void>({
+    getAllBanner: builder.query({
       query: () => ({
-        url: `/auth/me`,
+        url: `/banners`,
         method: "GET",
       }),
-      providesTags: [tagTypes.getMe],
+      providesTags: [tagTypes.banners],
       transformResponse: (response: any) => response.data,
     }),
   }),
-  overrideExisting: false, 
+  overrideExisting: false,
 });
 
 
-export const { useGetAllBannerQuery } = GetMe;
+export const { useGetAllBannerQuery } = Banner;
 
 
