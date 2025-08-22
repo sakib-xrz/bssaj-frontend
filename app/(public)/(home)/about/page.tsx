@@ -1,9 +1,8 @@
-import About from "./about";
 
 const AboutPage = () => {
   return (
     <div>
-      <About />
+      
     </div>
   );
 };

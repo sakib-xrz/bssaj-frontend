@@ -116,8 +116,9 @@ interface User {
   profile_picture: string;
 }
 
+
 interface ApprovedBy {
-  name: string;
+  name: string | null;
 }
 
 export interface MemberType {

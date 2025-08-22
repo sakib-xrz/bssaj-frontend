@@ -6,6 +6,7 @@ import Container from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { MemberType } from "@/lib/types";
 import { useAuthUser } from "@/redux/features/auth/authSlice";
 import { useGetOwnMemberQuery } from "@/redux/features/member/memberApi";
 import {
@@ -31,9 +32,8 @@ const memberKindLabels = {
 
 export default function SingleMemberProfilePage() {
   const { data, isLoading, isError, error } = useGetOwnMemberQuery("own");
-  const member: Member | undefined = data?.data;
+  const member:MemberType | undefined = data?.data;
   const user = useAuthUser();
-  console.log(user);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
@@ -164,21 +164,7 @@ export default function SingleMemberProfilePage() {
         {/* Member Card Section */}
         <div className="w-full max-w-2xl">
           <MemberCard
-            member={{
-              id: member.id,
-              name: member.name,
-              email: member.email,
-              phone: member.phone,
-              kind: member.kind,
-              status: member.approved_at ? "APPROVED" : "PENDING",
-              approved_at: member.approved_at,
-              created_at: member.created_at,
-              user: {
-                profile_picture: user?.profile_picture || null,
-              },
-              approved_by: null,
-              profile_picture: member.profile_picture,
-            }}
+            member={member}
             isCompact={false}
           />
         </div>

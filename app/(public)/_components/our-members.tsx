@@ -24,7 +24,7 @@ import {
 import Link from "next/link";
 import Container from "@/components/shared/container";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
-import { Member } from "../(home)/members/_components/member-card";
+import { MemberType } from "@/lib/types";
 
 const memberKindIcons = {
   ADVISER: Crown,
@@ -51,8 +51,10 @@ const memberKindLabels = {
 };
 
 export default function OurMembers() {
-  const { data, isLoading, isError, error } = useGetMembersQuery([{name:'status',value:'APPROVED'}]);
-  const fetchedMembers: Member[] = data?.data || [];
+  const { data, isLoading, isError, error } = useGetMembersQuery([
+    { name: "status", value: "APPROVED" },
+  ]);
+  const fetchedMembers: MemberType[] = data?.data || [];
 
   const memberKindPriority = {
     ADVISER: 1,

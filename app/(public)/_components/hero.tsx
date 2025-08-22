@@ -14,6 +14,7 @@ import {
 import { ChevronRight, ChevronLeft } from "lucide-react";
 
 export default function HeroCarousel() {
+  
   const slides = [
     {
       id: 1,

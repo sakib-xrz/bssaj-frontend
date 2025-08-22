@@ -6,7 +6,7 @@ import Container from "@/components/shared/container";
 import dynamic from "next/dynamic";
 
 import { useGetMemberByIdQuery } from "@/redux/features/member/memberApi";
-import { Member } from "../_components/member-card";
+import { MemberType } from "@/lib/types";
 const MemberDetails = dynamic(() => import("./_components/member-details"), {
   ssr: false,
 });
@@ -14,7 +14,7 @@ const MemberDetails = dynamic(() => import("./_components/member-details"), {
 export default function MemberPage({ params }: { params: { id: string } }) {
   const { data, isLoading, isError, error } = useGetMemberByIdQuery(params.id);
 
-  const member: Member | undefined = data?.data;
+  const member: MemberType | undefined = data?.data;
 
   if (isLoading) {
     return (
