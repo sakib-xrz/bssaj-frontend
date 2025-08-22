@@ -17,9 +17,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
-
-import { Member } from "../../_components/member-card";
 import { useGetMemberByIdQuery } from "@/redux/features/member/memberApi";
+import { MemberType } from "@/lib/types";
 
 const memberKindLabels = {
   ADVISER: "Adviser",
@@ -39,7 +38,7 @@ const memberKindColors = {
 
 export default function MemberDetails({ memberId }: { memberId: string }) {
   const { data, isLoading, isError, error } = useGetMemberByIdQuery(memberId);
-  const member: Member | undefined = data?.data;
+  const member: MemberType | undefined = data?.data;
 
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
 
@@ -281,7 +280,7 @@ export default function MemberDetails({ memberId }: { memberId: string }) {
                   <span>Member ID</span>
                 </div>
                 <span className="text-sm font-medium text-[#003366] font-mono">
-                  #{member.id.toUpperCase()}
+                  #{member.member_id}
                 </span>
               </div>
             </div>

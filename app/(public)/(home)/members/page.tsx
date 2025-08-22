@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
 import { useEffect, useMemo, useState } from "react";
 import { CustomPagination } from "../../_components/CustomPagination";
-import MemberCard, { Member } from "./_components/member-card";
+import { MemberType } from "@/lib/types";
+import MemberCard from "./_components/member-card";
 
 export default function Members() {
   const [search, setSearch] = useState("");
@@ -48,7 +49,7 @@ export default function Members() {
 
   // Sort & filter approved members
   const approvedMembers = useMemo(() => {
-    const fetchedMembers: Member[] = data?.data || [];
+    const fetchedMembers: MemberType[] = data?.data || [];
     return [...fetchedMembers].filter((member) => member.status === "APPROVED");
   }, [data?.data]);
 

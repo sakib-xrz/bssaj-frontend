@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { MemberType } from "@/lib/types";
 import { Award, Briefcase, Crown, GraduationCap, Mail, Phone, Star } from "lucide-react";
 import Link from "next/link";
 
@@ -29,28 +30,12 @@ const memberKindLabels = {
   STUDENT_REPRESENTATIVE: "Student Representative",
 };
 
-export type Member = {
-  profile_picture: string | undefined;
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  kind: "ADVISER" | "HONORABLE" | "EXECUTIVE" | "ASSOCIATE" | "STUDENT_REPRESENTATIVE";
-  status: "APPROVED" | "PENDING" | "NOT_APPROVED";
-  approved_at: string | null;
-  created_at: string;
-  user: {
-    profile_picture: string | null;
-  };
-  approved_by: {
-    name: string;
-  } | null;
-};
+
 export default function MemberCard({
   member,
   isCompact = false,
 }: {
-  member: Member;
+  member: MemberType;
   isCompact?: boolean;
 }) {
   const IconComponent =

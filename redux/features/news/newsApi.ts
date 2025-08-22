@@ -1,14 +1,27 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
-
+interface IQueryItem {
+  name: string;
+  value: string | number | boolean | undefined;
+}
 export const newsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllNews: builder.query({
-      query: (params) => ({
-        url: `/news`,
-        method: "GET",
-        params,
-      }),
+      query: (args: IQueryItem[]) => {
+        const queryString = new URLSearchParams(
+          args.reduce((acc: Record<string, any>, { name, value }) => {
+            if (value !== undefined && value !== null) {
+              acc[name] = value;
+            }
+            return acc;
+          }, {})
+        ).toString();
+
+        return {
+          url: `/news?${queryString}`,
+          method: "GET",
+        };
+      },
       providesTags: [tagTypes.News],
     }),
     getSingleNews: builder.query({

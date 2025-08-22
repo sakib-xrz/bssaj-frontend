@@ -110,3 +110,34 @@ export interface Certificate {
     name: string;
   };
 }
+
+
+interface User {
+  profile_picture: string;
+}
+
+interface ApprovedBy {
+  name: string;
+}
+
+export interface MemberType {
+  id: string;
+  name: string;
+  email: string;
+  kind: string;
+  phone: string;
+  status: string;
+  approved_at: string;
+  created_at: string;
+  member_id: string;
+  user: User;
+  approved_by: ApprovedBy;
+}
+export type NewsType = {
+  id: string;
+  title: string;
+  content: string;
+  created_at: string; 
+  updated_at: string; 
+  is_deleted: boolean;
+};
