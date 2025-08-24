@@ -9,14 +9,17 @@ import {
   CheckCircleIcon,
   MapPinIcon,
   PlusIcon,
+  Trash2Icon,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 import DashboardLoading from "@/app/(public)/_components/dashboard-loading";
 import { BASE_URL } from "@/lib/constant";
 import {
+  useDeleteAgencyMutation,
   useGetAgenciesByUserIdQuery,
   useGetAllAgencyQuery,
 } from "@/redux/features/agency/agencyApi";
@@ -39,6 +42,14 @@ interface Agency {
   };
 }
 
+interface ApiError {
+  status?: number;
+  data?: {
+    message?: string;
+  };
+  message?: string;
+}
+
 export default function AgencyPage() {
   const [activeTab, setActiveTab] = useState<"Approved" | "Pending">(
     "Approved"
@@ -46,6 +57,9 @@ export default function AgencyPage() {
 
   const user = useAuthUser();
   const userId = user?.id;
+
+  // Delete mutation
+  const [deleteAgency, { isLoading: isDeleting }] = useDeleteAgencyMutation();
 
   console.log("Current user:", user);
   console.log("User ID:", userId);
@@ -58,6 +72,44 @@ export default function AgencyPage() {
   } = useGetAgenciesByUserIdQuery(userId || "", {
     skip: !userId, // Skip the query if no user ID
   });
+
+  // Handle agency deletion
+  const handleDeleteAgency = async (agencyId: string, agencyName: string) => {
+    {
+      try {
+        console.log("Attempting to delete agency:", agencyId);
+        const result = await deleteAgency(agencyId).unwrap();
+        console.log("Delete result:", result);
+        toast.success(`Agency "${agencyName}" deleted successfully!`);
+      } catch (error: unknown) {
+        console.error("Failed to delete agency:", error);
+        console.error("Error details:", {
+          status: (error as ApiError)?.status,
+          data: (error as ApiError)?.data,
+          message: (error as ApiError)?.message,
+        });
+
+        // Provide more specific error messages
+        const errorStatus = (error as ApiError)?.status;
+        const errorData = (error as ApiError)?.data;
+        const errorMessage = (error as ApiError)?.message;
+
+        if (errorStatus === 401) {
+          toast.error("Unauthorized. Please log in again.");
+        } else if (errorStatus === 403) {
+          toast.error("You don't have permission to delete this agency.");
+        } else if (errorStatus === 404) {
+          toast.error("Agency not found.");
+        } else if (errorStatus && errorStatus >= 500) {
+          toast.error("Server error. Please try again later.");
+        } else {
+          toast.error(
+            `Failed to delete agency: ${errorData?.message || errorMessage || "Unknown error"}`
+          );
+        }
+      }
+    }
+  };
 
   // Also try getting all agencies to see if there's a filtering issue
   const { data: allAgenciesData } = useGetAllAgencyQuery(
@@ -271,8 +323,19 @@ export default function AgencyPage() {
                         <Button
                           variant="destructive"
                           className="flex-1 font-medium"
+                          onClick={() =>
+                            handleDeleteAgency(agency.id, agency.name)
+                          }
+                          disabled={isDeleting}
                         >
-                          Delete
+                          {isDeleting ? (
+                            "Deleting..."
+                          ) : (
+                            <>
+                              <Trash2Icon className="h-4 w-4 mr-2" />
+                              Delete
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>
@@ -357,8 +420,19 @@ export default function AgencyPage() {
                         <Button
                           variant="destructive"
                           className="flex-1 font-medium"
+                          onClick={() =>
+                            handleDeleteAgency(agency.id, agency.name)
+                          }
+                          disabled={isDeleting}
                         >
-                          Delete
+                          {isDeleting ? (
+                            "Deleting..."
+                          ) : (
+                            <>
+                              <Trash2Icon className="h-4 w-4 mr-2" />
+                              Delete
+                            </>
+                          )}
                         </Button>
                       </div>
                     </div>

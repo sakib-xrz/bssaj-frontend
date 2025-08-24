@@ -1,5 +1,6 @@
 "use client";
 
+import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -99,6 +100,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [shouldRemoveLogo, setShouldRemoveLogo] = useState(false);
 
   // States to manage success stories
   const [removedSuccessStoryIds, setRemovedSuccessStoryIds] = useState<
@@ -148,6 +150,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (initialData) {
       setLogoPreview(initialData.logo ? getImageUrl(initialData.logo) : null);
+      setShouldRemoveLogo(false); // Reset logo removal state
 
       console.log("Initial data success stories:", initialData.success_stories);
       console.log(
@@ -234,6 +237,11 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
         }
         if (logoFile) {
           agencyFormData.append("logo", logoFile);
+        }
+
+        // Handle logo removal
+        if (shouldRemoveLogo) {
+          agencyFormData.append("remove_logo", "true");
         }
 
         await updateAgency({
@@ -329,6 +337,7 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
       const previewUrl = URL.createObjectURL(file);
       setLogoPreview(previewUrl);
       setLogoFile(file);
+      setShouldRemoveLogo(false); // Reset removal state when new logo is selected
     } else {
       setLogoPreview(initialData?.logo ? getImageUrl(initialData.logo) : null);
       setLogoFile(null);
@@ -336,14 +345,17 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
   };
 
   const handleRemoveLogo = () => {
+    console.log("handleRemoveLogo called"); // Debug log
     if (logoPreview && !initialData?.logo) {
       URL.revokeObjectURL(logoPreview);
     }
     setLogoPreview(null);
     setLogoFile(null);
+    setShouldRemoveLogo(true); // Set state to indicate logo should be removed
     if (logoInputRef.current) {
       logoInputRef.current.value = "";
     }
+    console.log("Logo removal state updated"); // Debug log
   };
 
   const handleSuccessStoryImagesChange = (
@@ -508,23 +520,26 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
               <span className="text-sm text-gray-600 truncate flex-grow">
                 {logoFile
                   ? logoFile.name
-                  : initialData?.logo
+                  : initialData?.logo && !shouldRemoveLogo
                     ? "Existing logo"
                     : "No file chosen"}
               </span>
-              {(logoPreview || initialData?.logo) && (
-                <Button
+              {(logoPreview || (initialData?.logo && !shouldRemoveLogo)) && (
+                <button
                   type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="flex-shrink-0"
-                  onClick={handleRemoveLogo}
+                  className="flex-shrink-0 bg-red-500 hover:bg-red-600 text-white p-2 rounded transition-colors"
+                  onClick={() => {
+                    handleRemoveLogo();
+                  }}
+                  title="Remove logo"
                 >
                   <X className="h-4 w-4" />
-                </Button>
+                </button>
               )}
             </div>
-            {(logoPreview || initialData?.logo) && (
+
+            {/* Logo preview */}
+            {(logoPreview || (initialData?.logo && !shouldRemoveLogo)) && (
               <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden border border-gray-200">
                 <Image
                   src={logoPreview || getImageUrl(initialData?.logo || "")}
@@ -539,19 +554,13 @@ export default function EditAgencyPage({ params }: { params: { id: string } }) {
 
           <div className="space-y-2">
             <Label htmlFor="description">Short Description *</Label>
-            <Textarea
-              id="description"
-              name="description"
+            <RichTextEditor
+              content={formik.values.description}
+              onChange={(content) => {
+                formik.setFieldValue("description", content);
+                formik.setFieldTouched("description", true);
+              }}
               placeholder="Enter a short description of the agency"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              rows={3}
-              className={
-                formik.touched.description && formik.errors.description
-                  ? "border-red-500"
-                  : ""
-              }
             />
             {formik.touched.description && formik.errors.description && (
               <p className="text-sm text-red-500">

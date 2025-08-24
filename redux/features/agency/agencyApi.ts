@@ -31,6 +31,14 @@ export const agencyApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.Agency],
     }),
 
+    deleteAgency: builder.mutation({
+      query: (id) => ({
+        url: `/agencies/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [tagTypes.Agency],
+    }),
+
     getAgenciesByUserId: builder.query<any, string>({
       query: (userId) => ({
         url: `/agencies?creatorId=${userId}`,
@@ -111,6 +119,7 @@ export const {
   useCreateAgencyMutation,
   useGetAgencyByIdQuery,
   useUpdateAgencyMutation,
+  useDeleteAgencyMutation,
   useGetAgenciesByUserIdQuery,
   useGetAllAgencyQuery,
   useGetMyAgenciesQuery,
