@@ -9,9 +9,9 @@ import { Event } from "@/lib/types";
 import { useGetAllEventQuery } from "@/redux/features/event/eventApi";
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
+import { CustomPagination } from "../../_components/CustomPagination";
 import Error from "../../_components/error";
 import EventCard from "../../_components/EventCard";
-import { CustomPagination } from "../../_components/CustomPagination";
 
 const EventsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,7 +40,7 @@ const EventsPage = () => {
           title="Events"
           description="Join us for exciting events, workshops, and activities designed to support and connect the Bangladeshi student community in Japan."
         />
-        <div className="relative w-full text-center mx-auto lg:w-1/2 mb-10">
+        <div className="relative w-full text-center mx-auto lg:w-1/2 mt-8">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <Input
             type="text"

@@ -40,15 +40,14 @@ const MemberAgencies = () => {
 
   return (
     <div>
-      <div className="bg-gradient-to-r mb-10 from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
+      <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
         <SectionHeader
-          className="mb-12"
           title="Member Agencies"
           description="Explore our network of member agencies supporting Bangladeshi students in Japan."
         />
       </div>
 
-      <div className="flex justify-center gap-4 w-full mb-8 max-w-6xl mx-auto px-4">
+      <div className="flex justify-center gap-4 w-full mb-8 mt-6 max-w-6xl mx-auto px-4">
         {/* Search Input */}
         <div className="relative w-full sm:w-2/3">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />

@@ -1,26 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardTitle, CardDescription } from "@/components/ui/card";
-import {
-  SearchIcon,
-  MessageSquareIcon,
-  PhoneCallIcon,
-  FileTextIcon,
-  VideoIcon,
-  GraduationCapIcon,
-  FileStackIcon,
-  HomeIcon,
-  BriefcaseIcon,
-  DollarSignIcon,
-  UsersIcon,
-  ChevronRightIcon,
-} from "lucide-react";
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  BriefcaseIcon,
+  ChevronRightIcon,
+  DollarSignIcon,
+  FileStackIcon,
+  FileTextIcon,
+  GraduationCapIcon,
+  HomeIcon,
+  MessageSquareIcon,
+  PhoneCallIcon,
+  SearchIcon,
+  UsersIcon,
+  VideoIcon,
+} from "lucide-react";
 import Link from "next/link";
+import React, { useState } from "react";
 
 interface SupportOptionProps {
   id: string;
@@ -161,7 +161,7 @@ const Helpdesk: React.FC = () => {
       </div>
 
       <Container className="py-12 md:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {supportOptions.map((option) => (
             <Card
               key={option.id}

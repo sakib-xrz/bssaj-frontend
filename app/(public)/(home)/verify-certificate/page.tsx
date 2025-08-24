@@ -1,25 +1,25 @@
 "use client";
 
 import Container from "@/components/shared/container";
-import SectionHeader from "@/components/shared/section-header";
-import QRCodeGenerator from "@/components/shared/qr-code-generator";
 import PDFViewer from "@/components/shared/pdf-viewer";
-import { Button } from "@/components/ui/button";
+import QRCodeGenerator from "@/components/shared/qr-code-generator";
+import SectionHeader from "@/components/shared/section-header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { FRONTEND_URL } from "@/lib/constant";
 import { useVerifyCertificateQuery } from "@/redux/features/certificate/certificateApi";
-import { useSearchParams } from "next/navigation";
 import {
-  GraduationCap,
-  User,
   Award,
   Calendar,
   Download,
+  GraduationCap,
   QrCode,
+  User,
 } from "lucide-react";
-import { FRONTEND_URL } from "@/lib/constant";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 export default function VerifyCertificate() {
   const searchParams = useSearchParams();
@@ -31,7 +31,6 @@ export default function VerifyCertificate() {
       <div>
         <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
           <SectionHeader
-            className="mb-20"
             title="Certificate Verification"
             description="Verify your certificate"
           />
@@ -63,7 +62,6 @@ export default function VerifyCertificate() {
       <div>
         <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
           <SectionHeader
-            className="mb-20"
             title="Certificate Verification"
             description="Verify your certificate"
           />
@@ -120,7 +118,6 @@ export default function VerifyCertificate() {
     <div>
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
         <SectionHeader
-          className="mb-20"
           title="Certificate Verification"
           description="Verify your certificate"
         />
@@ -256,7 +253,7 @@ export default function VerifyCertificate() {
                         {certificate.course_duration} months
                       </p>
                     </div>
-                    <div >
+                    <div>
                       <label className="text-sm text-gray-600">
                         Issue Date
                       </label>

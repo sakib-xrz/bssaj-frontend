@@ -3,10 +3,10 @@
 import Container from "@/components/shared/container";
 import SectionHeader from "@/components/shared/section-header";
 import { Input } from "@/components/ui/input";
+import { MemberType } from "@/lib/types";
 import { useGetMembersQuery } from "@/redux/features/member/memberApi";
 import { useEffect, useMemo, useState } from "react";
 import { CustomPagination } from "../../_components/CustomPagination";
-import { MemberType } from "@/lib/types";
 import MemberCard from "./_components/member-card";
 
 export default function Members() {
@@ -84,12 +84,11 @@ export default function Members() {
     <div>
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20">
         <SectionHeader
-          className="mb-20"
           title="Our Executive Members"
           description="Explore our network of member agencies supporting Bangladeshi students in Japan."
         />
       </div>
-      <div className="max-w-lg mx-auto text-center my-10">
+      <div className="max-w-lg mx-auto text-center mt-8 mb-6">
         <Input
           placeholder="Search member"
           value={search}
