@@ -69,55 +69,62 @@ export default function AgencyPage() {
     isLoading,
     isError,
     error,
+    refetch,
   } = useGetAgenciesByUserIdQuery(userId || "", {
     skip: !userId, // Skip the query if no user ID
   });
 
+  // Also try getting all agencies to see if there's a filtering issue
+  const { data: allAgenciesData, refetch: refetchAllAgencies } =
+    useGetAllAgencyQuery([{ name: "creatorId", value: userId || "" }], {
+      skip: !userId,
+    });
+
   // Handle agency deletion
   const handleDeleteAgency = async (agencyId: string, agencyName: string) => {
-    {
-      try {
-        console.log("Attempting to delete agency:", agencyId);
-        const result = await deleteAgency(agencyId).unwrap();
-        console.log("Delete result:", result);
-        toast.success(`Agency "${agencyName}" deleted successfully!`);
-      } catch (error: unknown) {
-        console.error("Failed to delete agency:", error);
-        console.error("Error details:", {
-          status: (error as ApiError)?.status,
-          data: (error as ApiError)?.data,
-          message: (error as ApiError)?.message,
-        });
+    try {
+      console.log("Attempting to delete agency:", agencyId);
+      console.log("Current user ID:", userId);
 
-        // Provide more specific error messages
-        const errorStatus = (error as ApiError)?.status;
-        const errorData = (error as ApiError)?.data;
-        const errorMessage = (error as ApiError)?.message;
+      const result = await deleteAgency(agencyId).unwrap();
+      console.log("Delete result:", result);
+      toast.success(`Agency "${agencyName}" deleted successfully!`);
 
-        if (errorStatus === 401) {
-          toast.error("Unauthorized. Please log in again.");
-        } else if (errorStatus === 403) {
-          toast.error("You don't have permission to delete this agency.");
-        } else if (errorStatus === 404) {
-          toast.error("Agency not found.");
-        } else if (errorStatus && errorStatus >= 500) {
-          toast.error("Server error. Please try again later.");
-        } else {
-          toast.error(
-            `Failed to delete agency: ${errorData?.message || errorMessage || "Unknown error"}`
-          );
-        }
+      // Manually refetch the data to update the UI
+      refetch();
+      refetchAllAgencies();
+
+      // Debug: Log the current state after deletion
+      console.log("After deletion - agenciesData:", agenciesData);
+      console.log("After deletion - allAgenciesData:", allAgenciesData);
+    } catch (error: unknown) {
+      console.error("Failed to delete agency:", error);
+      console.error("Error details:", {
+        status: (error as ApiError)?.status,
+        data: (error as ApiError)?.data,
+        message: (error as ApiError)?.message,
+      });
+
+      // Provide more specific error messages
+      const errorStatus = (error as ApiError)?.status;
+      const errorData = (error as ApiError)?.data;
+      const errorMessage = (error as ApiError)?.message;
+
+      if (errorStatus === 401) {
+        toast.error("Unauthorized. Please log in again.");
+      } else if (errorStatus === 403) {
+        toast.error("You don't have permission to delete this agency.");
+      } else if (errorStatus === 404) {
+        toast.error("Agency not found.");
+      } else if (errorStatus && errorStatus >= 500) {
+        toast.error("Server error. Please try again later.");
+      } else {
+        toast.error(
+          `Failed to delete agency: ${errorData?.message || errorMessage || "Unknown error"}`
+        );
       }
     }
   };
-
-  // Also try getting all agencies to see if there's a filtering issue
-  const { data: allAgenciesData } = useGetAllAgencyQuery(
-    [{ name: "creatorId", value: userId || "" }],
-    {
-      skip: !userId,
-    }
-  );
 
   console.log("Agencies data:", agenciesData);
   console.log("All agencies:", agenciesData?.data);

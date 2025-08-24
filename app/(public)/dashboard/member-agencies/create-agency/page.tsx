@@ -24,9 +24,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import * as Yup from "yup";
 
+import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { useAuthUser } from "@/redux/features/auth/authSlice";
 import { toast } from "sonner";
-import { RichTextEditor } from "@/components/shared/rich-text-editor";
 
 const agencySchema = Yup.object({
   name: Yup.string()
@@ -141,6 +141,7 @@ export default function CreateAgencyPage() {
         // Use RTK Query mutation
         const result = await createAgency(formData).unwrap();
         console.log("Agency created successfully:", result);
+        console.log("Description that was sent:", formData.get("description"));
 
         // Success actions
         formik.resetForm();
@@ -418,6 +419,11 @@ export default function CreateAgencyPage() {
                   <Label htmlFor="description">Description</Label>
                   <RichTextEditor
                     content={formik.values.description}
+                    onChange={(content) => {
+                      console.log("RichTextEditor content:", content);
+                      formik.setFieldValue("description", content);
+                      formik.setFieldTouched("description", true);
+                    }}
                     placeholder="Start writing your Agency Description..."
                     className={
                       formik.touched.description && formik.errors.description
