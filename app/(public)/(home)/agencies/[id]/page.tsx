@@ -267,7 +267,12 @@ export default function SingleAgencyProfilePage({
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 text-gray-700 leading-relaxed">
-              {agency.description || "No description available."}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: agency.description || "No description available.",
+                }}
+                className="prose prose-gray max-w-none"
+              />
             </CardContent>
           </Card>
 

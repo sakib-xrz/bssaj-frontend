@@ -181,6 +181,12 @@ export default function AgencyPage() {
     return `${BASE_URL}/uploads/${imagePath}`;
   };
 
+  // Utility function to strip HTML tags for display
+  const stripHtmlTags = (html: string): string => {
+    if (!html) return "";
+    return html.replace(/<[^>]*>/g, "");
+  };
+
   // Handle image loading errors
   const handleImageError = (
     event: React.SyntheticEvent<HTMLImageElement, Event>
@@ -289,7 +295,7 @@ export default function AgencyPage() {
                       </h2>
 
                       <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
-                        {agency.description}
+                        {stripHtmlTags(agency.description)}
                       </p>
 
                       {/* Agency Details */}
@@ -386,7 +392,7 @@ export default function AgencyPage() {
                       </h2>
 
                       <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
-                        {agency.description}
+                        {stripHtmlTags(agency.description)}
                       </p>
 
                       {/* Agency Details */}
