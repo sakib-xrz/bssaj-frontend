@@ -6,16 +6,20 @@ import { DashboardHeader } from "../_components/dashboard-header";
 import ProtectedRoute from "../_components/ProtectedRoute";
 import { UserSidebar } from "../_components/UserSidebar";
 
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const user = useAuthUser();
+  let sidebar = null;
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const user = useAuthUser()
-  let sidebar = null 
-
-  if(user?.role === "STUDENT"){
-    sidebar = <UserSidebar />
-  }else if(user?.role === "AGENCY"){
-    sidebar = <AgencySidebar />
+  if (user?.role === "STUDENT") {
+    sidebar = <UserSidebar />;
+  } else if (user?.role === "AGENCY") {
+    sidebar = <AgencySidebar />;
   }
+
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-gray-50">

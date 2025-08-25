@@ -1,35 +1,59 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use client";
 
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
-import { useForm } from "react-hook-form"
+import { format, addMonths } from "date-fns";
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
 
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
-import { useGetMyAgenciesQuery } from "@/redux/features/agency/agencyApi"
-import { useCreateCertificateMutation } from "@/redux/features/certificate/certificateApi"
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { useGetMyAgenciesQuery } from "@/redux/features/agency/agencyApi";
+import { useCreateCertificateMutation } from "@/redux/features/certificate/certificateApi";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface FormValues {
-  name: string
-  date_of_birth: Date | undefined
-  gender: string
-  father_name: string
-  mother_name: string
-  student_id: string
-  agency_id: string
-  completed_hours: string
-  grade: string
-  course_duration: string
-  issued_at: Date | undefined
-  institute_name: string
+  name: string;
+  date_of_birth: Date | null;
+  gender: "male" | "female" | "other" | "";
+  father_name: string;
+  mother_name: string;
+  student_id: string;
+  agency_id: string;
+  completed_hours: string;
+  grade: string;
+  course_duration: string;
+  issued_at: Date | null;
+  institute_name: string;
 }
 
 const defaultFormValues: FormValues = {
@@ -42,51 +66,67 @@ const defaultFormValues: FormValues = {
   grade: "",
   course_duration: "",
   institute_name: "",
-  date_of_birth: undefined,
-  issued_at: undefined,
+  date_of_birth: null,
+  issued_at: null,
   gender: "",
-}
+};
 
 export function StudentCertificateForm() {
-  const { data } = useGetMyAgenciesQuery(undefined)
-  const [sendFormData, { isLoading, isError }] = useCreateCertificateMutation(undefined)
-  console.log(isError)
+  const { data } = useGetMyAgenciesQuery(undefined);
+  const [sendFormData, { isLoading, isError }] =
+    useCreateCertificateMutation(undefined);
+  const [useAdvancedIssueDate, setUseAdvancedIssueDate] = useState(false);
+  const [advancedIssueDate, setAdvancedIssueDate] = useState<Date | null>(
+    addMonths(new Date(), 1)
+  );
+
+  console.log(isError);
   const form = useForm<FormValues>({
     defaultValues: defaultFormValues,
-  })
+  });
 
   const allMyAgency = data?.data?.map((item: { name: string; id: string }) => ({
     name: item.name,
     value: item.id,
-  }))
+  }));
 
-  async function onSubmit(values: FormValues) {
-    console.log("Form Submitted with values:", values)
+async function onSubmit(values: FormValues) {
+  console.log("Form Submitted with values:", values);
 
-    if (!values.date_of_birth || !values.issued_at) {
-      toast.error("Please fill all required fields")
-      return
-    }
-
-    try {
-      const formattedData = {
-        ...values,
-        date_of_birth: format(values.date_of_birth, "yyyy-MM-dd"),
-        issued_at: format(values.issued_at, "yyyy-MM-dd"),
-      }
-      console.log("Formatted Data:", formattedData)
-
-      const info = await sendFormData(formattedData).unwrap()
-      if (info.success) {
-        toast.success(info.message)
-      } else {
-        toast.error(info?.error?.message)
-      }
-    } catch (error: any) {
-      console.error("Submission error:", error)
-      toast.error("Something went wrong. Please try again")
-    }
+  if (!values.date_of_birth || (!values.issued_at && !useAdvancedIssueDate)) {
+    toast.error("Please fill all required fields");
+    return;
   }
+
+  try {
+    const formattedData = {
+      ...values,
+      date_of_birth: values.date_of_birth
+        ? format(values.date_of_birth, "yyyy-MM-dd")
+        : null, // or keep it undefined depending on your API
+
+      issued_at: useAdvancedIssueDate
+        ? advancedIssueDate
+          ? format(advancedIssueDate, "yyyy-MM-dd")
+          : null
+        : values.issued_at
+        ? format(values.issued_at, "yyyy-MM-dd")
+        : null,
+    };
+
+    console.log("Formatted Data:", formattedData);
+
+    const info = await sendFormData(formattedData).unwrap();
+    if (info.success) {
+      toast.success(info.message);
+    } else {
+      toast.error(info?.error?.message);
+    }
+  } catch (error: any) {
+    console.error("Submission error:", error);
+    toast.error("Something went wrong. Please try again");
+  }
+}
 
   return (
     <Card className="w-full shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
@@ -148,14 +188,45 @@ export function StudentCertificateForm() {
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
+                          <div className="flex items-center justify-between pt-2 px-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const currentYear =
+                                  field.value?.getFullYear() ||
+                                  new Date().getFullYear();
+                                field.onChange(new Date(currentYear - 1, 0, 1));
+                              }}
+                            >
+                              <ChevronLeftIcon className="h-4 w-4 mr-1" />
+                              Previous Year
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const currentYear =
+                                  field.value?.getFullYear() ||
+                                  new Date().getFullYear();
+                                field.onChange(new Date(currentYear + 1, 0, 1));
+                              }}
+                            >
+                              Next Year
+                              <ChevronRightIcon className="h-4 w-4 ml-1" />
+                            </Button>
+                          </div>
                           <Calendar
                             mode="single"
-                            selected={field.value}
+                            selected={field.value || undefined}
                             onSelect={field.onChange}
                             disabled={(date) =>
                               date > new Date() || date < new Date("1900-01-01")
                             }
                             initialFocus
+                            captionLayout="dropdown"
+                            fromYear={1900}
+                            toYear={new Date().getFullYear()}
                           />
                         </PopoverContent>
                       </Popover>
@@ -330,45 +401,96 @@ export function StudentCertificateForm() {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                <FormField
-                  control={form.control}
-                  name="issued_at"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Issue Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
+                <div className="space-y-3">
+                  <FormLabel>Issue Date</FormLabel>
+
+                  {useAdvancedIssueDate ? (
+                    <div className="p-3 border rounded-md bg-muted/50">
+                      <p className="text-sm">
+                        Certificate will be issued on:{" "}
+                        {format(advancedIssueDate!, "PPP")}
+                      </p>
+                    </div>
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="issued_at"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant="outline"
+                                  className={cn(
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
+                                  )}
+                                >
+                                  {field.value
+                                    ? format(field.value, "PPP")
+                                    : "Pick issue date"}
+                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              className="w-auto p-0"
+                              align="start"
                             >
-                              {field.value
-                                ? format(field.value, "PPP")
-                                : "Pick issue date"}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
+                              <div className="flex items-center justify-between pt-2 px-3">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const currentYear =
+                                      field.value?.getFullYear() ||
+                                      new Date().getFullYear();
+                                    field.onChange(
+                                      new Date(currentYear - 1, 0, 1)
+                                    );
+                                  }}
+                                >
+                                  <ChevronLeftIcon className="h-4 w-4 mr-1" />
+                                  Previous Year
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const currentYear =
+                                      field.value?.getFullYear() ||
+                                      new Date().getFullYear();
+                                    field.onChange(
+                                      new Date(currentYear + 1, 0, 1)
+                                    );
+                                  }}
+                                >
+                                  Next Year
+                                  <ChevronRightIcon className="h-4 w-4 ml-1" />
+                                </Button>
+                              </div>
+                              <Calendar
+                                mode="single"
+                                selected={field.value || undefined}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                  date > new Date() ||
+                                  date < new Date("1900-01-01")
+                                }
+                                initialFocus
+                                captionLayout="dropdown" // ✅ fixed
+                                fromYear={1900}
+                                toYear={new Date().getFullYear() + 5}
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -377,10 +499,7 @@ export function StudentCertificateForm() {
                     <FormItem>
                       <FormLabel>Grade</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter institute grade"
-                          {...field}
-                        />
+                        <Input placeholder="Enter institute grade" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

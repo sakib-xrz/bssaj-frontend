@@ -30,8 +30,8 @@ import { Certificate } from "@/lib/types";
 
 function Page() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isLoading, isError, data } = useGetAllCartificateQuery(undefined,{
-    refetchOnMountOrArgChange:true
+  const { isLoading, isError, data } = useGetAllCartificateQuery(undefined, {
+    refetchOnMountOrArgChange: true,
   });
 
   const downloadQRCode = (sl_no: string) => {
@@ -61,122 +61,144 @@ function Page() {
     return <Error error="Something went wrong" />;
   }
 
-
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 mx-auto items-center mb-8">
-        <h1 className="text-lg md:text-4xl font-bold text-gray-900">
-          Certificates
-        </h1>
+      {/* Header Section */}
+      <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center mb-8">
+          <h1 className="text-xl md:text-4xl font-bold text-gray-900 text-center md:text-left">
+            Certificates
+          </h1>
 
-        <div className="flex md:justify-end">
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 w-auto">
-                <PlusIcon className="h-4 w-4" />
-                Student Certificate Form
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Certificate</DialogTitle>
-              </DialogHeader>
-              <StudentCertificateForm />
-            </DialogContent>
-          </Dialog>
+          <div className="flex justify-center md:justify-end">
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary hover:bg-primary/90 text-white flex items-center gap-2 w-full md:w-auto">
+                  <PlusIcon className="h-4 w-4" />
+                  Student Certificate Form
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create New Certificate</DialogTitle>
+                </DialogHeader>
+                <StudentCertificateForm />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
+      {/* Table Section */}
       <div className="container mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle>Certificate Records</CardTitle>
+            <CardTitle className="text-lg md:text-2xl">
+              Certificate Records
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>SL No</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Institute</TableHead>
-                  <TableHead>Date of Birth</TableHead>
-                  <TableHead>Issued At</TableHead>
-                  <TableHead>QR Code</TableHead>
-                  <TableHead>Edit Cartificate</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data?.data?.map((certificate: Certificate) => (
-                  <TableRow key={certificate.id}>
-                    <TableCell className="font-medium">
-                      {certificate?.sl_no}
-                    </TableCell>
-                    <TableCell>{certificate.name}</TableCell>
-                    <TableCell>{certificate.institute_name || "-"}</TableCell>
-                    <TableCell>
-                      {format(
-                        new Date(certificate.date_of_birth),
-                        "MMM dd, yyyy"
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {format(
-                        new Date(
-                          certificate.issued_at || certificate.created_at
-                        ),
-                        "MMM dd, yyyy 'at' h:mm a"
-                      )}
-                    </TableCell>
-                    <TableCell className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => downloadQRCode(certificate.sl_no)}
-                        className="flex items-center gap-1"
-                      >
-                        <QrCode className="h-4 w-4" />
-                        QR Code
-                      </Button>
-                      {certificate.certificate_url && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="flex items-center gap-1"
-                        >
-                          <a
-                            href={certificate.certificate_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Download className="h-4 w-4" />
-                            Certificate
-                          </a>
-                        </Button>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/dashboard/certificate/${certificate.id}`}>
-                        <Button>Edit Cartificate</Button>
-                      </Link>
-                    </TableCell>
+            {/* Always scrollable table */}
+            <div className="w-full overflow-x-auto">
+              <Table className="min-w-[700px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="whitespace-nowrap">SL No</TableHead>
+                    <TableHead className="whitespace-nowrap">Name</TableHead>
+                    <TableHead className="whitespace-nowrap">Grade</TableHead>
+                    <TableHead className="whitespace-nowrap">
+                      Date of Birth
+                    </TableHead>
+                    <TableHead className="whitespace-nowrap">
+                      Issued At
+                    </TableHead>
+                    <TableHead className="whitespace-nowrap">QR Code</TableHead>
+                    <TableHead className="whitespace-nowrap">
+                      Edit Certificate
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {data?.data?.map((certificate: Certificate) => (
+                    <TableRow key={certificate.id}>
+                      <TableCell>{certificate.sl_no}</TableCell>
+                      <TableCell className="break-words max-w-[150px]">
+                        {certificate.name}
+                      </TableCell>
+                      <TableCell>{certificate.grade || "-"}</TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(certificate.date_of_birth),
+                          "MMM dd, yyyy"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(
+                            certificate.issued_at || certificate.created_at
+                          ),
+                          "MMM dd, yyyy 'at' h:mm a"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => downloadQRCode(certificate.sl_no)}
+                            className="flex items-center gap-1"
+                          >
+                            <QrCode className="h-4 w-4" />
+                            QR Code
+                          </Button>
+                          {certificate.certificate_url && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              asChild
+                              className="flex items-center gap-1"
+                            >
+                              <a
+                                href={certificate.certificate_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <Download className="h-4 w-4" />
+                                Certificate
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/dashboard/certificate/${certificate.id}`}>
+                          <Button>Edit</Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="hidden">
-        {data?.data.map((certificate: Certificate) => (
-          <div key={`qr-${certificate.id}`} id={`qrcode-${certificate.sl_no}`}>
-            <QRCodeGenerator
-              value={`${FRONTEND_URL}/verify-certificate?sl=${certificate.sl_no}`}
-              size={128}
-            />
-          </div>
-        ))}
+      {/* Hidden QR Codes */}
+      <div className="container">
+        <div className="hidden">
+          {data?.data.map((certificate: Certificate) => (
+            <div
+              key={`qr-${certificate.id}`}
+              id={`qrcode-${certificate.sl_no}`}
+            >
+              <QRCodeGenerator
+                value={`${FRONTEND_URL}/verify-certificate?sl=${certificate.sl_no}`}
+                size={128}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );
