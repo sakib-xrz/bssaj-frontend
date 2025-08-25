@@ -45,6 +45,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+
 interface FormValues {
   name: string;
   date_of_birth: Date | undefined;
@@ -218,7 +219,7 @@ export default function StudentCertificateEditForm() {
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                {/* DateofBirth */}
+                {/* Date of Birth */}
                 <FormField
                   control={form.control}
                   name="date_of_birth"
@@ -251,6 +252,9 @@ export default function StudentCertificateEditForm() {
                               date > new Date() || date < new Date("1900-01-01")
                             }
                             initialFocus
+                            captionLayout="dropdown"
+                            fromYear={1900}
+                            toYear={new Date().getFullYear()}
                           />
                         </PopoverContent>
                       </Popover>
@@ -288,7 +292,7 @@ export default function StudentCertificateEditForm() {
                 />
               </div>
 
-              {/* Mother  */}
+              {/* Father and Mother Name */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                 <FormField
                   control={form.control}
@@ -326,7 +330,7 @@ export default function StudentCertificateEditForm() {
               </div>
             </div>
 
-            {/*  Information */}
+            {/* Academic Information Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
                 Academic Information
@@ -431,13 +435,14 @@ export default function StudentCertificateEditForm() {
               </div>
             </div>
 
-            {/* Certificate */}
+            {/* Certificate Information Section */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">
                 Certificate Information
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
+                {/* Issue Date */}
                 <FormField
                   control={form.control}
                   name="issued_at"
@@ -466,10 +471,11 @@ export default function StudentCertificateEditForm() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
+                            disabled={(date) => date < new Date("1900-01-01")}
                             initialFocus
+                            captionLayout="dropdown"
+                            fromYear={1900}
+                            toYear={new Date().getFullYear() + 5}
                           />
                         </PopoverContent>
                       </Popover>
@@ -493,7 +499,7 @@ export default function StudentCertificateEditForm() {
                 />
               </div>
 
-              {/* File */}
+              {/* File Upload */}
               <FormField
                 control={form.control}
                 name="certificate_file"
