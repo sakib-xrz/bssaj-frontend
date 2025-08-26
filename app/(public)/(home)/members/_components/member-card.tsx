@@ -53,7 +53,7 @@ export default function MemberCard({member,isCompact = false}: { member: MemberT
                 } ring-4 ring-white shadow-lg group-hover:ring-[#00AEEF]/30 transition-all duration-300`}
             >
               <AvatarImage
-                src={member.user.profile_picture }
+                src={member?.user?.profile_picture }
                 alt={member.name}
               />
               <AvatarFallback className="bg-gradient-to-br from-[#00AEEF] to-[#003366] text-white text-xl font-bold">
