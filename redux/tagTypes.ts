@@ -8,6 +8,7 @@ export const tagTypes = {
   certificate: "certificate",
   banners: "banners",
   payments: "payments",
+  jobs:"jobs"
 };
 
 export const tagTypesList = [
@@ -18,5 +19,6 @@ export const tagTypesList = [
   tagTypes.blog,
   tagTypes.News,
   tagTypes.banners,
-  tagTypes.payments
+  tagTypes.payments,
+  tagTypes.jobs
 ];
