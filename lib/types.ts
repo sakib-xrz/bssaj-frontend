@@ -142,3 +142,25 @@ export type NewsType = {
   updated_at: string; 
   is_deleted: boolean;
 };
+
+export type AgencyPayment = {
+  id: string;
+  agency_id: string;
+  payment_month: string; // format: YYYY-MM
+  amount: string; // could be number if backend supports numeric type
+  payment_date: string; // ISO timestamp
+  payment_status: string;
+  payment_method: string; // e.g. "Bank Transfer", "Cash"
+  transaction_id: string;
+  notes: string;
+  approved_at: string | null; // timestamp or null
+  approved_by_id: string | null;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+  approved_by?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+};

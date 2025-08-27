@@ -7,16 +7,15 @@ import { useGetAllNewsQuery } from "@/redux/features/news/newsApi";
 import { Calendar, Eye, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { NewsType } from "@/lib/types";
-import SectionHeader from "@/components/shared/section-header";
-import { CustomPagination } from "./CustomPagination";
+
 import { NewsModal } from "../(home)/news/_newsModal";
 
 const News = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(3);
+  const [page] = useState(1);
+  const [limit] = useState(3);
   const [selectedNews, setSelectedNews] = useState<NewsType | null>(null);
-  const { isLoading, isError, data } = useGetAllNewsQuery([
+  const {  data } = useGetAllNewsQuery([
     { name: "page", value: page },
     { name: "limit", value: limit },
   ]);

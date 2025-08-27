@@ -33,7 +33,6 @@ const memberKindLabels = {
 export default function SingleMemberProfilePage() {
   const { data, isLoading, isError, error } = useGetOwnMemberQuery("own");
   const member:MemberType | undefined = data?.data;
-  const user = useAuthUser();
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
