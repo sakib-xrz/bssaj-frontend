@@ -142,3 +142,61 @@ export type NewsType = {
   updated_at: string; 
   is_deleted: boolean;
 };
+
+export type AgencyPayment = {
+  id: string;
+  agency_id: string;
+  payment_month: string; // format: YYYY-MM
+  amount: string; // could be number if backend supports numeric type
+  payment_date: string; // ISO timestamp
+  payment_status: string;
+  payment_method: string; // e.g. "Bank Transfer", "Cash"
+  transaction_id: string;
+  notes: string;
+  approved_at: string | null; // timestamp or null
+  approved_by_id: string | null;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+  approved_by?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+};
+
+export interface Jobs  {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  kind:string;
+  company_name: string;
+  company_logo: string | null;
+  company_website: string | null;
+  company_email: string;
+  company_phone: string;
+  company_address: string;
+  experience_min: string;
+  salary_min: string;
+  salary_max: string;
+  deadline: string; // ISO date string
+  apply_link: string;
+  number_of_vacancies: string;
+  posted_by_id: string;
+  is_deleted: boolean;
+  created_at: string; // ISO date string
+  updated_at: string; // ISO date string
+  approved_at: string | null; // ISO date string or null
+  approved_by_id: string;
+  posted_by: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  approved_by: {
+    id: string;
+    name: string;
+    email: string;
+  };
+};

@@ -75,8 +75,8 @@ export function StudentCertificateForm() {
   const { data } = useGetMyAgenciesQuery(undefined);
   const [sendFormData, { isLoading, isError }] =
     useCreateCertificateMutation(undefined);
-  const [useAdvancedIssueDate, setUseAdvancedIssueDate] = useState(false);
-  const [advancedIssueDate, setAdvancedIssueDate] = useState<Date | null>(
+  const [useAdvancedIssueDate] = useState(false);
+  const [advancedIssueDate] = useState<Date | null>(
     addMonths(new Date(), 1)
   );
 

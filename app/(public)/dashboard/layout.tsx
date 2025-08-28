@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   LogOut,
+  WalletCards,
   User as UserIcon,
 } from "lucide-react";
 
@@ -60,6 +61,7 @@ export default function DashboardLayout({
     { name: "My Membership", href: "/dashboard/my-membership", icon: Users },
     { name: "My Agencies", href: "/dashboard/member-agencies", icon: Users },
     { name: "Certificate", href: "/dashboard/certificate", icon: Award },
+    { name: "Payment", href: "/dashboard/payment", icon: WalletCards },
   ];
 
   const navigation =

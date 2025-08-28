@@ -61,14 +61,14 @@ export default function AgencyPage() {
   // Delete mutation
   const [deleteAgency, { isLoading: isDeleting }] = useDeleteAgencyMutation();
 
-  // console.log("Current user:", user);
-  // console.log("User ID:", userId);
+  console.log("Current user:", user);
+  console.log("User ID:", userId);
 
   const {
     data: agenciesData,
     isLoading,
     isError,
-    error,
+
     refetch,
   } = useGetAgenciesByUserIdQuery(userId || "", {
     skip: !userId, // Skip the query if no user ID
@@ -83,28 +83,11 @@ export default function AgencyPage() {
   // Handle agency deletion
   const handleDeleteAgency = async (agencyId: string, agencyName: string) => {
     try {
-      console.log("Attempting to delete agency:", agencyId);
-      console.log("Current user ID:", userId);
-
-      const result = await deleteAgency(agencyId).unwrap();
-      console.log("Delete result:", result);
-      toast.success(`Agency "${agencyName}" deleted successfully!`);
-
+      await deleteAgency(agencyId).unwrap();
       // Manually refetch the data to update the UI
       refetch();
       refetchAllAgencies();
-
-      // Debug: Log the current state after deletion
-      console.log("After deletion - agenciesData:", agenciesData);
-      console.log("After deletion - allAgenciesData:", allAgenciesData);
     } catch (error: unknown) {
-      console.error("Failed to delete agency:", error);
-      console.error("Error details:", {
-        status: (error as ApiError)?.status,
-        data: (error as ApiError)?.data,
-        message: (error as ApiError)?.message,
-      });
-
       // Provide more specific error messages
       const errorStatus = (error as ApiError)?.status;
       const errorData = (error as ApiError)?.data;
@@ -126,11 +109,6 @@ export default function AgencyPage() {
     }
   };
 
-  console.log("Agencies data:", agenciesData);
-  console.log("All agencies:", agenciesData?.data);
-  console.log("Alternative agencies data:", allAgenciesData);
-  console.log("Alternative all agencies:", allAgenciesData?.data);
-
   // Use the first approach, but fall back to the alternative if needed
   const allAgencies: Agency[] =
     agenciesData?.data || allAgenciesData?.data || [];
@@ -145,10 +123,10 @@ export default function AgencyPage() {
   const userAgencies = allAgencies.filter((agency) => {
     // Check if the agency belongs to the current user
     // The agency should have a user_id or creator_id field that matches the current user's ID
-    // console.log("Agency:", agency);
-    // console.log("Agency user_id:", agency.user_id);
-    // console.log("Agency creator_id:", agency.creator_id);
-    // console.log("Current user ID:", userId);
+    console.log("Agency:", agency);
+    console.log("Agency user_id:", agency.user_id);
+    console.log("Agency creator_id:", agency.creator_id);
+    console.log("Current user ID:", userId);
 
     return (
       agency.user_id === userId ||
@@ -219,7 +197,6 @@ export default function AgencyPage() {
   }
 
   if (isError) {
-    console.error("Failed to fetch agencies:", error);
     return (
       <Container className="py-12 md:py-16 text-center text-red-500">
         <div className="space-y-4">

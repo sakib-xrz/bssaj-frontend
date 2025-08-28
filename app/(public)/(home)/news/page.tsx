@@ -14,9 +14,9 @@ import { CustomPagination } from "../../_components/CustomPagination";
 const News = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(9);
+  const [limit] = useState(9);
   const [selectedNews, setSelectedNews] = useState<NewsType | null>(null);
-  const { isLoading, isError, data } = useGetAllNewsQuery([
+  const {  data } = useGetAllNewsQuery([
     { name: "page", value: page },
     { name: "limit", value: limit },
   ]);
