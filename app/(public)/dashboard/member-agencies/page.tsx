@@ -61,8 +61,8 @@ export default function AgencyPage() {
   // Delete mutation
   const [deleteAgency, { isLoading: isDeleting }] = useDeleteAgencyMutation();
 
-  console.log("Current user:", user);
-  console.log("User ID:", userId);
+  // console.log("Current user:", user);
+  // console.log("User ID:", userId);
 
   const {
     data: agenciesData,
@@ -145,10 +145,10 @@ export default function AgencyPage() {
   const userAgencies = allAgencies.filter((agency) => {
     // Check if the agency belongs to the current user
     // The agency should have a user_id or creator_id field that matches the current user's ID
-    console.log("Agency:", agency);
-    console.log("Agency user_id:", agency.user_id);
-    console.log("Agency creator_id:", agency.creator_id);
-    console.log("Current user ID:", userId);
+    // console.log("Agency:", agency);
+    // console.log("Agency user_id:", agency.user_id);
+    // console.log("Agency creator_id:", agency.creator_id);
+    // console.log("Current user ID:", userId);
 
     return (
       agency.user_id === userId ||
