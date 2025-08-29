@@ -200,3 +200,13 @@ export interface Jobs  {
     email: string;
   };
 };
+
+
+export type GalleryItem = {
+  id: string;
+  title: string;
+  image: string;
+  link: string | null;
+  created_at: string;
+  updated_at: string;
+};

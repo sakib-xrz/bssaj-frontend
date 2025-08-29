@@ -9,7 +9,8 @@ export const tagTypes = {
   banners: "banners",
   payments: "payments",
   jobs:"jobs",
-  committees:"committees"
+  committees:"committees",
+  gallery:"gallery"
 };
 
 export const tagTypesList = [

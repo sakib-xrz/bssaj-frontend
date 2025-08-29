@@ -1,93 +1,95 @@
+"use client";
+
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Container from "@/components/shared/container";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { GalleryItem } from "@/lib/types";
+import { useGeteAllGalleryQuery } from "@/redux/features/gallery/galleryApi";
 
-interface MomentCardProps {
-    id: string;
-    imageSrc: string;
-    title: string;
-}
+const OurBigMoments = () => {
+  const { data: mainData } = useGeteAllGalleryQuery(undefined);
+  const data: GalleryItem[] = mainData?.data || [];
 
-const momentCards: MomentCardProps[] = [
-    {
-        id: "1",
-        imageSrc: "/images/moments.png",
-        title: "Bangladesh Student Japan",
-    },
-    {
-        id: "2",
-        imageSrc: "/images/moments.png",
-        title: "Bangladesh Student Japan",
-    },
-    {
-        id: "3",
-        imageSrc: "/images/moments.png",
-        title: "Bangladesh Student Japan",
-    },
-    {
-        id: "4",
-        imageSrc: "/images/moments.png",
-        title: "Bangladesh Student Japan",
-    },
-    {
-        id: "5",
-        imageSrc: "/images/moments.png",
-        title: "Bangladesh Student Japan",
-    },
-    {
-        id: "6",
-        imageSrc: "/images/moments.png",
-        title: "Bangladesh Student Japan",
-    },
-];
+  return (
+    <Container className="py-12 flex flex-col items-center">
+      {/* Heading */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
+          Our Big Moments
+        </h1>
+        <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          A glimpse into our journey, achievements, and celebrations.
+        </p>
+      </div>
 
-const OurBigMoments: React.FC = () => {
-    return (
-        <Container className="flex flex-col items-center justify-between">
-            {/* Top Section: Heading and Paragraph */}
-            <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight">
-                    Our Big Moments
-                </h1>
-                <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                    A glimpse into our journey, achievements, and celebrations.
-                </p>
-            </div>
-
-            {/* Moment Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full  mb-12">
-                {momentCards.map((moment) => (
-                    <Card
-                        key={moment.id}
-                        className="flex flex-col rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1"
-                    >
-                        <CardContent className="p-0">
-                            <div className="relative w-full aspect-[16/10]">
-                                <Image
-                                    src={moment.imageSrc}
-                                    alt={moment.title}
-                                    fill
-                                    className="rounded-t-xl object-cover"
-                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                />
-                            </div>
-                            <div className="p-4">
-                                <h3 className="text-lg font-semibold text-gray-900 leading-tight">
-                                    {moment.title}
-                                </h3>
-                            </div>
-                        </CardContent>
+      {/* Carousel */}
+      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+        <CarouselContent className="-ml-4">
+          {data.map((moment: GalleryItem) => (
+            <CarouselItem
+              key={moment.id}
+              className="pl-4 md:basis-1/2 lg:basis-1/3"
+            >
+              <div className="p-4">
+                {moment.link ? (
+                  <a
+                    href={moment.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Card className="group h-full flex flex-col rounded-2xl bg-white shadow-md transition duration-300 transform hover:-translate-y-1">
+                      <div className="relative w-full aspect-[16/10]">
+                        <Image
+                          src={moment.image}
+                          alt={moment.title}
+                          fill
+                          className="rounded-t-xl object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                      </div>
+                      <CardContent className="p-5">
+                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-1 group-hover:text-primary">
+                          {moment.title}
+                        </h3>
+                      </CardContent>
                     </Card>
-                ))}
-            </div>
+                  </a>
+                ) : (
+                  <Card className="group h-full flex flex-col rounded-2xl bg-white shadow-md transition duration-300 transform hover:-translate-y-1">
+                    <div className="relative w-full aspect-[16/10]">
+                      <Image
+                        src={moment.image}
+                        alt={moment.title}
+                        fill
+                        className="rounded-t-xl object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                    <CardContent className="p-5">
+                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                        {moment.title}
+                      </h3>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
 
-            {/* View All Button */}
-            <Button className="bg-primary text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg">
-                View All
-            </Button>
-        </Container>
-    );
+        {/* Carousel Navigation */}
+        <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+        <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+      </Carousel>
+    </Container>
+  );
 };
 
 export default OurBigMoments;
