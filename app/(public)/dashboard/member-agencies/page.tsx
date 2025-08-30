@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Container from "@/components/shared/container";
@@ -22,7 +21,6 @@ import { BASE_URL } from "@/lib/constant";
 import {
   useDeleteAgencyMutation,
   useGetAgenciesByUserIdQuery,
-  useGetAllAgencyQuery,
 } from "@/redux/features/agency/agencyApi";
 import { useAuthUser } from "@/redux/features/auth/authSlice";
 
@@ -62,37 +60,30 @@ export default function AgencyPage() {
   // Delete mutation
   const [deleteAgency, { isLoading: isDeleting }] = useDeleteAgencyMutation();
 
-  console.log("Current user:", user);
-  console.log("User ID:", userId);
-
+  // Fetch agencies using the most reliable endpoint
   const {
     data: agenciesData,
     isLoading,
     isError,
-
-    refetch,
   } = useGetAgenciesByUserIdQuery(userId || "", {
     skip: !userId, // Skip the query if no user ID
   });
 
-  // Also try getting all agencies to see if there's a filtering issue
-  const { data: allAgenciesData, refetch: refetchAllAgencies } =
-    useGetAllAgencyQuery([{ name: "creatorId", value: userId || "" }], {
-      skip: !userId,
-    });
-
   // Handle agency deletion
   const handleDeleteAgency = async (agencyId: string, agencyName: string) => {
     try {
+      console.log(`Attempting to delete agency with ID: ${agencyId}`);
       await deleteAgency(agencyId).unwrap();
-      // Manually refetch the data to update the UI
-      refetch();
-      refetchAllAgencies();
+      toast.success(`Agency "${agencyName}" deleted successfully!`);
+      // The invalidatesTags should handle the UI update automatically.
     } catch (error: unknown) {
-      // Provide more specific error messages
-      const errorStatus = (error as ApiError)?.status;
-      const errorData = (error as ApiError)?.data;
-      const errorMessage = (error as ApiError)?.message;
+      console.error("Failed to delete agency:", error);
+
+      const apiError = error as ApiError;
+      const errorStatus = apiError?.status;
+      const errorData = apiError?.data;
+
+      console.error("Redux Toolkit error details:", apiError);
 
       if (errorStatus === 401) {
         toast.error("Unauthorized. Please log in again.");
@@ -104,40 +95,24 @@ export default function AgencyPage() {
         toast.error("Server error. Please try again later.");
       } else {
         toast.error(
-          `Failed to delete agency: ${errorData?.message || errorMessage || "Unknown error"}`
+          `Failed to delete agency: ${errorData?.message || "Unknown error"}`
         );
       }
     }
   };
 
-  // Use the first approach, but fall back to the alternative if needed
-  const allAgencies: Agency[] =
-    agenciesData?.data || allAgenciesData?.data || [];
+  const allAgencies: Agency[] = agenciesData?.data || [];
 
-  // Debug: Log all unique status values
-  const uniqueStatuses = Array.from(
-    new Set(allAgencies.map((agency) => agency.status))
-  );
-  console.log("Unique status values:", uniqueStatuses);
-
-  // Filter agencies by user ID first, then by status
+  // Explicitly filter agencies by the current user's ID
   const userAgencies = allAgencies.filter((agency) => {
-    // Check if the agency belongs to the current user
-    // The agency should have a user_id or creator_id field that matches the current user's ID
-    console.log("Agency:", agency);
-    console.log("Agency user_id:", agency.user_id);
-    console.log("Agency creator_id:", agency.creator_id);
-    console.log("Current user ID:", userId);
-
     return (
-      agency.user_id === userId ||
       agency.creator_id === userId ||
+      agency.user_id === userId ||
       agency.user?.id === userId
     );
   });
 
-  console.log("User agencies after filtering:", userAgencies);
-
+  // Filter the user's agencies by the status tab
   const filteredAgencies = userAgencies.filter((agency) => {
     const agencyStatus = agency.status?.toLowerCase();
     const activeTabLower = activeTab.toLowerCase();
@@ -147,23 +122,15 @@ export default function AgencyPage() {
   // Utility function to construct proper image URLs
   const getImageUrl = (imagePath: string | null): string => {
     if (!imagePath) return "/images/member1.png";
-
-    // If it's already a full URL, return as is
     if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
       return imagePath;
     }
-
-    // If it's a blob URL, return as is
     if (imagePath.startsWith("blob:")) {
       return imagePath;
     }
-
-    // If it's a relative path, construct full URL
     if (imagePath.startsWith("/")) {
       return `${BASE_URL}${imagePath}`;
     }
-
-    // If it's just a filename, construct full URL
     return `${BASE_URL}/uploads/${imagePath}`;
   };
 
