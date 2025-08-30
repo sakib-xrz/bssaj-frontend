@@ -161,7 +161,7 @@ export default function OurMembers() {
                       </div>
                     </div>
 
-                    <h3 className="font-semibold text-lg text-[#003366] mb-2 group-hover:text-[#00AEEF] transition-colors">
+                    <h3 className="font-semibold line-clamp-1 text-lg text-[#003366] mb-2 group-hover:text-[#00AEEF] transition-colors">
                       {member.name}
                     </h3>
 

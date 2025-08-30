@@ -36,7 +36,7 @@ export default function Navbar() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Filter navLinks to hide Membership if user is authenticated
-  const filteredNavLinks = navLinks.filter(link => {
+  const filteredNavLinks = navLinks.filter((link) => {
     if (link.name === "Membership" && user?.role === "AGENCY") {
       return false;
     }
@@ -89,6 +89,7 @@ export default function Navbar() {
               priority
             />
           </div>
+          <span className="font-bold text-xl text-[#003366]">BSSAJ</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -99,10 +100,11 @@ export default function Navbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${isActive
+                className={`text-sm font-medium transition-colors ${
+                  isActive
                     ? "text-primary font-semibold"
                     : "text-[#868686] hover:text-primary"
-                  }`}
+                }`}
               >
                 {link.name}
               </Link>
@@ -221,10 +223,11 @@ export default function Navbar() {
                       key={link.name}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className={`text-lg font-medium ${isActive
+                      className={`text-lg font-medium ${
+                        isActive
                           ? "text-primary font-semibold"
                           : "text-gray-700 hover:text-primary"
-                        }`}
+                      }`}
                     >
                       {link.name}
                     </Link>
@@ -241,10 +244,11 @@ export default function Navbar() {
                     <Link
                       href="/dashboard"
                       onClick={() => setOpen(false)}
-                      className={`text-sm font-medium transition-colors ${pathname === "/dashboard"
+                      className={`text-sm font-medium transition-colors ${
+                        pathname === "/dashboard"
                           ? "text-primary font-semibold"
                           : "text-[#868686] hover:text-primary"
-                        }`}
+                      }`}
                     >
                       Profile
                     </Link>

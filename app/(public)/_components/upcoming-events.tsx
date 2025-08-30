@@ -9,7 +9,6 @@ import Error from "./error";
 import EventCard from "./EventCard";
 import Loading from "./loading";
 
-
 const EventsPage = () => {
   const [limit] = useState(6);
 
@@ -43,7 +42,6 @@ const EventsPage = () => {
             <EventCard event={item} key={item.id} />
           ))}
         </div>
-
       </Container>
     </div>
   );
