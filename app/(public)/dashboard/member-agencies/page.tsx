@@ -65,6 +65,7 @@ export default function AgencyPage() {
     data: agenciesData,
     isLoading,
     isError,
+    error,
   } = useGetAgenciesByUserIdQuery(userId || "", {
     skip: !userId, // Skip the query if no user ID
   });
