@@ -3,7 +3,6 @@
 import { useGetAllJobsQuery } from "@/redux/features/jobs/jobApi";
 import React, { useState, useEffect } from "react";
 import { JobCard } from "../../_components/job-card";
-import { Button } from "@/components/ui/button";
 import { Jobs } from "@/lib/types";
 import SectionHeader from "@/components/shared/section-header";
 import { CustomPagination } from "../../_components/CustomPagination";

@@ -22,3 +22,4 @@ export interface DecodedUser {
   profile_picture: string | null;
   role: "USER" | "ADMIN" | string;
 }
+
