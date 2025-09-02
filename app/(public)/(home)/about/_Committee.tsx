@@ -1,41 +1,39 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { useGetAllCommieeQuery } from "@/redux/features/Committee/CommitteeApi";
-import { Card, CardContent } from "@/components/ui/card";
+import Container from "@/components/shared/container";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, User } from "lucide-react";
-import { CommitteeMember } from "@/redux/tagTypes";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetAllCommieeQuery } from "@/redux/features/Committee/CommitteeApi";
+import { Briefcase, Mail, Phone } from "lucide-react";
+import Link from "next/link";
 
 function Committee() {
-  const { isLoading, data } = useGetAllCommieeQuery(
-    [
-        {name:"limit",value:999}
-    ]
-  );
+  const { isLoading, data } = useGetAllCommieeQuery([
+    { name: "limit", value: 999 },
+  ]);
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <p>Loading members...</p>
-      </div>
+      <Container className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-12 md:py-16">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div key={index} className="w-full">
+            <Skeleton className="h-64 w-full rounded-xl" />
+          </div>
+        ))}
+      </Container>
     );
   }
 
   if (!data || data.data.length === 0) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-center">
-          <User className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-4 text-lg font-medium text-gray-900">
-            No members found
-          </h3>
-          <p className="mt-1 text-gray-500">
-            There are currently no committee members to display.
-          </p>
-        </div>
-      </div>
+      <Container className="col-span-full text-center py-20 text-gray-500">
+        <p className="text-lg md:text-xl">
+          No committee members found at the moment. Please check back later!
+        </p>
+      </Container>
     );
   }
 
@@ -57,52 +55,84 @@ function Committee() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {data.data.map((profile: CommitteeMember) => (
+      <Container className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 py-12 md:py-16">
+        {data.data.map((profile: any) => (
           <Card
             key={profile.id}
-            className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border-t-4 border-[#003366]"
+            className="group hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-0 shadow-lg overflow-hidden bg-white"
           >
-            <CardContent className="flex flex-col items-center text-center p-6">
-              {/* Profile Image */}
-              <div className="relative h-32 w-32 mb-4 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                <Image
-                  src={profile.profile_picture || "/placeholder.svg"}
-                  alt={profile.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
+            {/* Gradient top border - same as MemberCard */}
+            <div className="h-2 bg-gradient-to-r from-[#003366]/90 to-[#00AEEF]/90" />
 
-              {/* Name */}
-              <h2 className="text-xl font-bold text-gray-900">
-                {profile.name}
-              </h2>
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center text-center">
+                <div className="relative">
+                  {/* Avatar with ring effects - same as MemberCard */}
+                  <Avatar className="h-24 w-24 ring-4 ring-white shadow-lg group-hover:ring-[#00AEEF]/30 transition-all duration-300">
+                    <AvatarImage
+                      src={profile.profile_picture}
+                      alt={profile.name}
+                    />
+                    <AvatarFallback className="bg-gradient-to-br from-[#00AEEF] to-[#003366] text-white text-xl font-bold">
+                      {profile.name
+                        .split(" ")
+                        .map((n: string) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
 
-              {/* Designation Badge */}
-              <Badge className="mt-2 bg-[#003366] text-white px-3 py-1">
-                {formatDesignation(profile.designation)}
-              </Badge>
+                  {/* Icon overlay - same as MemberCard */}
+                  <div className="absolute -bottom-1 -right-1 p-1.5 bg-gradient-to-r from-[#003366]/90 to-[#00AEEF]/90 rounded-full shadow-lg">
+                    <Briefcase className="h-4 w-4 text-white" />
+                  </div>
+                </div>
 
-              {/* Term */}
-              <div className="flex items-center justify-center mt-3 text-sm text-gray-600">
-                <Calendar className="h-4 w-4 mr-1" />
-                <span>
-                  Term: {profile.term_start_year} - {profile.term_end_year}
-                </span>
-              </div>
+                <div className="mt-4 w-full">
+                  {/* Name - same styling as MemberCard */}
+                  <h3 className="font-bold text-[#003366] text-xl mb-2 group-hover:text-[#00AEEF] transition-colors">
+                    {profile.name}
+                  </h3>
 
-              {/* Member since */}
-              <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
-                <User className="h-4 w-4 mr-1" />
-                <span>
-                  Member since {new Date(profile.created_at).getFullYear()}
-                </span>
+                  {/* Badge - same styling as MemberCard */}
+                  <Badge className="bg-gradient-to-r from-[#003366]/90 to-[#00AEEF]/90 text-white border-0 shadow-sm mb-3">
+                    {formatDesignation(profile.designation)}
+                  </Badge>
+
+                  {/* Contact info - same structure as MemberCard */}
+                  <div className="space-y-2 mb-4">
+                    {profile.email && (
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                        <Mail className="h-4 w-4" />
+                        <span className="truncate">{profile.email}</span>
+                      </div>
+                    )}
+                    {profile.phone && (
+                      <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                        <Phone className="h-4 w-4" />
+                        <span>{profile.phone}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom section - same layout as MemberCard */}
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="text-xs text-gray-500">
+                      Joined {new Date(profile.created_at).toLocaleDateString()}
+                    </div>
+                    <Button
+                      size="sm"
+                      className="bg-gradient-to-r from-[#00AEEF] to-[#0099CC] hover:from-[#0099CC] hover:to-[#00AEEF] text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
+                      asChild
+                    >
+                      <Link href={`/members/${profile.id}`}>View Profile</Link>
+                    </Button>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
         ))}
-      </div>
+      </Container>
     </div>
   );
 }
