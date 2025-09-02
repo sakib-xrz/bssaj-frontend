@@ -1,11 +1,11 @@
 "use client";
 
+import React, { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import Image from "next/image";
 import Container from "../../../components/shared/container";
-
 import {
   Carousel,
   CarouselContent,
@@ -29,6 +29,19 @@ export interface BannerType {
 
 export default function HeroCarousel() {
   const { isLoading, isError, data } = useGetAllBannerQuery(undefined);
+
+  // Ref for the "Next" button
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-slide effect: simulate click on "Next" button
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (nextBtnRef.current) {
+        nextBtnRef.current.click();
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (isError) {
     return (
@@ -113,7 +126,10 @@ export default function HeroCarousel() {
             <ChevronLeft className="w-5 h-5" />
           </CarouselPrevious>
 
-          <CarouselNext className="hidden sm:flex absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center">
+          <CarouselNext
+            ref={nextBtnRef}
+            className="hidden sm:flex absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center"
+          >
             <ChevronRight className="w-5 h-5" />
           </CarouselNext>
         </Carousel>
