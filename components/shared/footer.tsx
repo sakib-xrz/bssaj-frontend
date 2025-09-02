@@ -103,14 +103,6 @@ const Footer: React.FC = () => {
                 Scholarships
               </Link>
             </li>
-            <li>
-              <Link
-                href="/grievance"
-                className="hover:text-white transition-colors duration-200"
-              >
-                Grievance & Suggestions
-              </Link>
-            </li>
           </ul>
         </div>
         <div className="col-span-1">
