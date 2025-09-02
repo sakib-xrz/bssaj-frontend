@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Container from "@/components/shared/container";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,10 +11,28 @@ import {
 } from "@/components/ui/carousel";
 import { GalleryItem } from "@/lib/types";
 import { useGeteAllGalleryQuery } from "@/redux/features/gallery/galleryApi";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
 
 const OurBigMoments = () => {
   const { data: mainData } = useGeteAllGalleryQuery(undefined);
   const data: GalleryItem[] = mainData?.data || [];
+
+  // Ref for the "Next" button
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-slide effect: simulate click on "Next" button - more aggressive to ensure continuous movement
+  useEffect(() => {
+    if (!data || data.length === 0) return;
+
+    const interval = setInterval(() => {
+      if (nextBtnRef.current) {
+        nextBtnRef.current.click();
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [data]);
 
   return (
     <Container className="py-12 flex flex-col items-center">
@@ -30,7 +47,10 @@ const OurBigMoments = () => {
       </div>
 
       {/* Carousel */}
-      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+      <Carousel
+        opts={{ align: "start", loop: true, skipSnaps: false }}
+        className="w-full"
+      >
         <CarouselContent className="-ml-4">
           {data.map((moment: GalleryItem) => (
             <CarouselItem
@@ -86,7 +106,10 @@ const OurBigMoments = () => {
 
         {/* Carousel Navigation */}
         <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
-        <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+        <CarouselNext
+          ref={nextBtnRef}
+          className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center"
+        />
       </Carousel>
     </Container>
   );

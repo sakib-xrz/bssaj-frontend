@@ -1,11 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
-import Image from "next/image";
-import Container from "../../../components/shared/container";
 import {
   Carousel,
   CarouselContent,
@@ -13,8 +8,12 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllBannerQuery } from "@/redux/features/banner/bannerApi";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
+import Container from "../../../components/shared/container";
 
 // Type for banner data
 export interface BannerType {
@@ -33,15 +32,18 @@ export default function HeroCarousel() {
   // Ref for the "Next" button
   const nextBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Auto-slide effect: simulate click on "Next" button
+  // Auto-slide effect: simulate click on "Next" button - more aggressive to ensure continuous movement
   useEffect(() => {
+    if (!data || data.length === 0) return;
+
     const interval = setInterval(() => {
       if (nextBtnRef.current) {
         nextBtnRef.current.click();
       }
-    }, 3000);
+    }, 3500);
+
     return () => clearInterval(interval);
-  }, []);
+  }, [data]);
 
   if (isError) {
     return (
@@ -79,10 +81,31 @@ export default function HeroCarousel() {
 
   const banners: BannerType[] = data || [];
 
+  if (banners.length === 0) {
+    return (
+      <section className="relative w-full py-16 md:py-24 bg-gradient-to-r from-white to-blue-100 overflow-hidden">
+        <Container>
+          <div className="text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-5xl leading-tight text-primary mb-6">
+              Welcome to BSSAJ
+            </h1>
+            <p className="max-w-[700px] text-lg md:text-xl mx-auto text-muted-foreground mb-8">
+              Supporting Bangladeshi students in Japan with guidance, resources,
+              and community.
+            </p>
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
   return (
     <section className="relative w-full py-16 md:py-24 bg-gradient-to-r from-white to-blue-100 overflow-hidden">
       <Container>
-        <Carousel opts={{ align: "start", loop: true }} className="w-full">
+        <Carousel
+          opts={{ align: "start", loop: true, skipSnaps: false }}
+          className="w-full"
+        >
           <CarouselContent>
             {banners.map((banner) => (
               <CarouselItem key={banner.id}>
@@ -122,16 +145,11 @@ export default function HeroCarousel() {
           </CarouselContent>
 
           {/* Carousel controls */}
-          <CarouselPrevious className="hidden sm:flex absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center">
-            <ChevronLeft className="w-5 h-5" />
-          </CarouselPrevious>
-
+          <CarouselPrevious className="hidden sm:flex absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center" />
           <CarouselNext
             ref={nextBtnRef}
             className="hidden sm:flex absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 hover:scale-110 transition-transform duration-300 z-20 items-center justify-center"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </CarouselNext>
+          />
         </Carousel>
       </Container>
     </section>

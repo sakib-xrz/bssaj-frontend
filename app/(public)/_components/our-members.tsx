@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 
+import Container from "@/components/shared/container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { MemberType } from "@/lib/types";
+import { useGetMembersQuery } from "@/redux/features/member/memberApi";
 import {
   Award,
   Briefcase,
@@ -23,9 +26,6 @@ import {
   Star,
 } from "lucide-react";
 import Link from "next/link";
-import Container from "@/components/shared/container";
-import { useGetMembersQuery } from "@/redux/features/member/memberApi";
-import { MemberType } from "@/lib/types";
 
 const memberKindIcons = {
   ADVISER: Crown,
@@ -60,16 +60,6 @@ export default function OurMembers() {
   // Ref for the "Next" button
   const nextBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Auto-slide effect: simulate click on "Next" button
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (nextBtnRef.current) {
-        nextBtnRef.current.click();
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
   const memberKindPriority = {
     ADVISER: 1,
     HONORABLE: 2,
@@ -83,6 +73,19 @@ export default function OurMembers() {
       memberKindPriority[a.kind as keyof typeof memberKindPriority] -
       memberKindPriority[b.kind as keyof typeof memberKindPriority]
   );
+
+  // Auto-slide effect: simulate click on "Next" button - more aggressive to ensure continuous movement
+  useEffect(() => {
+    if (!sortedMembers || sortedMembers.length === 0) return;
+
+    const interval = setInterval(() => {
+      if (nextBtnRef.current) {
+        nextBtnRef.current.click();
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [sortedMembers]);
 
   if (isLoading) {
     return (
@@ -125,7 +128,10 @@ export default function OurMembers() {
         </p>
       </div>
 
-      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+      <Carousel
+        opts={{ align: "start", loop: true, skipSnaps: false }}
+        className="w-full"
+      >
         <CarouselContent className="-ml-4">
           {sortedMembers.map((member) => {
             const Icon =

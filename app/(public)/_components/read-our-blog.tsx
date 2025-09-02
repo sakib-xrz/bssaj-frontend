@@ -1,5 +1,4 @@
 "use client";
-import React, { useRef, useEffect } from "react";
 import Container from "@/components/shared/container";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -13,6 +12,7 @@ import { Blog } from "@/lib/types";
 import { useGetAllBlogsQuery } from "@/redux/features/blog/blogApi";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 const ReadOurBlog = () => {
   const { data: mainData } = useGetAllBlogsQuery([]);
@@ -23,15 +23,18 @@ const ReadOurBlog = () => {
   // Ref for the "Next" button
   const nextBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Auto-slide effect: simulate click on "Next" button
+  // Auto-slide effect: simulate click on "Next" button - more aggressive to ensure continuous movement
   useEffect(() => {
+    if (!data || data.length === 0) return;
+
     const interval = setInterval(() => {
       if (nextBtnRef.current) {
         nextBtnRef.current.click();
       }
-    }, 3000);
+    }, 3500); 
+
     return () => clearInterval(interval);
-  }, []);
+  }, [data]);
 
   const showCarouselNavigation = data && data.length > 3;
 
@@ -46,7 +49,11 @@ const ReadOurBlog = () => {
           - curated to inspire and inform.
         </p>
       </div>
-      <Carousel opts={{ align: "start", loop: true }} className="w-full">
+
+      <Carousel
+        opts={{ align: "start", loop: true, skipSnaps: false }}
+        className="w-full"
+      >
         <CarouselContent className="-ml-4">
           {data?.map((post: Blog) => (
             <CarouselItem
