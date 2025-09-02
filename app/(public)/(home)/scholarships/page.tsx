@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useCreateScholarshipMutation } from "@/redux/features/scholarship/scholarshipApi";
 
 // Define the validation schema using Zod
 const formSchema = z.object({
@@ -56,6 +57,8 @@ const formSchema = z.object({
 
 export default function ScholarshipPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createScholarship, { isLoading: isCreating }] =
+    useCreateScholarshipMutation();
 
   // Initialize the form with react-hook-form
   const form = useForm<z.infer<typeof formSchema>>({
@@ -75,14 +78,19 @@ export default function ScholarshipPage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      console.log("Submitting form with data:", values);
+      await createScholarship({
+        ...values,
+        deadline: values.deadline ? values.deadline.toISOString() : undefined,
+      }).unwrap();
 
       toast.success("Scholarship application submitted successfully!");
-      form.reset(); // Reset form on success
-    } catch (error) {
-      console.error("Failed to submit scholarship:", error);
-      toast.error("Failed to submit scholarship. Please try again.");
+      form.reset();
+    } catch (error: unknown) {
+      const errMessage = (error as { data?: { message?: string } })?.data
+        ?.message;
+      toast.error(
+        errMessage || "Failed to submit scholarship. Please try again."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -287,9 +295,11 @@ export default function ScholarshipPage() {
                     <Button
                       type="submit"
                       className="w-full bg-primary hover:from-blue-600 hover:to-primary text-white font-semibold py-3 rounded-lg shadow-lg transition"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || isCreating}
                     >
-                      {isSubmitting ? "Submitting..." : "Submit Scholarship"}
+                      {isSubmitting || isCreating
+                        ? "Submitting..."
+                        : "Submit Scholarship"}
                     </Button>
                   </div>
                 </form>
