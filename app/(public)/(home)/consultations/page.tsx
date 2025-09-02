@@ -1,25 +1,36 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import Container from "@/components/shared/container";
+import SectionHeader from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardTitle,
   CardDescription,
+  CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useCreateConsultationMutation } from "@/redux/features/consultation/consultationApi";
+import {
+  BriefcaseIcon,
   CalendarDaysIcon,
   CheckCircleIcon,
-  GraduationCapIcon,
-  BriefcaseIcon,
-  FileTextIcon,
-  UserIcon,
   ClockIcon,
+  FileTextIcon,
+  GraduationCapIcon,
+  UserIcon,
 } from "lucide-react";
-import Container from "@/components/shared/container";
-import SectionHeader from "@/components/shared/section-header";
+import React, { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 interface ConsultationServiceProps {
   id: string;
@@ -100,6 +111,60 @@ const consultationServices: ConsultationServiceProps[] = [
 ];
 
 const Consultations: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [formData, setFormData] = useState({
+    kind: "ACADEMIC_CONSULTATION" as string,
+    name: "John Doe example",
+    email: "john.doe@example.com",
+    phone: "+1234567890",
+    message:
+      "I need consultation regarding my academic career path and course selection for studying abroad.",
+  });
+
+  const [createConsultation, { isLoading: isSubmitting }] =
+    useCreateConsultationMutation();
+
+  const serviceIdToKind = useMemo(
+    () =>
+      ({
+        academic: "ACADEMIC_CONSULTATION",
+        career: "CAREER_CONSULTATION",
+        visa: "VISA_AND_IMMIGRATION_CONSULTATION",
+        personal: "PERSONAL_CONSULTATION",
+      }) as Record<string, string>,
+    []
+  );
+
+  const handleOpenModal = (serviceId: string) => {
+    const mappedKind = serviceIdToKind[serviceId] || "ACADEMIC_CONSULTATION";
+    setFormData((prev) => ({
+      ...prev,
+      kind: mappedKind,
+    }));
+    setIsOpen(true);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await createConsultation(formData).unwrap();
+      toast.success("Consultation request submitted successfully");
+      setIsOpen(false);
+    } catch (error: unknown) {
+      const errMessage = (error as { data?: { message?: string } })?.data
+        ?.message;
+      toast.error(errMessage || "Failed to submit consultation request");
+    }
+  };
+
   return (
     <div>
       <div className="bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-20 text-center">
@@ -162,16 +227,99 @@ const Consultations: React.FC = () => {
                 </ul>
 
                 <Button
-                  asChild
                   className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg transition-colors duration-200 text-lg shadow-md mt-auto"
+                  onClick={() => handleOpenModal(service.id)}
                 >
-                  <Link href={service.link}>Book {service.title} </Link>
+                  Book {service.title}
                 </Button>
               </CardContent>
             </Card>
           ))}
         </div>
       </Container>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Book a Consultation</DialogTitle>
+            <DialogDescription>
+              Please provide your details. We&apos;ll contact you to confirm
+              your booking.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="kind">Consultation Type</Label>
+              <Input
+                id="kind"
+                name="kind"
+                value={formData.kind}
+                onChange={handleChange}
+                disabled
+              />
+            </div>
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="message">Message</Label>
+              <Textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                rows={5}
+                required
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="bg-primary hover:bg-primary/90"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

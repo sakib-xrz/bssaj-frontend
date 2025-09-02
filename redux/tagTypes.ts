@@ -8,9 +8,10 @@ export const tagTypes = {
   certificate: "certificate",
   banners: "banners",
   payments: "payments",
-  jobs:"jobs",
-  committees:"committees",
-  gallery:"gallery"
+  jobs: "jobs",
+  committees: "committees",
+  gallery: "gallery",
+  consultation: "consultation",
 };
 
 export const tagTypesList = [
@@ -23,7 +24,8 @@ export const tagTypesList = [
   tagTypes.banners,
   tagTypes.payments,
   tagTypes.jobs,
-  tagTypes.committees
+  tagTypes.committees,
+  tagTypes.consultation,
 ];
 
 export type CommitteeMember = {

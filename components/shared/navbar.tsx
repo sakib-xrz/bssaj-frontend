@@ -13,7 +13,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { navLinks } from "@/lib/data";
 import { persistor } from "@/redux/store";
-import { ChevronDown, LogOut, MenuIcon, User } from "lucide-react";
+import { LogOut, MenuIcon, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -110,10 +110,6 @@ export default function Navbar() {
               </Link>
             );
           })}
-
-          <Button className="text-muted bg-[#00AEEF] hover:bg-[#00AEEF]/90">
-            En <ChevronDown className="ml-1 h-4 w-4" />
-          </Button>
 
           {user ? (
             <>
