@@ -3,11 +3,45 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Blog } from "@/lib/types";
 import { format } from "date-fns";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function BlogCard({ blog }: { blog: Blog }) {
+  const [imageError, setImageError] = useState(false);
+
+  // Safety check - if no blog data, show a placeholder
+  if (!blog) {
+    return (
+      <div className="max-w-md mx-auto">
+        <Card className="overflow-hidden border-0 shadow-lg h-full">
+          <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+            <div className="text-gray-400 text-center">
+              <FileText className="h-12 w-12 mx-auto mb-2" />
+              <p>No blog data</p>
+            </div>
+          </div>
+          <div className="p-6 bg-white">
+            <h2 className="text-xl font-bold text-gray-400 mb-3">No Title</h2>
+            <p className="text-gray-400 text-sm mb-6">No content available</p>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-8 w-8 bg-gray-300">
+                <AvatarFallback className="text-gray-600 text-xs">
+                  NA
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-gray-400 text-sm">No Author</p>
+                <p className="text-gray-400 text-xs">No Date</p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   // Helper functions to safely handle missing data
   const getSafeTitle = () => {
     return blog?.title || "Untitled Blog Post";
@@ -46,29 +80,44 @@ export default function BlogCard({ blog }: { blog: Blog }) {
   };
 
   const getSafeImageSrc = () => {
-    return blog?.cover_image || "/images/blog-1.png";
+    // If no cover image or empty string, return null to show placeholder
+    if (!blog?.cover_image || blog.cover_image.trim() === "") {
+      return null;
+    }
+
+    // If the cover image is a valid URL or path, use it
+    return blog.cover_image;
   };
 
   const getSafeImageAlt = () => {
     return blog?.title || "Blog post image";
   };
 
+  // Check if we should show an image or placeholder
+  const shouldShowImage = getSafeImageSrc() && !imageError;
+
   return (
     <div className="max-w-md mx-auto">
       <Card className="overflow-hidden border-0 shadow-lg h-full">
         {/* Blog Cover Image */}
         <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
-          <Image
-            src={getSafeImageSrc()}
-            alt={getSafeImageAlt()}
-            fill
-            className="object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/images/blog-1.png";
-              target.onerror = null;
-            }}
-          />
+          {shouldShowImage ? (
+            <Image
+              src={getSafeImageSrc()!}
+              alt={getSafeImageAlt()}
+              fill
+              className="object-cover"
+              priority={false}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center text-gray-400">
+                <ImageIcon className="h-16 w-16 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No Image Available</p>
+              </div>
+            </div>
+          )}
 
           {/* Optional Back Button or Tag can go here */}
           <Button
@@ -82,7 +131,10 @@ export default function BlogCard({ blog }: { blog: Blog }) {
 
         {/* Content Section */}
         <div className="p-6 bg-white flex flex-col h-full">
-          <Link href={`/blog/${blog?.id}`} className="flex-grow">
+          <Link
+            href={blog?.id ? `/blog/${blog.id}` : "#"}
+            className="flex-grow"
+          >
             <h2 className="text-xl font-bold line-clamp-1 text-gray-900 mb-3 leading-tight hover:text-primary transition-colors">
               {getSafeTitle()}
             </h2>
@@ -99,10 +151,6 @@ export default function BlogCard({ blog }: { blog: Blog }) {
               <AvatarImage
                 src={blog?.author?.profile_picture || ""}
                 alt={getSafeAuthorName()}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = "none";
-                }}
               />
               <AvatarFallback className="text-white text-xs font-semibold">
                 {getSafeAuthorInitials()}
