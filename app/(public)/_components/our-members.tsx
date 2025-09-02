@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,19 @@ export default function OurMembers() {
     { name: "status", value: "APPROVED" },
   ]);
   const fetchedMembers: MemberType[] = data?.data || [];
+
+  // Ref for the "Next" button
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-slide effect: simulate click on "Next" button
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (nextBtnRef.current) {
+        nextBtnRef.current.click();
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   const memberKindPriority = {
     ADVISER: 1,
@@ -213,7 +227,11 @@ export default function OurMembers() {
         {showCarouselNavigation && (
           <>
             <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
-            <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+            {/* Attach ref to CarouselNext for auto-slide */}
+            <CarouselNext
+              ref={nextBtnRef}
+              className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-10 h-10 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center"
+            />
           </>
         )}
       </Carousel>
