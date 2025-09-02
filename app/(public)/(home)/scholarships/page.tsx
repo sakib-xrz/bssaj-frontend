@@ -1,311 +1,249 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { BuildingIcon, CalendarIcon, ExternalLinkIcon } from "lucide-react";
+import { useEffect } from "react";
 import { toast } from "sonner";
-import * as z from "zod";
 
 import Container from "@/components/shared/container";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { useCreateScholarshipMutation } from "@/redux/features/scholarship/scholarshipApi";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useGetScholarshipsQuery } from "@/redux/features/scholarship/scholarshipApi";
 
-// Define the validation schema using Zod
-const formSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title is required.",
-  }),
-  description: z.string().min(1, {
-    message: "Description is required.",
-  }),
-  eligibility: z.string().min(1, {
-    message: "Eligibility is required.",
-  }),
-  provider: z.string().min(1, {
-    message: "Provider is required.",
-  }),
-  amount: z.string().min(1, {
-    message: "Amount is required.",
-  }),
-  deadline: z.date().refine((date) => !!date, {
-    message: "A deadline is required.",
-  }),
-  application_url: z.string().url({
-    message: "Invalid URL format.",
-  }),
-});
+interface Scholarship {
+  id: string;
+  title: string;
+  description: string;
+  eligibility: string;
+  provider: string;
+  amount: number;
+  deadline: string;
+  application_url: string;
+}
 
 export default function ScholarshipPage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [createScholarship, { isLoading: isCreating }] =
-    useCreateScholarshipMutation();
+  const { data: scholarships, isLoading, error } = useGetScholarshipsQuery({});
 
-  // Initialize the form with react-hook-form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      eligibility: "",
-      provider: "",
-      amount: "",
-      application_url: "",
-      deadline: undefined,
-    },
-  });
-
-  // Handle form submission
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true);
-    try {
-      await createScholarship({
-        ...values,
-        deadline: values.deadline ? values.deadline.toISOString() : undefined,
-      }).unwrap();
-
-      toast.success("Scholarship application submitted successfully!");
-      form.reset();
-    } catch (error: unknown) {
-      const errMessage = (error as { data?: { message?: string } })?.data
-        ?.message;
-      toast.error(
-        errMessage || "Failed to submit scholarship. Please try again."
-      );
-    } finally {
-      setIsSubmitting(false);
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load scholarships");
     }
+  }, [error]);
+
+  // Debug: Log the API response only when it changes
+  useEffect(() => {
+    console.log("Scholarships API Response:", scholarships);
+    console.log("Scholarships type:", typeof scholarships);
+    console.log("Scholarships is array:", Array.isArray(scholarships));
+  }, [scholarships]);
+
+  const handleApply = (applicationUrl: string) => {
+    window.open(applicationUrl, "_blank");
   };
+
+  const formatAmount = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  const formatDeadline = (deadline: string) => {
+    return format(new Date(deadline), "PPP");
+  };
+
+  const isDeadlinePassed = (deadline: string) => {
+    return new Date(deadline) < new Date();
+  };
+
+  // Safely handle different API response structures
+  const getScholarshipsArray = () => {
+    if (!scholarships) return [];
+
+    // If scholarships is directly an array
+    if (Array.isArray(scholarships)) {
+      return scholarships;
+    }
+
+    // If scholarships is an object with a data property (common API structure)
+    if (
+      scholarships &&
+      typeof scholarships === "object" &&
+      "data" in scholarships
+    ) {
+      return Array.isArray(scholarships.data) ? scholarships.data : [];
+    }
+
+    // If scholarships is an object with a results property
+    if (
+      scholarships &&
+      typeof scholarships === "object" &&
+      "results" in scholarships
+    ) {
+      return Array.isArray(scholarships.results) ? scholarships.results : [];
+    }
+
+    // If scholarships is an object with any array property, try to find it
+    if (scholarships && typeof scholarships === "object") {
+      for (const key in scholarships) {
+        if (Array.isArray(scholarships[key])) {
+          return scholarships[key];
+        }
+      }
+    }
+
+    return [];
+  };
+
+  const scholarshipsArray = getScholarshipsArray();
+
+  // Filter only active scholarships (deadline not passed)
+  const activeScholarships = scholarshipsArray.filter(
+    (scholarship: Scholarship) => !isDeadlinePassed(scholarship.deadline)
+  );
+
+  // If no active scholarships, don't show the page
+  if (!isLoading && activeScholarships.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🎓</div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">
+            No Active Scholarships Available
+          </h1>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Currently, there are no active scholarship opportunities. Please
+            check back later for new scholarships or contact us for more
+            information.
+          </p>
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg max-w-md mx-auto">
+            <p className="text-sm text-gray-600">
+              <strong>Debug Info:</strong>
+              <br />
+              Raw API Response: {JSON.stringify(scholarships, null, 2)}
+              <br />
+              Scholarships type: {typeof scholarships}
+              <br />
+              Is Array: {Array.isArray(scholarships) ? "Yes" : "No"}
+              <br />
+              Extracted array length: {scholarshipsArray.length}
+              <br />
+              Active scholarships: {activeScholarships.length}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Loading scholarships...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      {/* Improved Header Section */}
+      {/* Header Section */}
       <div className="relative bg-gradient-to-r from-white via-[#E6F0FF] to-[#B3D7FF] py-24 flex items-center justify-center">
         <div className="absolute inset-0 bg-[url('/header-bg.svg')] bg-cover bg-center opacity-10 pointer-events-none" />
         <div className="relative z-10 text-center max-w-2xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 drop-shadow-lg">
-            Apply for a Scholarship
+            Available Scholarships
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-6">
-            Share scholarship opportunities and help students achieve their
-            dreams. Submit details below!
+            Discover and apply for scholarships to support your educational
+            journey
           </p>
+          {/* Debug info */}
+          <div className="text-sm text-gray-600 bg-white/80 px-4 py-2 rounded-lg">
+            Showing {activeScholarships.length} active scholarships
+          </div>
         </div>
       </div>
 
       <Container className="py-12 md:py-16">
-        <div className="max-w-4xl mx-auto">
-          <Card className="rounded-2xl shadow-2xl border-0 bg-white/80 backdrop-blur-md">
-            <CardContent className="p-10">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-8"
-                >
-                  {/* Title */}
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-semibold">
-                          Scholarship Title
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., Japanese Government Scholarship"
-                            className="rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Provider */}
-                  <FormField
-                    control={form.control}
-                    name="provider"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-semibold">
-                          Provider
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., MEXT, JASSO, etc."
-                            className="rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Amount */}
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-semibold">Amount</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., ¥150,000 per month"
-                            className="rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Deadline */}
-                  <FormField
-                    control={form.control}
-                    name="deadline"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="font-semibold">
-                          Deadline
-                        </FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "w-full rounded-lg pl-3 text-left font-normal border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition",
-                                  !field.value && "text-muted-foreground"
-                                )}
-                              >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date < new Date()}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Description (full width) */}
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel className="font-semibold">
-                          Description
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Provide a detailed description of the scholarship."
-                            className="resize-y rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
-                            rows={4}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Eligibility (full width) */}
-                  <FormField
-                    control={form.control}
-                    name="eligibility"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel className="font-semibold">
-                          Eligibility
-                        </FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="e.g., Must be a Bangladeshi citizen, enrolled in a STEM major, etc."
-                            className="resize-y rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
-                            rows={3}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Application URL (full width) */}
-                  <FormField
-                    control={form.control}
-                    name="application_url"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel className="font-semibold">
-                          Application URL
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="https://example.com/apply"
-                            className="rounded-lg border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/30 transition"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Submit Button (full width) */}
-                  <div className="md:col-span-2">
-                    <Button
-                      type="submit"
-                      className="w-full bg-primary hover:from-blue-600 hover:to-primary text-white font-semibold py-3 rounded-lg shadow-lg transition"
-                      disabled={isSubmitting || isCreating}
-                    >
-                      {isSubmitting || isCreating
-                        ? "Submitting..."
-                        : "Submit Scholarship"}
-                    </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+          {activeScholarships.map((scholarship: Scholarship) => (
+            <Card
+              key={scholarship.id}
+              className="rounded-xl shadow-lg border border-gray-200 bg-white hover:shadow-xl transition-shadow duration-300"
+            >
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between mb-2">
+                  <Badge
+                    variant="default"
+                    className="text-xs bg-green-100 text-green-700"
+                  >
+                    Active
+                  </Badge>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold text-primary">
+                      {formatAmount(scholarship.amount)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Award Amount
+                    </p>
                   </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                </div>
+                <CardTitle className="text-lg font-semibold text-gray-900 leading-tight line-clamp-2">
+                  {scholarship.title}
+                </CardTitle>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <BuildingIcon className="h-4 w-4 mr-2" />
+                  {scholarship.provider}
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                <CardDescription className="text-sm text-gray-600 line-clamp-3">
+                  {scholarship.description}
+                </CardDescription>
+
+                <div className="space-y-2">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <CalendarIcon className="h-4 w-4 mr-2 text-gray-500" />
+                    <span className="text-green-600 font-medium">
+                      Deadline: {formatDeadline(scholarship.deadline)}
+                    </span>
+                  </div>
+
+                  <div className="text-sm">
+                    <p className="font-medium text-gray-700 mb-1">
+                      Eligibility:
+                    </p>
+                    <p className="text-gray-600 line-clamp-2">
+                      {scholarship.eligibility}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={() => handleApply(scholarship.application_url)}
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                  <ExternalLinkIcon className="h-4 w-4" />
+                  Apply Now
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </Container>
     </div>
