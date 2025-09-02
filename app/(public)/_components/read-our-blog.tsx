@@ -1,4 +1,5 @@
 "use client";
+import React, { useRef, useEffect } from "react";
 import Container from "@/components/shared/container";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -18,6 +19,21 @@ const ReadOurBlog = () => {
   const data = mainData?.data?.filter(
     (item: Blog) => item.is_approved === true
   );
+
+  // Ref for the "Next" button
+  const nextBtnRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-slide effect: simulate click on "Next" button
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (nextBtnRef.current) {
+        nextBtnRef.current.click();
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const showCarouselNavigation = data && data.length > 3;
 
   return (
     <Container className="py-12 flex flex-col items-center">
@@ -92,8 +108,16 @@ const ReadOurBlog = () => {
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
-        <CarouselNext className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+        {showCarouselNavigation && (
+          <>
+            <CarouselPrevious className="absolute top-1/2 left-3 sm:left-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center" />
+            {/* Attach ref to CarouselNext for auto-slide */}
+            <CarouselNext
+              ref={nextBtnRef}
+              className="absolute top-1/2 right-3 sm:right-6 -translate-y-1/2 w-8 h-8 rounded-full bg-white text-primary border shadow-lg hover:bg-gray-100 transition z-20 flex items-center justify-center"
+            />
+          </>
+        )}
       </Carousel>
     </Container>
   );
