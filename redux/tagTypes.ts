@@ -12,6 +12,7 @@ export const tagTypes = {
   committees: "committees",
   gallery: "gallery",
   consultation: "consultation",
+  scholarship: "scholarship",
 };
 
 export const tagTypesList = [
@@ -26,6 +27,8 @@ export const tagTypesList = [
   tagTypes.jobs,
   tagTypes.committees,
   tagTypes.consultation,
+  tagTypes.scholarship,
+  tagTypes.gallery,
 ];
 
 export type CommitteeMember = {
