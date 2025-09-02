@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
     <footer className="bg-primary text-gray-200 py-12 px-4 md:px-8">
       <div className="container mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-blue-700">
         <div className="col-span-1">
-          <h3 className="text-2xl font-bold text-white mb-4">BSSAJ</h3>
+          <h3 className="text-2xl font-bold text-red-600 mb-4">BSSAJ</h3>
           <p className="text-sm leading-relaxed">
             Bangladesh Student&#39;s Support in Association Japan is dedicated
             to supporting Bangladeshi students in Japan through community,

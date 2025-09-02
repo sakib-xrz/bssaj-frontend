@@ -89,7 +89,7 @@ export default function Navbar() {
               priority
             />
           </div>
-          <span className="font-bold text-xl text-[#003366]">BSSAJ</span>
+          <span className="font-bold text-xl text-red-600">BSSAJ</span>
         </Link>
 
         {/* Desktop Navigation */}
