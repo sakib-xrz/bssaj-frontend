@@ -27,6 +27,7 @@ import * as Yup from "yup";
 interface BlogFormData {
   title: string;
   content: string;
+  cover_image: File | null;
 }
 
 interface BlogFormProps {
@@ -48,6 +49,7 @@ const blogSchema = Yup.object({
   content: Yup.string()
     .min(10, "Content must be at least 10 characters")
     .required("Content is required"),
+  cover_image: Yup.mixed().required("Cover image is required"),
 });
 
 export function BlogForm({ initialData, onSuccess, onCancel }: BlogFormProps) {
@@ -73,18 +75,27 @@ export function BlogForm({ initialData, onSuccess, onCancel }: BlogFormProps) {
     initialValues: {
       title: initialData?.title || "",
       content: initialData?.content || "",
+      cover_image: null,
     },
     validationSchema: blogSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
       try {
+        // Validate cover image is present
+        if (!coverImage && !coverImagePreview) {
+          toast.error("Cover image is required");
+          return;
+        }
+
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("content", values.content);
 
-        // FIXED: Changed from 'file' to 'cover_image' to match backend expectation
         if (coverImage) {
           formData.append("cover_image", coverImage);
+        } else if (coverImagePreview && initialData?.cover_image) {
+          // For editing, if no new image is selected, use the existing one
+          formData.append("cover_image", initialData.cover_image);
         }
 
         if (isEditing && initialData?.id) {
@@ -170,7 +181,7 @@ export function BlogForm({ initialData, onSuccess, onCancel }: BlogFormProps) {
 
           {/* Cover Image */}
           <div className="space-y-2">
-            <Label htmlFor="cover_photo">Cover Image (Optional)</Label>
+            <Label htmlFor="cover_photo">Cover Image *</Label>
             <div className="flex flex-col gap-4">
               <Input
                 id="cover_photo"
@@ -193,7 +204,12 @@ export function BlogForm({ initialData, onSuccess, onCancel }: BlogFormProps) {
                     size="icon"
                     className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
                     onClick={() => {
-                      URL.revokeObjectURL(coverImagePreview);
+                      if (
+                        coverImagePreview &&
+                        coverImagePreview !== initialData?.cover_image
+                      ) {
+                        URL.revokeObjectURL(coverImagePreview);
+                      }
                       setCoverImagePreview(null);
                       setCoverImage(null);
                     }}
@@ -208,12 +224,18 @@ export function BlogForm({ initialData, onSuccess, onCancel }: BlogFormProps) {
                   onClick={() =>
                     document.getElementById("cover_photo")?.click()
                   }
+                  className={
+                    !coverImagePreview ? "border-red-300 bg-red-50" : ""
+                  }
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   Upload Cover Image
                 </Button>
               )}
             </div>
+            {!coverImagePreview && (
+              <p className="text-sm text-red-500">Cover image is required</p>
+            )}
             <p className="text-xs text-gray-500">
               Upload a cover image to showcase your blog (recommended size:
               1200x400px)

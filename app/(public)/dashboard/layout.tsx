@@ -109,8 +109,8 @@ export default function DashboardLayout({
           )}
         >
           <div className="flex flex-col h-full">
-            <div className="p-4 text-xl font-bold text-primary flex items-center justify-between">
-              <Link href="/">Bssaj</Link>
+            <div className="p-4 text-xl font-bold text-red-600 flex items-center justify-between">
+              <Link href="/">BSSAJ</Link>
               <button
                 className="lg:hidden"
                 onClick={() => setSidebarOpen(false)}
