@@ -3,12 +3,11 @@
 import Container from "@/components/shared/container";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetAllCommieeQuery } from "@/redux/features/Committee/CommitteeApi";
 import { Briefcase, Mail, Phone } from "lucide-react";
-import Link from "next/link";
 
 function Committee() {
   const { isLoading, data } = useGetAllCommieeQuery([
@@ -119,13 +118,6 @@ function Committee() {
                     <div className="text-xs text-gray-500">
                       Joined {new Date(profile.created_at).toLocaleDateString()}
                     </div>
-                    <Button
-                      size="sm"
-                      className="bg-gradient-to-r from-[#00AEEF] to-[#0099CC] hover:from-[#0099CC] hover:to-[#00AEEF] text-white border-0 shadow-md hover:shadow-lg transition-all duration-300"
-                      asChild
-                    >
-                      <Link href={`/members/${profile.id}`}>View Profile</Link>
-                    </Button>
                   </div>
                 </div>
               </div>

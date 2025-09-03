@@ -31,10 +31,11 @@ const Blogs = () => {
   const user = useAuthUser();
 
   const { data, isLoading, isError, error, refetch } = useGetAllBlogsQuery([
-    {
-      name: "is_approved",
-      value: true,
-    },
+    // Remove the is_approved filter to get all blogs
+    // {
+    //   name: "is_approved",
+    //   value: true,
+    // },
   ]);
 
   const blogs = data?.data || [];
@@ -83,6 +84,12 @@ const Blogs = () => {
       blog.author?.id === user?.id &&
       (activeTab === "Approved" ? blog.is_approved : !blog.is_approved)
   );
+
+  // Debug logging
+  console.log("All blogs:", blogs);
+  console.log("User ID:", user?.id);
+  console.log("Active tab:", activeTab);
+  console.log("Filtered blogs:", filteredBlogs);
 
   return (
     <Container className="py-12 md:py-16">
@@ -151,7 +158,7 @@ const Blogs = () => {
                     <CardTitle className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                       {blog.title}
                     </CardTitle>
-                    <CardDescription className="text-sm text-gray-600 line-clamp-3 mb-4">
+                    <CardDescription className="text-sm text-gray-600 line-clamp-2 mb-4">
                       {blog.content.replace(/<[^>]*>/g, "").substring(0, 100)}
                       ...
                     </CardDescription>
