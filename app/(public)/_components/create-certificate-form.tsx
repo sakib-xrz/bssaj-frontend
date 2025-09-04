@@ -400,111 +400,42 @@ async function onSubmit(values: FormValues) {
                 Certificate Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-4">
-                <div className="space-y-3">
-                  <FormLabel>Issue Date</FormLabel>
-
-                  {useAdvancedIssueDate ? (
-                    <div className="p-3 border rounded-md bg-muted/50">
-                      <p className="text-sm">
-                        Certificate will be issued on:{" "}
-                        {format(advancedIssueDate!, "PPP")}
-                      </p>
-                    </div>
-                  ) : (
-                    <FormField
-                      control={form.control}
-                      name="issued_at"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-col">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant="outline"
-                                  className={cn(
-                                    "w-full pl-3 text-left font-normal",
-                                    !field.value && "text-muted-foreground"
-                                  )}
-                                >
-                                  {field.value
-                                    ? format(field.value, "PPP")
-                                    : "Pick issue date"}
-                                  <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <div className="flex items-center justify-between pt-2 px-3">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const currentYear =
-                                      field.value?.getFullYear() ||
-                                      new Date().getFullYear();
-                                    field.onChange(
-                                      new Date(currentYear - 1, 0, 1)
-                                    );
-                                  }}
-                                >
-                                  <ChevronLeftIcon className="h-4 w-4 mr-1" />
-                                  Previous Year
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const currentYear =
-                                      field.value?.getFullYear() ||
-                                      new Date().getFullYear();
-                                    field.onChange(
-                                      new Date(currentYear + 1, 0, 1)
-                                    );
-                                  }}
-                                >
-                                  Next Year
-                                  <ChevronRightIcon className="h-4 w-4 ml-1" />
-                                </Button>
-                              </div>
-                              <Calendar
-                                mode="single"
-                                selected={field.value || undefined}
-                                onSelect={field.onChange}
-                                disabled={(date) =>
-                                  date > new Date() ||
-                                  date < new Date("1900-01-01")
-                                }
-                                initialFocus
-                                captionLayout="dropdown" // ✅ fixed
-                                fromYear={1900}
-                                toYear={new Date().getFullYear() + 5}
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="grade"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Grade</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter institute grade" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <div className="space-y-3">
+                <FormLabel>Issue Date</FormLabel>
+                {useAdvancedIssueDate ? (
+                  <div className="p-3 border rounded-md bg-muted/50">
+                    <p className="text-sm">
+                      Certificate will be issued on:{" "}
+                      {advancedIssueDate && format(advancedIssueDate, "PPP")}
+                    </p>
+                  </div>
+                ) : (
+                  <FormField
+                    control={form.control}
+                    name="issued_at"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            {...field}
+                            value={
+                              field.value
+                                ? format(field.value, "yyyy-MM-dd")
+                                : ""
+                            }
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value ? new Date(e.target.value) : null
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
             </div>
 
