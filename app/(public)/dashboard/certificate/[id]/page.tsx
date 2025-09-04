@@ -45,7 +45,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-
 interface FormValues {
   name: string;
   date_of_birth: Date | undefined;
@@ -184,7 +183,7 @@ export default function StudentCertificateEditForm() {
   if (isCertificateLoading) {
     return <div>Loading certificate data...</div>;
   }
-  console.log(singleCartificate);
+
   return (
     <Card className="container mx-auto shadow-xl border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
       <CardHeader className="space-y-1 pb-6 sticky top-0 bg-white/80 dark:bg-gray-800/80 z-10">
@@ -248,13 +247,11 @@ export default function StudentCertificateEditForm() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("1900-01-01")
-                            }
+                            disabled={(date) => date < new Date("1900-01-01")}
                             initialFocus
                             captionLayout="dropdown"
                             fromYear={1900}
-                            toYear={new Date().getFullYear()}
+                            toYear={new Date().getFullYear() + 10}
                           />
                         </PopoverContent>
                       </Popover>
@@ -471,11 +468,14 @@ export default function StudentCertificateEditForm() {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < new Date("1900-01-01")}
+                            // Fixed: Disable future dates
+                            disabled={(date) =>
+                              date < new Date() || date < new Date("1900-01-01")
+                            }
                             initialFocus
                             captionLayout="dropdown"
                             fromYear={1900}
-                            toYear={new Date().getFullYear() + 5}
+                            toYear={new Date().getFullYear() + 10} // Only show up to current year
                           />
                         </PopoverContent>
                       </Popover>
