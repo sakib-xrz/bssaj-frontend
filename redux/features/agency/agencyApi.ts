@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
-
+interface IQueryItem {
+  name: string;
+  value: string | number | boolean | undefined;
+}
 export const agencyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Agency Endpoints
     createAgency: builder.mutation({
       query: (data) => ({
         url: `/agencies`,
@@ -54,23 +56,25 @@ export const agencyApi = baseApi.injectEndpoints({
       }),
       providesTags: [tagTypes.Agency],
     }),
-
     getAllAgency: builder.query({
-      query: (args: any) => {
-        const queryString = new URLSearchParams(
-          args.reduce(
-            (
-              acc: Record<string, string>,
-              { name, value }: { name: string; value: string }
-            ) => {
-              if (value) acc[name] = value;
-              return acc;
-            },
-            {} as Record<string, string>
-          )
-        ).toString();
+      query: (args: IQueryItem[]) => {
+        const params = new URLSearchParams();
+
+        args.forEach(({ name, value }) => {
+          if (
+            value !== undefined &&
+            value !== null &&
+            value !== "" &&
+            (typeof value === "string" ||
+              typeof value === "number" ||
+              typeof value === "boolean")
+          ) {
+            params.append(name, String(value));
+          }
+        });
+
         return {
-          url: `/agencies?${queryString}`,
+          url: `/agencies?${params.toString()}`,
           method: "GET",
         };
       },
