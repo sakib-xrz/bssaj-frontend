@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Download, PlusIcon, QrCode } from "lucide-react";
-import { useState } from "react";
+import { use, useState } from "react";
 import { StudentCertificateForm } from "../../_components/create-certificate-form";
 import { useGetAllCartificateQuery } from "@/redux/features/certificate/certificateApi";
 import Loading from "../../_components/loading";
@@ -27,13 +27,23 @@ import QRCodeGenerator from "@/components/shared/qr-code-generator";
 import { FRONTEND_URL } from "@/lib/constant";
 import Link from "next/link";
 import { Certificate } from "@/lib/types";
+import { CustomPagination } from "../../_components/CustomPagination";
 
 function Page() {
   const [isOpen, setIsOpen] = useState(false);
-  const { isLoading, isError, data } = useGetAllCartificateQuery(undefined, {
-    refetchOnMountOrArgChange: true,
-  });
-
+  const [page,setPage] = useState(1)
+  const [limit,setLimit]=useState(10)
+  const { isLoading, isError, data } = useGetAllCartificateQuery(
+    [
+      { name: "limit", value: limit },
+      { name: "page", value: page },
+    ],
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+   const totalItems = data?.meta?.total || 0;
+   const totalPages = Math.ceil(totalItems / limit);
   const downloadQRCode = (sl_no: string) => {
     const canvas = document.querySelector(`#qrcode-${sl_no} canvas`);
     if (!canvas) {
@@ -199,6 +209,14 @@ function Page() {
             </div>
           ))}
         </div>
+      </div>
+      <div className="flex justify-center py-10">
+        <CustomPagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                className="mb-10"
+              />
       </div>
     </>
   );

@@ -1,6 +1,9 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { tagTypes } from "@/redux/tagTypes";
-
+interface IQueryItem {
+  name: string;
+  value: string | number | boolean | undefined;
+}
 export const certificateApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     verifyCertificate: builder.query({
@@ -18,17 +21,35 @@ export const certificateApi = baseApi.injectEndpoints({
       invalidatesTags: [tagTypes.certificate],
     }),
     updateCertificate: builder.mutation({
-      query: ({data,id}) => ({
+      query: ({ data, id }) => ({
         url: `/certifications/${id}`,
         method: "PATCH",
         body: data,
       }),
       invalidatesTags: [tagTypes.certificate],
     }),
+    // getAllCartificate: builder.query({
+    //   query: () => ({
+    //     url: `/certifications/my-agencies`,
+    //   }),
+    //   providesTags: [tagTypes.certificate],
+    // }),
     getAllCartificate: builder.query({
-      query: () => ({
-        url: `/certifications/my-agencies`,
-      }),
+      query: (args: IQueryItem[]) => {
+        const queryString = new URLSearchParams(
+          args.reduce((acc: Record<string, any>, { name, value }) => {
+            if (value !== undefined && value !== null) {
+              acc[name] = value;
+            }
+            return acc;
+          }, {})
+        ).toString();
+
+        return {
+          url: `/certifications/my-agencies?${queryString}`,
+          method: "GET",
+        };
+      },
       providesTags: [tagTypes.certificate],
     }),
     getSingleCartificate: builder.query({
