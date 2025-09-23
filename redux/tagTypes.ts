@@ -13,6 +13,7 @@ export const tagTypes = {
   gallery: "gallery",
   consultation: "consultation",
   scholarship: "scholarship",
+  event:"event"
 };
 
 export const tagTypesList = [

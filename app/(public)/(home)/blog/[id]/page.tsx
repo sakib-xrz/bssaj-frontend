@@ -30,7 +30,7 @@ export async function generateMetadata({
     openGraph: {
       title: blog.title,
       description: blog?.excerpt || blog?.content?.slice(0, 150),
-      url: `https://your-domain.com/blogs/${params.id}`,
+      url: `https://api.bssaj.org/api/v1/blogs/${params.id}`,
       images: [
         {
           url: blog.cover_image || "/placeholder.png",
@@ -98,8 +98,6 @@ export default async function SingleBlogPage({
               </Badge>
             )}
           </div>
-
-          {/* ✅ Share button */}
           <ShareButton />
         </div>
 

@@ -23,14 +23,14 @@ export const eventApi = baseApi.injectEndpoints({
                     method: "GET",
                 };
             },
-            providesTags: [tagTypes.blog],
+            providesTags: [tagTypes.event],
         }),
         getSinglEvent: builder.query({
             query: (id) => ({
                 url: `/events/${id}`,
                 method: "GET",
             }),
-            providesTags: [tagTypes.blog],
+            providesTags: [tagTypes.event],
         }),
     }),
 });
