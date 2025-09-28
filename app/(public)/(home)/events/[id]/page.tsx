@@ -1,13 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import ShareButton from "@/app/(public)/_components/ShareButton";
 import { Calendar, CheckCircle, User } from "lucide-react";
 import Image from "next/image";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import ShareButton from "@/app/(public)/_components/ShareButton";
 
 // ====== SERVER SIDE DATA FETCH ======
 async function getEvent(id: string) {
@@ -30,11 +30,12 @@ export async function generateMetadata({
   // Create plain text description from HTML content
   const plainDescription = event?.description?.replace(/<[^>]*>/g, "") || "";
 
-
   return {
     title: event.title,
+    description: plainDescription.slice(0, 160),
     openGraph: {
       title: event.title,
+      description: plainDescription.slice(0, 150),
       url: `https://bssaj.org/events/${params.id}`,
       images: [
         {
@@ -49,6 +50,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: event.title,
+      description: plainDescription.slice(0, 150),
       images: [event.cover_image || "/placeholder.png"],
     },
   };
