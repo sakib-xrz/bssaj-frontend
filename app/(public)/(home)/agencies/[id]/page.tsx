@@ -1,116 +1,144 @@
-"use client";
-
+// app/(public)/agencies/[id]/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
-
+import { Metadata } from "next";
 import Container from "@/components/shared/container";
 import {
   Calendar,
   Facebook,
   Globe,
-  Loader2,
   Mail,
   MapPin,
   Phone,
   User,
 } from "lucide-react";
+import ShareButton from "@/app/(public)/_components/ShareButton";
 
-import { useGetAgencyByIdQuery } from "@/redux/features/agency/agencyApi";
+// ====== SERVER SIDE DATA FETCH ======
+async function getAgency(id: string) {
+  const res = await fetch(`https://api.bssaj.org/api/v1/agencies/${id}`, {
+    next: { revalidate: 60 }, // cache for 1 minute (ISR)
+  });
 
-import deafultImage from "@/lib/image/deafultImage.jpg";
+  if (!res.ok) {
+    if (res.status === 404) {
+      return null;
+    }
+    throw new Error("Failed to fetch agency");
+  }
 
-export type Agency = {
-  id: string;
-  name: string;
-  logo: string | null;
-  cover_photo: string | null; // Added cover_photo field
-  category: string;
-  location: string;
-  description: string;
-  contact_email: string;
-  contact_phone: string;
-  website: string | null;
-  director_name: string | null;
-  established_year: number | null;
-  address: string | null;
-  facebook_url: string | null;
-  success_stories?: Array<{
-    id: string;
-    agency_id: string;
-    image: string;
-  }>;
-  successStoryImages?: string[];
-  status: "Approved" | "Pending";
+  const data = await res.json();
+  return data.data;
+}
 
-  profileLink?: string;
-  websiteLink?: string;
-};
+// ====== META TAGS (SEO + SOCIAL SHARE) ======
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const agency = await getAgency(params.id);
 
-export default function SingleAgencyProfilePage({
+  if (!agency) {
+    return {
+      title: "Agency Not Found",
+      description: "The agency profile you are looking for does not exist.",
+    };
+  }
+
+  return {
+    title: `${agency.name} - Agency Profile`,
+    description:
+      agency.description?.slice(0, 160) ||
+      `Learn more about ${agency.name}, a ${agency.category} agency based in ${agency.location}.`,
+    openGraph: {
+      title: `${agency.name} - Agency Profile`,
+      description:
+        agency.description?.slice(0, 160) ||
+        `Learn more about ${agency.name}, a ${agency.category} agency based in ${agency.location}.`,
+      url: `https://yourdomain.com/agencies/${params.id}`,
+      siteName: "Your Site Name",
+      images: [
+        {
+          url: agency.cover_photo || agency.logo || "/placeholder-og.jpg",
+          width: 1200,
+          height: 630,
+          alt: `${agency.name} - Agency Profile`,
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${agency.name} - Agency Profile`,
+      description:
+        agency.description?.slice(0, 160) ||
+        `Learn more about ${agency.name}, a ${agency.category} agency based in ${agency.location}.`,
+      images: [agency.cover_photo || agency.logo || "/placeholder-og.jpg"],
+      creator: "@yourtwitterhandle",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+// ====== LOADING COMPONENT ======
+function LoadingState() {
+  return (
+    <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
+      <div className="w-16 h-16 border-4 border-primary border-dashed rounded-full animate-spin mb-4"></div>
+      <p className="text-lg text-primary font-semibold">
+        Loading agency profile...
+      </p>
+    </Container>
+  );
+}
+
+// ====== ERROR COMPONENT ======
+function ErrorState({ message }: { message: string }) {
+  return (
+    <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
+      <p className="text-lg text-red-500">{message}</p>
+    </Container>
+  );
+}
+
+// ====== NOT FOUND COMPONENT ======
+function NotFoundState() {
+  return (
+    <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
+      <h2 className="text-2xl font-bold mb-4 text-gray-700">
+        Agency Not Found
+      </h2>
+      <p className="text-center text-gray-600">
+        The agency profile you are looking for does not exist.
+      </p>
+    </Container>
+  );
+}
+
+// ====== MAIN PAGE COMPONENT ======
+export default async function SingleAgencyProfilePage({
   params,
 }: {
   params: { id: string };
 }) {
-  const agencyId = params.id;
+  let agency;
 
-  const {
-    data: agencyData,
-    isLoading,
-    isError,
-    error,
-  } = useGetAgencyByIdQuery(agencyId);
-
-  const agency: Agency | undefined = agencyData?.data;
-
-  useEffect(() => {
-    if (agency) {
-      document.title = `${agency.name}'s Profile`;
-      console.log("Agency data:", agency);
-      console.log("Success stories (success_stories):", agency.success_stories);
-      console.log(
-        "Success stories (successStoryImages):",
-        agency.successStoryImages
-      );
-    } else {
-      document.title = "Agency Profile";
-    }
-  }, [agency]);
-
-  if (isLoading) {
+  try {
+    agency = await getAgency(params.id);
+  } catch (error) {
+    console.error("Error fetching agency:", error);
     return (
-      <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
-        <Loader2 className="w-16 h-16 border-4 border-primary border-dashed rounded-full animate-spin mb-4" />
-        <p className="text-lg text-primary font-semibold">
-          Loading agency profile...
-        </p>
-      </Container>
-    );
-  }
-
-  if (isError) {
-    console.error("Failed to fetch agency details:", error);
-    return (
-      <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
-        <p className="text-lg text-red-500">
-          Error loading agency details. Please try again later.
-        </p>
-      </Container>
+      <ErrorState message="Error loading agency details. Please try again later." />
     );
   }
 
   if (!agency) {
-    return (
-      <Container className="flex flex-col items-center justify-center min-h-[80vh] py-12 md:py-16 bg-gray-50">
-        <h2 className="text-2xl font-bold mb-4 text-gray-700">
-          Agency Not Found
-        </h2>
-        <p className="text-center text-gray-600">
-          The agency profile you are looking for does not exist.
-        </p>
-      </Container>
-    );
+    return <NotFoundState />;
   }
 
   return (
@@ -134,22 +162,27 @@ export default function SingleAgencyProfilePage({
         {agency.cover_photo && (
           <div className="absolute inset-0 bg-blue-900/70"></div>
         )}
-        <Container className="flex items-center relative z-10">
-          <div className="relative w-20 h-20 rounded-full overflow-hidden mr-4 flex-shrink-0">
-            <Image
-              src={agency.logo || deafultImage}
-              alt={`${agency.name} logo`}
-              width={80}
-              height={80}
-              className="object-cover"
-            />
+
+        <Container className="flex items-center justify-between relative z-10">
+          <div className="flex items-center">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden mr-4 flex-shrink-0 border-2 border-white">
+              <Image
+                src={agency.logo || "/placeholder.svg"}
+                alt={`${agency.name} logo`}
+                width={80}
+                height={80}
+                className="object-cover bg-white"
+              />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">{agency.name}</h1>
+              <p className="text-blue-200 text-lg">
+                {agency.category} • {agency.location}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold">{agency.name}</h1>
-            <p className="text-blue-200 text-lg">
-              {agency.category} • {agency.location}
-            </p>
-          </div>
+
+          {/* Share Button */}
         </Container>
       </div>
 
@@ -160,6 +193,7 @@ export default function SingleAgencyProfilePage({
               <CardTitle className="text-xl font-bold text-gray-900">
                 Contact Information
               </CardTitle>
+              <ShareButton />
             </CardHeader>
             <CardContent className="p-0 space-y-4">
               <div className="flex items-center gap-3">
@@ -237,7 +271,7 @@ export default function SingleAgencyProfilePage({
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="text-sm text-gray-600">Founder</div>
+                    <div className="text-sm text-gray-600">Director</div>
                     <div className="font-medium text-gray-800">
                       {agency.director_name}
                     </div>
@@ -248,9 +282,30 @@ export default function SingleAgencyProfilePage({
                 <div className="flex items-center gap-3">
                   <Calendar className="h-5 w-5 text-primary" />
                   <div>
-                    <div className="text-sm text-gray-600">Founded</div>
+                    <div className="text-sm text-gray-600">Established</div>
                     <div className="font-medium text-gray-800">
                       {agency.established_year}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {agency.status && (
+                <div className="flex items-center gap-3">
+                  <div className="h-5 w-5 flex items-center justify-center">
+                    <div
+                      className={`h-2 w-2 rounded-full ${
+                        agency.status === "APPROVED"
+                          ? "bg-green-500"
+                          : agency.status === "PENDING"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">Status</div>
+                    <div className="font-medium text-gray-800 capitalize">
+                      {agency.status.toLowerCase()}
                     </div>
                   </div>
                 </div>
@@ -276,44 +331,32 @@ export default function SingleAgencyProfilePage({
             </CardContent>
           </Card>
 
-          {(() => {
-            const successStories =
-              agency.success_stories || agency.successStoryImages || [];
-            const hasSuccessStories = successStories.length > 0;
-
-            if (!hasSuccessStories) return null;
-
-            return (
-              <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6">
-                <CardHeader className="p-0 mb-4">
-                  <CardTitle className="text-xl font-bold text-gray-900">
-                    Success Stories
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {successStories.map((story, index) => {
-                    const imgSrc =
-                      typeof story === "string" ? story : story.image;
-                    const key = typeof story === "string" ? index : story.id;
-
-                    return (
-                      <div
-                        key={key}
-                        className="relative w-full aspect-video rounded-lg overflow-hidden"
-                      >
-                        <Image
-                          src={imgSrc}
-                          alt={`Success Story ${index + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            );
-          })()}
+          {agency.success_stories && agency.success_stories.length > 0 && (
+            <Card className="rounded-xl shadow-lg border border-gray-200 bg-white p-6">
+              <CardHeader className="p-0 mb-4">
+                <CardTitle className="text-xl font-bold text-gray-900">
+                  Success Stories
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0 grid grid-cols-2 md:grid-cols-3 gap-4">
+                {agency.success_stories.map(
+                  (story: { id: string; image: string }) => (
+                    <div
+                      key={story.id}
+                      className="relative w-full aspect-video rounded-lg overflow-hidden"
+                    >
+                      <Image
+                        src={story.image}
+                        alt={`Success Story ${story.id}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </Container>
     </div>
