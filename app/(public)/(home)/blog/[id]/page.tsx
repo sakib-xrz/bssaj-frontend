@@ -26,11 +26,11 @@ export async function generateMetadata({
 
   return {
     title: blog.title,
-    description: blog?.excerpt || blog?.content?.slice(0, 150),
+    description: blog?.excerpt || "", // Keep for SEO but minimal
     openGraph: {
       title: blog.title,
-      description: blog?.excerpt || blog?.content?.slice(0, 150),
-      url: `https://api.bssaj.org/api/v1/blogs/${params.id}`,
+      description: "", // Empty description
+      url: `https://bssaj.org/blogs/${params.id}`, // Fixed URL
       images: [
         {
           url: blog.cover_image || "/placeholder.png",
@@ -44,7 +44,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: blog.title,
-      description: blog?.excerpt || blog?.content?.slice(0, 150),
+      description: "", // Empty description
       images: [blog.cover_image || "/placeholder.png"],
     },
   };

@@ -43,20 +43,13 @@ export async function generateMetadata({
   if (!agency) {
     return {
       title: "Agency Not Found",
-      description: "The agency profile you are looking for does not exist.",
     };
   }
 
   return {
     title: `${agency.name} - Agency Profile`,
-    description:
-      agency.description?.slice(0, 160) ||
-      `Learn more about ${agency.name}, a ${agency.category} agency based in ${agency.location}.`,
     openGraph: {
       title: `${agency.name} - Agency Profile`,
-      description:
-        agency.description?.slice(0, 160) ||
-        `Learn more about ${agency.name}, a ${agency.category} agency based in ${agency.location}.`,
       url: `https://yourdomain.com/agencies/${params.id}`,
       siteName: "Your Site Name",
       images: [
@@ -72,9 +65,6 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: `${agency.name} - Agency Profile`,
-      description:
-        agency.description?.slice(0, 160) ||
-        `Learn more about ${agency.name}, a ${agency.category} agency based in ${agency.location}.`,
       images: [agency.cover_photo || agency.logo || "/placeholder-og.jpg"],
       creator: "@yourtwitterhandle",
     },
